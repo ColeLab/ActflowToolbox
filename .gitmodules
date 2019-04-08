@@ -1,0 +1,3 @@
+[submodule "taku_repo/ColeAnticevicNetPartition"]
+	path = taku_repo/ColeAnticevicNetPartition
+	url = https://github.com/ColeLab/ColeAnticevicNetPartition.git
