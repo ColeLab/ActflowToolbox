@@ -14,11 +14,7 @@ dilateMM = 10
 partitiondir = 'ColeAnticevicNetPartition/'
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 
-surfacedir = labeldir + 'Q1-Q6_RelatedParcellation210/MNINonLinear/fsaverage_LR32k/'
-leftSurface = surfacedir + 'Q1-Q6_RelatedParcellation210.L.inflated_MSMAll_2_d41_WRN_DeDrift.32k_fs_LR.surf.gii'
-rightSurface = surfacedir + 'Q1-Q6_RelatedParcellation210.R.inflated_MSMAll_2_d41_WRN_DeDrift.32k_fs_LR.surf.gii'
-
-def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=True):
+def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=True,verbose=False):
     """
     This function computes multiple regression FC for a parcellation scheme
     Takes in vertex-wise data and generates a parcel X parcel FC matrix based on multiple linear regression
@@ -34,6 +30,7 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
     nparcels = 360
     parcel_arr = np.arange(nparcels)
     # Load dlabel file (cifti)
+    if verbose: print 'Loading in CIFTI dlabel file'
     dlabels = np.squeeze(nib.load(dlabelfile).get_data())
     # Find and sort unique parcels
     unique_parcels = np.sort(np.unique(dlabels))
@@ -44,19 +41,22 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
     fc_matrix = np.zeros((nparcels,nparcels))
 
     for parcel in unique_parcels:
+        if verbose: print 'Computing FC for target parcel', int(parcel)
+
         # Find where this parcel is in the unique parcel array
         parcel_ind = np.where(unique_parcels==parcel)[0]
         # Load in mask for target parcel
         if dilated_parcels:
-            parcel_mask = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(parcel) + '_dilated_10mm.dscalar.nii').get_data())
+            parcel_mask = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(int(parcel)) + '_dilated_10mm.dscalar.nii').get_data())
         else:
-            parcel_mask = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(parcel) + '.dscalar.nii').get_data())
+            parcel_mask = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
 
         # get all target ROI indices
-        target_ind = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(parcel) + '.dscalar.nii').get_data())
+        target_ind = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+        target_ind = np.asarray(target_ind,dtype=bool)
 
         # remove target parcel's mask from set of possible source vertices
-        mask_ind = np.where(parcel_mask=1.0)[0] # find mask indices
+        mask_ind = np.where(parcel_mask==1.0)[0] # find mask indices
         source_indices = dlabels.copy() # copy the original parcellation dlabel file
         source_indices[mask_ind] = 0 # modify original dlabel file to remove any vertices that are in the mask
 
@@ -68,7 +68,13 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
         i = 0
         for source in source_parcels:
             source_ind = np.where(source_indices==source)[0] # Find source parcel indices (from modified dlabel file)
-            source_parcel_ts[i,:] = np.mean(data[source_ind,:],axis=0) # compute averaged time series of source parcel
+            # If the entire parcel is excluded (i.e, the time series is all 0s, then skip computing the mean for this parcel)
+            if len(source_ind)==0:
+                i += 1
+                # Go to next source parcel
+                continue
+            
+            source_parcel_ts[i,:] = np.nanmean(data[source_ind,:],axis=0) # compute averaged time series of source parcel
             i += 1
 
         # compute averaged time series of TARGET
@@ -77,8 +83,8 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
         beta_fc, resid = regression.regression(target_parcel_ts,source_parcel_ts.T,alpha=0, constant=True) # increase alpha if want to apply a ridge penalty
 
         # Find matrix indices for all source parcels;
-        source_rows = source_parcels - 1 # subtract by 1 since source_parcels are organized from 1-360, and need to transform to python indices
-        target_col = parcel - 1 # subtract by 1 to fit to python indices
+        source_rows = np.asarray((source_parcels - 1),dtype=int) # subtract by 1 since source_parcels are organized from 1-360, and need to transform to python indices
+        target_col = int(parcel - 1) # subtract by 1 to fit to python indices
         fc_matrix[source_rows,target_col] = beta_fc[1:] # exclude 1st coef; first coef is beta_0 (or mean)
 
     return fc_matrix
