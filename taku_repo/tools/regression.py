@@ -44,4 +44,8 @@ def regression(data,regressors,alpha=0,constant=True):
     # Calculate residuals
     resid = data - (betas[0] + np.dot(X[:,1:],betas[1:]))
 
+    # remove 'imaginary portion'
+    betas = betas.real
+    resid = resid.real
+
     return betas, resid
