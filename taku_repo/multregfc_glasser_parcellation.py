@@ -1,8 +1,8 @@
 # Taku Ito
 # 4/8/2019
 
-# This script dilates individual parcels by x mm (default 10mm)
-# Purpose is to use this as a mask to exclude any vertices within 10mm of a parcel when estimaing FC via either ridge or multiple linear regression
+# This function computes multiple linear regression FC for parcel-to-parcel FC, while excluding vertices in the neighborhood of a given target parcel
+# Excludes all vertices within a 10mm dilated mask of the target parcel when computing parcel-to-parcel cortical FC.
 
 import numpy as np
 import nibabel as nib
