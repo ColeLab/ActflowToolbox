@@ -8,11 +8,13 @@ import numpy as np
 import nibabel as nib
 from tools import regression
 import os
+import pkg_resources
 
 dilateMM = 10
 
-partitiondir = 'ColeAnticevicNetPartition/'
-defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
+partitiondir = '/ColeAnticevicNetPartition/'
+defaultdlabelfile_path = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
+defaultdlabelfile = pkg_resources.resource_filename(__name__, defaultdlabelfile_path)
 
 def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=True,verbose=False):
     """
