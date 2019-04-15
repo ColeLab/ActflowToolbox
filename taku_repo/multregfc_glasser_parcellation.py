@@ -43,7 +43,7 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
     fc_matrix = np.zeros((nparcels,nparcels))
 
     for parcel in unique_parcels:
-        if verbose: print 'Computing FC for target parcel', int(parcel)
+        if verbose: print('Computing FC for target parcel', int(parcel))
 
         # Find where this parcel is in the unique parcel array
         parcel_ind = np.where(unique_parcels==parcel)[0]
