@@ -12,11 +12,11 @@ import pkg_resources
 
 dilateMM = 10
 
-partitiondir = '/ColeAnticevicNetPartition/'
-defaultdlabelfile_path = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
-defaultdlabelfile = pkg_resources.resource_filename(__name__, defaultdlabelfile_path)
+defaulttoolboxpath='/projects/f_mc1689_1/AnalysisTools/ActflowToolbox/taku_repo/'
+partitiondir = 'ColeAnticevicNetPartition/'
+defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 
-def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=True,verbose=False):
+def compute_parcellation_fc(data, toolboxpath=defaulttoolboxpath, dlabelfile=defaultdlabelfile, dilated_parcels=True,verbose=False):
     """
     This function computes multiple regression FC for a parcellation scheme
     Takes in vertex-wise data and generates a parcel X parcel FC matrix based on multiple linear regression
@@ -33,7 +33,7 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
     parcel_arr = np.arange(nparcels)
     # Load dlabel file (cifti)
     if verbose: print('Loading in CIFTI dlabel file')
-    dlabels = np.squeeze(nib.load(dlabelfile).get_data())
+    dlabels = np.squeeze(nib.load(defaulttoolboxpath+dlabelfile).get_data())
     # Find and sort unique parcels
     unique_parcels = np.sort(np.unique(dlabels))
     # Only include cortex
@@ -49,12 +49,12 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
         parcel_ind = np.where(unique_parcels==parcel)[0]
         # Load in mask for target parcel
         if dilated_parcels:
-            parcel_mask = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(int(parcel)) + '_dilated_10mm.dscalar.nii').get_data())
+            parcel_mask = np.squeeze(nib.load(defaulttoolboxpath+'surfaceMasks/GlasserParcel' + str(int(parcel)) + '_dilated_10mm.dscalar.nii').get_data())
         else:
-            parcel_mask = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+            parcel_mask = np.squeeze(nib.load(defaulttoolboxpath+'surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
 
         # get all target ROI indices
-        target_ind = np.squeeze(nib.load('surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+        target_ind = np.squeeze(nib.load(defaulttoolboxpath+'surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
         target_ind = np.asarray(target_ind,dtype=bool)
 
         # remove target parcel's mask from set of possible source vertices
