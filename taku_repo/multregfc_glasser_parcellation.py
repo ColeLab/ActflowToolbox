@@ -20,7 +20,7 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
     """
     This function computes multiple regression FC for a parcellation scheme
     Takes in vertex-wise data and generates a parcel X parcel FC matrix based on multiple linear regression
-    Currently only works for cortex FC 
+    Currently only works for cortex FC
     PARAMETERS:
         data            :       vertex-wise data... vertices x time; default assumes that data is 96k dense array
         dlabelfile      :       parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
@@ -32,7 +32,7 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
     nparcels = 360
     parcel_arr = np.arange(nparcels)
     # Load dlabel file (cifti)
-    if verbose: print 'Loading in CIFTI dlabel file'
+    if verbose: print('Loading in CIFTI dlabel file')
     dlabels = np.squeeze(nib.load(dlabelfile).get_data())
     # Find and sort unique parcels
     unique_parcels = np.sort(np.unique(dlabels))
@@ -75,7 +75,7 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
                 i += 1
                 # Go to next source parcel
                 continue
-            
+
             source_parcel_ts[i,:] = np.nanmean(data[source_ind,:],axis=0) # compute averaged time series of source parcel
             i += 1
 
@@ -90,17 +90,3 @@ def compute_parcellation_fc(data, dlabelfile=defaultdlabelfile, dilated_parcels=
         fc_matrix[source_rows,target_col] = beta_fc[1:] # exclude 1st coef; first coef is beta_0 (or mean)
 
     return fc_matrix
-
-
-        
-
-
-
-
-
-     
-
-
-
-
-
