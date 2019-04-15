@@ -35,10 +35,7 @@ def regression(data,regressors,alpha=0,constant=True):
     LAMBDA = np.identity(X.shape[1])*alpha
 
     # Least squares minimization
-    try:
-        C_ss_inv = np.linalg.pinv(np.dot(X.T,X) + LAMBDA)
-    except np.linalg.LinAlgError as err:
-        C_ss_inv = np.linalg.pinv(np.cov(X.T) + LAMBDA)
+    C_ss_inv = np.linalg.pinv(np.cov(X.T) + LAMBDA)
     
     betas = np.dot(C_ss_inv,np.dot(X.T,data))
     # Calculate residuals
