@@ -13,7 +13,7 @@ import pkg_resources
 dilateMM = 10
 
 defaulttoolboxpath='/projects/f_mc1689_1/AnalysisTools/ActflowToolbox/taku_repo/'
-partitiondir = 'ColeAnticevicNetPartition/'
+partitiondir = defaulttoolboxpath+'ColeAnticevicNetPartition/'
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 
 def compute_parcellation_fc(data, toolboxpath=defaulttoolboxpath, dlabelfile=defaultdlabelfile, dilated_parcels=True,verbose=False):
@@ -33,7 +33,7 @@ def compute_parcellation_fc(data, toolboxpath=defaulttoolboxpath, dlabelfile=def
     parcel_arr = np.arange(nparcels)
     # Load dlabel file (cifti)
     if verbose: print('Loading in CIFTI dlabel file')
-    dlabels = np.squeeze(nib.load(defaulttoolboxpath+dlabelfile).get_data())
+    dlabels = np.squeeze(nib.load(dlabelfile).get_data())
     # Find and sort unique parcels
     unique_parcels = np.sort(np.unique(dlabels))
     # Only include cortex
