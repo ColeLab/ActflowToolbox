@@ -13,7 +13,7 @@ Other included methods that can be used along with activity flow mapping (or not
 ### Included connectivity mapping methods
 * Resting-state functional connectivity (correlation and multiple regression)
 * Task-state functional connectivity (correlation and multiple regression)
-	* With mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf)
+	* With flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf)
 
 ## Development guidelines
 * Primary language: Python 3
