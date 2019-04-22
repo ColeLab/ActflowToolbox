@@ -1,4 +1,4 @@
-# Compute principle component regression functional connectivity 
+# Compute principle component regression functional connectivity
 
 import numpy as np
 import os
@@ -40,30 +40,6 @@ def pcaFC(stim,resp,n_components=500,nproc=10):
 
     return fc_mat,components
 
-
-def multregressionconnectivity(activityMatrix):
-    """
-    Activity matrix should be region/voxel X time
-    Assumes all time series are de-meaned
-    """
-
-    nregions = activityMatrix.shape[0]
-    timepoints = activityMatrix.shape[1]
-    if nregions > timepoints:
-         raise Exception('More regions (regressors) than timepoints! Use regularized regression')
-
-    interaction_mat = np.zeros((nregions,nregions))
-
-    for targetregion in range(nregions):
-        otherregions = range(nregions)
-        otherregions = np.delete(otherregions, targetregion) # Delete target region from 'other regions'
-        X = activityMatrix[otherregions,:].T
-        # Add 'constant' regressor
-        y = activityMatrix[targetregion,:]
-        betas, resid = regression(y,X,constant=True)
-        interaction_mat[otherregions, targetregion] = betas[1:] # all betas except for constant betas
-
-    return interaction_mat
 
 def regression(data,regressors,alpha=0,constant=True):
     """
