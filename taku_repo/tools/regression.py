@@ -35,7 +35,7 @@ def regression(data,regressors,alpha=0,constant=True):
     LAMBDA = np.identity(X.shape[1])*alpha
 
     # Least squares minimization
-    C_ss_inv = np.linalg.pinv(np.cov(X.T) + LAMBDA)
+    C_ss_inv = np.linalg.pinv(np.matmul(X.T,X) + LAMBDA)
     
     betas = np.dot(C_ss_inv,np.dot(X.T,data))
     # Calculate residuals
