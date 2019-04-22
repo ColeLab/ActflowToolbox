@@ -29,7 +29,7 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 
 ## Conventions
 * Data matrices all node X time
-* Directed connectivity matrices all source X target
+* Directed connectivity matrices all target X source
 * Primary (default) brain parcellation: CAB-NP (https://github.com/ColeLab/ColeAnticevicNetPartition), which uses the Glasser2016 parcellation for cortex (https://balsa.wustl.edu/study/show/RVVG)
 
 ## Software development guidelines
@@ -43,8 +43,8 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 
 ## Contents
 * _Directory_: actflowcalc - Calculating activity flow mapping
-	* parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation). This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within 10 mm of each to-be-predicted parcel.
 * _Directory_: connectivity_estimation - Connectivity estimation methods
+	* calcconn_parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation). This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within 10 mm of each to-be-predicted parcel.
 * _Directory_: dependencies - Other packages Actflow Toolbox depends on
 * _Directory_: infotransfermapping - Calculating information transfer mapping
 * _Directory_: matlab_code - Limited functions for activity flow mapping in MATLAB

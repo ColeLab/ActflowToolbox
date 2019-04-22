@@ -25,7 +25,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
         dlabelfile      :       parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
     RETURNS:
-        fc_matrix       :       Region X Region FC Matrix. Sources-to-target mappings are organized as rows (sources) to each column (target)
+        fc_matrix       :       Target X Source FC Matrix. Sources-to-target mappings are organized as rows (targets) from each column (source)
     """
 
     nparcels = 360
@@ -83,6 +83,6 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
 
 		if connmethod == 'multreg'
         	# run multiple regression, and add constant
-			fc_matrix[source_rows,target_col] = multregressionconnectivity(source_parcel_ts,target_parcel_ts)
+			fc_matrix[target_col,source_rows] = multregressionconnectivity(source_parcel_ts,target_parcel_ts)
 
     return fc_matrix

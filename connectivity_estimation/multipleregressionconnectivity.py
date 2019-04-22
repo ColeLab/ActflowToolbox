@@ -5,7 +5,7 @@ def multregressionconnectivity(activity_matrix, target_ts):
     """
     activity_matrix:	Activity matrix should be nodes X time
 	target_ts: 			Optional, used when only a single target time series (returns 1 X nnodes matrix)
-	Output: connectivity_mat, formatted sources X targets
+	Output: connectivity_mat, formatted targets X sources
     """
 
     nnodes = activity_matrix.shape[0]
@@ -22,7 +22,7 @@ def multregressionconnectivity(activity_matrix, target_ts):
 	        y = activity_matrix[targetnode,:]
 			#Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
 			reg = LinearRegression().fit(X, y)
-			connectivity_mat[otherNodes,nodeNum]=reg.coef_
+			connectivity_mat[nodeNum,otherNodes]=reg.coef_
 	else:
 		#Computing values for a single target node
 		connectivity_mat = np.zeros((nnodes,1))
