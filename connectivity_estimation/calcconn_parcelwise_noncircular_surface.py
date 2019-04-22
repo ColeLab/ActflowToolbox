@@ -1,27 +1,27 @@
 
-# This function computes multiple linear regression FC for parcel-to-parcel FC, while excluding vertices in the neighborhood of a given target parcel
+# This function computes FC for parcel-to-parcel FC, while excluding vertices in the neighborhood of a given target parcel
 # Excludes all vertices within a 10mm dilated mask of the target parcel when computing parcel-to-parcel cortical FC.
 
 import numpy as np
 import nibabel as nib
-#from tools import regression
-from sklearn.linear_model import LinearRegression
 import os
 import pkg_resources
 
 dilateMM = 10
 
-defaulttoolboxpath='/projects/f_mc1689_1/AnalysisTools/ActflowToolbox/taku_repo/'
-partitiondir = defaulttoolboxpath+'ColeAnticevicNetPartition/'
+defaulttoolboxpath='/projects/f_mc1689_1/AnalysisTools/ActflowToolbox/'
+partitiondir = defaulttoolboxpath+'dependencies/ColeAnticevicNetPartition/'
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
+dilatedmaskdir = defaulttoolboxpath + 'network_definitions/Glasser2016/surfaceMasks/'
 
-def compute_parcellation_fc(data, toolboxpath=defaulttoolboxpath, dlabelfile=defaultdlabelfile, dilated_parcels=True,verbose=False):
+def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxpath=defaulttoolboxpath, dlabelfile=defaultdlabelfile, dilated_parcels=True,verbose=False):
     """
     This function computes multiple regression FC for a parcellation scheme
     Takes in vertex-wise data and generates a parcel X parcel FC matrix based on multiple linear regression
     Currently only works for cortex FC
     PARAMETERS:
         data            :       vertex-wise data... vertices x time; default assumes that data is 96k dense array
+		connmethod		:		a string indicating what connectivity method to use. Options: 'multreg' (default), 'pcreg'
         dlabelfile      :       parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
     RETURNS:
@@ -48,12 +48,12 @@ def compute_parcellation_fc(data, toolboxpath=defaulttoolboxpath, dlabelfile=def
         parcel_ind = np.where(unique_parcels==parcel)[0]
         # Load in mask for target parcel
         if dilated_parcels:
-            parcel_mask = np.squeeze(nib.load(defaulttoolboxpath+'surfaceMasks/GlasserParcel' + str(int(parcel)) + '_dilated_10mm.dscalar.nii').get_data())
+            parcel_mask = np.squeeze(nib.load(dilatedmaskdir+'GlasserParcel' + str(int(parcel)) + '_dilated_10mm.dscalar.nii').get_data())
         else:
-            parcel_mask = np.squeeze(nib.load(defaulttoolboxpath+'surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+            parcel_mask = np.squeeze(nib.load(dilatedmaskdir+'GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
 
         # get all target ROI indices
-        target_ind = np.squeeze(nib.load(defaulttoolboxpath+'surfaceMasks/GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+        target_ind = np.squeeze(nib.load(dilatedmaskdir+'GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
         target_ind = np.asarray(target_ind,dtype=bool)
 
         # remove target parcel's mask from set of possible source vertices
@@ -80,12 +80,9 @@ def compute_parcellation_fc(data, toolboxpath=defaulttoolboxpath, dlabelfile=def
 
         # compute averaged time series of TARGET
         target_parcel_ts = np.mean(data[target_ind,:],axis=0)
-        # run multiple regression, and add constant
-        beta_fc, resid = regression.regression(target_parcel_ts,source_parcel_ts.T,alpha=0, constant=True) # increase alpha if want to apply a ridge penalty
 
-        # Find matrix indices for all source parcels;
-        source_rows = np.asarray((source_parcels - 1),dtype=int) # subtract by 1 since source_parcels are organized from 1-360, and need to transform to python indices
-        target_col = int(parcel - 1) # subtract by 1 to fit to python indices
-        fc_matrix[source_rows,target_col] = beta_fc[1:] # exclude 1st coef; first coef is beta_0 (or mean)
+		if connmethod == 'multreg'
+        	# run multiple regression, and add constant
+			fc_matrix[source_rows,target_col] = multregressionconnectivity(source_parcel_ts,target_parcel_ts)
 
     return fc_matrix
