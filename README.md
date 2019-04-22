@@ -6,10 +6,6 @@ The purpose of this software package is to facilitate use of neuroscience method
 
 Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation are also included. The primary focus is on fMRI data, but in principle these approaches can be applied to other kinds of data.
 
-## How to install
-
-git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
-
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
 * Information transfer mapping (http://rdcu.be/wQ1M)
@@ -26,6 +22,10 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 * Special preprocessing for task-state functional connectivity
 	* Flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf)
 * Causal connectivity (fGES; https://doi.org/10.1007/s41060-016-0032-z)
+
+## How to install
+
+git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 
 ## Conventions
 * Data matrices all node X time
