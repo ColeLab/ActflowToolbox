@@ -2,24 +2,24 @@
 from sklearn.linear_model import LinearRegression
 
 def multregressionconnectivity(activity_matrix, target_ts):
-    """
-    activity_matrix:	Activity matrix should be nodes X time
+	"""
+	activity_matrix:	Activity matrix should be nodes X time
 	target_ts: 			Optional, used when only a single target time series (returns 1 X nnodes matrix)
 	Output: connectivity_mat, formatted targets X sources
-    """
+	"""
 
-    nnodes = activity_matrix.shape[0]
-    timepoints = activity_matrix.shape[1]
-    if nnodes > timepoints:
-         raise Exception('More nodes (regressors) than timepoints! Use regularized regression')
-
+	nnodes = activity_matrix.shape[0]
+	timepoints = activity_matrix.shape[1]
+	if nnodes > timepoints:
+		 raise Exception('More nodes (regressors) than timepoints! Use regularized regression')
+	
 	if target_ts is None:
 		connectivity_mat = np.zeros((nnodes,nnodes))
-	    for targetnode in range(nnodes):
-	        othernodes = range(nnodes)
-	        othernodes.remove(targetnode) # Remove target node from 'other nodes'
-	        X = activity_matrix[othernodes,:].T
-	        y = activity_matrix[targetnode,:]
+		for targetnode in range(nnodes):
+			othernodes = range(nnodes)
+			othernodes.remove(targetnode) # Remove target node from 'other nodes'
+			X = activity_matrix[othernodes,:].T
+			y = activity_matrix[targetnode,:]
 			#Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
 			reg = LinearRegression().fit(X, y)
 			connectivity_mat[nodeNum,otherNodes]=reg.coef_
@@ -32,4 +32,4 @@ def multregressionconnectivity(activity_matrix, target_ts):
 		reg = LinearRegression().fit(X, y)
 		connectivity_mat=reg.coef_
 
-    return connectivity_mat
+	return connectivity_mat
