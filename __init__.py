@@ -6,7 +6,7 @@
 #    _module = loader.find_module(module_name).load_module(module_name)
 #    globals()[module_name] = _module
 
-from . import actflowcomp
+from .actflowcomp import *
 from . import connectivity_estimation
 from . import dependencies
 from . import infotransfermapping
