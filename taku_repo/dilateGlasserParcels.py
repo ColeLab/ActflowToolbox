@@ -25,7 +25,7 @@ if execute == 1:
     glasser = np.squeeze(nib.load(dlabelfile).get_data())
 
     for parcel in range(1,nParcels+1):
-        print 'Dilating parcel', parcel
+        print('Dilating parcel', parcel)
 
         parcel_array = np.zeros(glasser.shape)
         # Find all vertices that don't correspond to this ROI`

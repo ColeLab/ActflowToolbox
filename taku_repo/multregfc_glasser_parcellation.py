@@ -4,9 +4,12 @@
 # This function computes multiple linear regression FC for parcel-to-parcel FC, while excluding vertices in the neighborhood of a given target parcel
 # Excludes all vertices within a 10mm dilated mask of the target parcel when computing parcel-to-parcel cortical FC.
 
+import sys
+sys.path.append("..")
+
 import numpy as np
 import nibabel as nib
-from tools import regression
+from ActflowToolbox.tools import regression
 import os
 import pkg_resources
 
