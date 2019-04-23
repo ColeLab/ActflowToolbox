@@ -81,7 +81,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
         # compute averaged time series of TARGET
         target_parcel_ts = np.mean(data[target_ind,:],axis=0)
 
-		if connmethod == 'multreg'
+		if connmethod == 'multreg':
         	# run multiple regression, and add constant
 			fc_matrix[target_col,source_rows] = multregressionconnectivity(source_parcel_ts,target_parcel_ts)
 
