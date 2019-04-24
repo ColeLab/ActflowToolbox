@@ -82,6 +82,10 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
 		# compute averaged time series of TARGET
 		target_parcel_ts = np.mean(np.real(data[target_ind,:]),axis=0)
 
+		# Find matrix indices for all source parcels
+		source_rows = np.asarray((source_parcels - 1),dtype=int) # subtract by 1 since source_parcels are organized from 1-360, and need to transform to python indices
+        target_col = int(parcel - 1) # subtract by 1 to fit to python indices
+
 		if connmethod == 'multreg':
 			# run multiple regression, and add constant
 			fc_matrix[target_col,source_rows] = multregconn(source_parcel_ts,target_parcel_ts)
