@@ -33,8 +33,9 @@ def multregconn(activity_matrix, target_ts=None):
 		#Computing values for a single target node
 		connectivity_mat = np.zeros((nnodes,1))
 		X = activity_matrix.T
-		y = np.zeros((1,np.shape(target_ts)[0]))
-		y[0,:] = target_ts
+		#y = np.zeros((1,np.shape(target_ts)[0]))
+		#y[0,:] = target_ts
+		y = target_ts
 		print(np.shape(y))
 		#Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
 		#reg = LinearRegression().fit(X, y)
