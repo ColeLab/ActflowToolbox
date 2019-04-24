@@ -20,7 +20,7 @@ def multregconn(activity_matrix, target_ts):
 		for targetnode in range(nnodes):
 			othernodes = range(nnodes)
 			othernodes.remove(targetnode) # Remove target node from 'other nodes'
-			X = activity_matrix[othernodes,:]
+			X = activity_matrix[othernodes,:].T
 			y = activity_matrix[targetnode,:]
 			#Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
 			#reg = LinearRegression().fit(X, y)
@@ -31,13 +31,14 @@ def multregconn(activity_matrix, target_ts):
 	else:
 		#Computing values for a single target node
 		connectivity_mat = np.zeros((nnodes,1))
-		X = activity_matrix
-		y = target_ts
+		X = activity_matrix[:,0:4781].T
+		y = np.zeros((1,np.shape(target_ts)[0]))
+		y[0,:] = target_ts
 		#Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
 		#reg = LinearRegression().fit(X, y)
 		#connectivity_mat=reg.coef_
 		# run multiple regression, and add constant
-		beta_fc = regression.regression(y,X,alpha=0, constant=True) # increase alpha if want to apply a ridge penalty
+		beta_fc = regression.regression(y,X.T,alpha=0, constant=True) # increase alpha if want to apply a ridge penalty
 		connectivity_mat = beta_fc[1:] # exclude 1st coef; first coef is beta_0 (or mean)
 
 	return connectivity_mat
