@@ -3,7 +3,7 @@
 from ..tools import regression
 import numpy as np
 
-def multregconn(activity_matrix, target_ts):
+def multregconn(activity_matrix, target_ts=None):
 	"""
 	activity_matrix:	Activity matrix should be nodes X time
 	target_ts: 			Optional, used when only a single target time series (returns 1 X nnodes matrix)
