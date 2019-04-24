@@ -18,7 +18,7 @@ def multregconn(activity_matrix, target_ts=None):
 	if target_ts is None:
 		connectivity_mat = np.zeros((nnodes,nnodes))
 		for targetnode in range(nnodes):
-			othernodes = range(nnodes)
+			othernodes = list(range(nnodes))
 			othernodes.remove(targetnode) # Remove target node from 'other nodes'
 			X = activity_matrix[othernodes,:].T
 			y = activity_matrix[targetnode,:]
