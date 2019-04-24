@@ -6,6 +6,7 @@ import numpy as np
 import nibabel as nib
 import os
 import pkg_resources
+from .multregconn import *
 
 dilateMM = 10
 
@@ -83,6 +84,6 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
 
 		if connmethod == 'multreg':
 			# run multiple regression, and add constant
-			fc_matrix[target_col,source_rows] = multregressionconnectivity(source_parcel_ts,target_parcel_ts)
+			fc_matrix[target_col,source_rows] = multregconn(source_parcel_ts,target_parcel_ts)
 
 	return fc_matrix
