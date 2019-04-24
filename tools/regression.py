@@ -49,6 +49,7 @@ def regression(data,regressors,alpha=0,constant=True,betasonly=False,residualson
 
     if betasonly and residualsonly:
         print('Incorrect options... returning both beta coefs and residuals')
+        return betas, resid
     if residualsonly:
         return resid
     if betasonly:
