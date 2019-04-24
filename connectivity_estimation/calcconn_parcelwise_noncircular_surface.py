@@ -76,11 +76,11 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
 				# Go to next source parcel
 				continue
 
-			source_parcel_ts[i,:] = np.nanmean(data[source_ind,:],axis=0) # compute averaged time series of source parcel
+			source_parcel_ts[i,:] = np.nanmean(real(data[source_ind,:]),axis=0) # compute averaged time series of source parcel
 			i += 1
 
 		# compute averaged time series of TARGET
-		target_parcel_ts = np.mean(data[target_ind,:],axis=0)
+		target_parcel_ts = np.mean(real(data[target_ind,:]),axis=0)
 
 		if connmethod == 'multreg':
 			# run multiple regression, and add constant
