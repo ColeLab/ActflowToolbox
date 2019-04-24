@@ -1,7 +1,7 @@
 
 from sklearn.linear_model import LinearRegression
 
-def multregressionconnectivity(activity_matrix, target_ts):
+def multregconn(activity_matrix, target_ts):
 	"""
 	activity_matrix:	Activity matrix should be nodes X time
 	target_ts: 			Optional, used when only a single target time series (returns 1 X nnodes matrix)
