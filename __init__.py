@@ -1,11 +1,5 @@
-#import pkgutil
 
-#__all__ = []
-#for loader, module_name, is_pkg in  pkgutil.walk_packages(__path__):
-#    __all__.append(module_name)
-#    _module = loader.find_module(module_name).load_module(module_name)
-#    globals()[module_name] = _module
-
+from . import actflowcomp
 from .actflowcomp import *
 from . import connectivity_estimation
 from . import dependencies
@@ -14,3 +8,7 @@ from . import pipelines
 from . import preprocessing
 from . import simulations
 from . import tools
+
+__all__ = []
+__all__.append('actflowcomp')
+__all__.append('connectivity_estimation')

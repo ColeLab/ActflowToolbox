@@ -2,6 +2,7 @@
 
 import numpy as np
 from scipy import stats
+from .actflowcalc import *
 
 def actflowtest(actVect_group, fcMat_group):
     if len(np.shape(actVect_group)) < 3:
