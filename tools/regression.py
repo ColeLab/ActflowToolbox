@@ -38,6 +38,9 @@ def regression(data,regressors,alpha=0,constant=True,betasonly=False,residualson
 
     # Least squares minimization
     C_ss_inv = np.linalg.pinv(np.dot(X.T,X) + LAMBDA)
+
+    # If data is a 1d array, squeeze it
+    data = np.squeeze(data)
     
     betas = np.dot(C_ss_inv,np.dot(X.T,data))
     # Calculate residuals
