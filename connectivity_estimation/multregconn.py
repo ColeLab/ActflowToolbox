@@ -1,5 +1,6 @@
 
 from sklearn.linear_model import LinearRegression
+import numpy as np
 
 def multregconn(activity_matrix, target_ts):
 	"""
