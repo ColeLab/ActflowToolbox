@@ -27,7 +27,7 @@ def multregconn(activity_matrix, target_ts=None):
 			#connectivity_mat[nodeNum,otherNodes]=reg.coef_
 			# run multiple regression, and add constant
 			beta_fc = regression.regression(y,X,alpha=0, constant=True) # increase alpha if want to apply a ridge penalty
-			connectivity_mat[targetnode,otherNodes] = beta_fc[1:] # exclude 1st coef; first coef is beta_0 (or mean)
+			connectivity_mat[targetnode,othernodes] = beta_fc[1:] # exclude 1st coef; first coef is beta_0 (or mean)
 	else:
 		#Computing values for a single target node
 		connectivity_mat = np.zeros((nnodes,1))
