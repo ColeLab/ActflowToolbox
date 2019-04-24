@@ -6,7 +6,7 @@
 
 import numpy as np
 
-def regression(data,regressors,alpha=0,constant=True):
+def regression(data,regressors,alpha=0,constant=True,betasonly=False,residualsonly=False):
     """
     Taku Ito
     2/21/2019
@@ -20,6 +20,8 @@ def regression(data,regressors,alpha=0,constant=True):
         regressors = observation x feature matrix
         alpha = regularization term. 0 for regular multiple regression. >0 for ridge penalty
         constant = True/False - pad regressors with 1s?
+        betasonly = True/False - return beta coefs only
+        residualsonly = True/False - return resiudals only
 
     OUTPUT
         betas = coefficients X n target variables
@@ -44,5 +46,13 @@ def regression(data,regressors,alpha=0,constant=True):
     # remove 'imaginary portion'
     betas = betas.real
     resid = resid.real
+
+    if betasonly and residualsonly:
+        print('Incorrect options... returning both beta coefs and residuals')
+        return betas, resid
+    if residualsonly:
+        return resid
+    if betasonly:
+        return betas
 
     return betas, resid
