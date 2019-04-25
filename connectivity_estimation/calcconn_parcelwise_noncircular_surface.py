@@ -67,17 +67,33 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
 
 		# Now compute mean time series of each ROI using modified dlabel file after removing target parcel's mask (ie source_indices)
 		source_parcel_ts = np.zeros((len(source_parcels),data.shape[1])) # source regions X time matrix
+                ## TAKU EDIT 
+                empty_source_row = [] # empty array to keep track of the row index of any sources that might be excluced
+                empty_source_parcel = [] # empty array to keep track of the actual parce number to be excluded
+                ## END EDIT
 		i = 0
 		for source in source_parcels:
 			source_ind = np.where(source_indices==source)[0] # Find source parcel indices (from modified dlabel file)
 			# If the entire parcel is excluded (i.e, the time series is all 0s, then skip computing the mean for this parcel)
 			if len(source_ind)==0:
+                                ## TAKU EDIT
+                                empty_source_row.append(i) # if this source is empty, remember its row (to delete it from the regressor matrix later)
+                                empty_source_parcel.append(source) # keep track of which parcel number this is
+                                ## END EDIT
 				i += 1
 				# Go to next source parcel
 				continue
 
 			source_parcel_ts[i,:] = np.nanmean(np.real(data[source_ind,:]),axis=0) # compute averaged time series of source parcel
 			i += 1
+
+                ## TAKU EDIT
+                # Delete source regions that have been entirely excluded from the source_parcels due to the dilation
+                empty_source = np.asarray(empty_source)
+                if len(empty_source_row)>0:
+                    source_parcel_ts = np.delete(data,empty_source_row,axis=0) # delete all ROIs with all 0s from regressor matrix
+                    source_parcels = np.delete(source_parcels,empty_source_parcel,axis=0) # Delete the 0-variance ROI from the list of sources
+                ## END EDIT
 
 		# compute averaged time series of TARGET
 		target_parcel_ts = np.mean(np.real(data[target_ind,:]),axis=0)
