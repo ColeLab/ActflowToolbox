@@ -68,9 +68,9 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
         # Now compute mean time series of each ROI using modified dlabel file after removing target parcel's mask (ie source_indices)
         source_parcel_ts = np.zeros((len(source_parcels),data.shape[1])) # source regions X time matrix
         ## TAKU EDIT
-            empty_source_row = [] # empty array to keep track of the row index of any sources that might be excluced
-            empty_source_parcel = [] # empty array to keep track of the actual parce number to be excluded
-            ## END EDIT
+        empty_source_row = [] # empty array to keep track of the row index of any sources that might be excluced
+        empty_source_parcel = [] # empty array to keep track of the actual parce number to be excluded
+        ## END EDIT
         i = 0
         for source in source_parcels:
             source_ind = np.where(source_indices==source)[0] # Find source parcel indices (from modified dlabel file)
