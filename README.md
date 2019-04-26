@@ -37,7 +37,8 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 * Secondary language (for select functions, minimally maintained/updated): MATLAB
 * Versioning guidelines: Semantic Versioning 2.0.0 (https://semver.org/); used loosely prior to v1.0, strictly after
 * Style specifications:
-	* Tabs for indentations (benefit: less chance for errors, e.g., 3 spaces instead of 4 for indentation)
+	* PEP8 style as general guidelines (loosely applied for now): https://www.python.org/dev/peps/pep-0008/
+	* Soft tabs (4 spaces) for indentations
 	* Use intuitive variable and function names
 	* Add detailed comments to explain what code does (especially when not obvious)
 
