@@ -89,7 +89,6 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
 
             ## TAKU EDIT
             # Delete source regions that have been entirely excluded from the source_parcels due to the dilation
-            empty_source = np.asarray(empty_source)
             if len(empty_source_row)>0:
                 source_parcel_ts = np.delete(data,empty_source_row,axis=0) # delete all ROIs with all 0s from regressor matrix
                 source_parcels = np.delete(source_parcels,empty_source_parcel,axis=0) # Delete the 0-variance ROI from the list of sources
