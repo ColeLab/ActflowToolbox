@@ -103,6 +103,8 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
 
         if connmethod == 'multreg':
             # run multiple regression, and add constant
+            print('source_parcel_ts',np.shape(source_parcel_ts))
+            print('target_parcel_ts',np.shape(target_parcel_ts))
             fc_matrix[target_row,source_cols] = multregconn(source_parcel_ts,target_parcel_ts)
 
     return fc_matrix
