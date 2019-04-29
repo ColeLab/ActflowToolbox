@@ -81,12 +81,10 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
             source_parcel_ts[i,:] = np.nanmean(np.real(data[source_ind,:]),axis=0) # compute averaged time series of source parcel
             i += 1
 
-        ## TAKU EDIT
         # Delete source regions that have been entirely excluded from the source_parcels due to the dilation
         if len(empty_source_row)>0:
             source_parcel_ts = np.delete(source_parcel_ts,empty_source_row,axis=0) # delete all ROIs with all 0s from regressor matrix
             source_parcels = np.delete(source_parcels,empty_source_row,axis=0) # Delete the 0-variance ROI from the list of sources
-        ## END EDIT
 
         # compute averaged time series of TARGET
         target_parcel_ts = np.mean(np.real(data[target_ind,:]),axis=0)
