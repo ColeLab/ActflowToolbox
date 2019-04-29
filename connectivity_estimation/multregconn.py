@@ -13,7 +13,8 @@ def multregconn(activity_matrix, target_ts=None):
 	nnodes = activity_matrix.shape[0]
 	timepoints = activity_matrix.shape[1]
 	if nnodes > timepoints:
-		 raise Exception('More nodes (regressors) than timepoints! Use regularized regression')
+        print('activity_matrix shape: ',np.shape(activity_matrix))
+		raise Exception('More nodes (regressors) than timepoints! Use regularized regression')
 
 	if target_ts is None:
 		connectivity_mat = np.zeros((nnodes,nnodes))
