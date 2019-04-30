@@ -7,6 +7,7 @@ import nibabel as nib
 import os
 import pkg_resources
 from .multregconn import *
+from .corrcoefconn import *
 
 dilateMM = 10
 
@@ -96,5 +97,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
         if connmethod == 'multreg':
             # run multiple regression, and add constant
             fc_matrix[target_row,source_cols] = multregconn(source_parcel_ts,target_parcel_ts)
+        else if connmethod == 'pearsoncorr':
+            fc_matrix[target_row,source_cols] = corrcoefconn(source_parcel_ts,target_parcel_ts)
 
     return fc_matrix
