@@ -20,11 +20,9 @@ def corrcoefconn(activity_matrix, target_ts=None):
     else:
         #Computing values for a single target node
         connectivity_mat = np.zeros((nnodes,1))
-        X = activity_matrix.T
-        y = target_ts
 
         #Compute correlation for each pair
         for source_node in range(nnodes):
-            connectivity_mat[source_node,:] = np.corrcoef(X[source_node,:],y)[0,1]
+            connectivity_mat[source_node,:] = np.corrcoef(activity_matrix[source_node,:],target_ts)[0,1]
 
     return connectivity_mat

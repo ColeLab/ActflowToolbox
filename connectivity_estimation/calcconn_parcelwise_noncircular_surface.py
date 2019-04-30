@@ -23,7 +23,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', toolboxp
     Currently only works for cortex FC
     PARAMETERS:
         data            :       vertex-wise data... vertices x time; default assumes that data is 96k dense array
-        connmethod        :        a string indicating what connectivity method to use. Options: 'multreg' (default), 'pcreg'
+        connmethod        :        a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr'
         dlabelfile      :       parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
     RETURNS:
