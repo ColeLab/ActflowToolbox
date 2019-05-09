@@ -1,4 +1,3 @@
-import os
 import numpy as np
 import pandas as pd
 from rpy2.robjects.packages import importr
@@ -6,7 +5,7 @@ psych = importr('psych')
 import rpy2.robjects.numpy2ri
 rpy2.robjects.numpy2ri.activate()
 
-def run_factor_analysis(data, subjs, states, n_factors=1):
+def run_factor_analysis(data, subjs, states, n_factors=1, fm='minres'):
     '''
     Runs factor analysis by connection.
     
@@ -20,33 +19,33 @@ def run_factor_analysis(data, subjs, states, n_factors=1):
         States associated with the data matrix.
     n_factors : int
         Optional: Number of factors in model.
+    fm : str
+        Optional: Factoring method. Default=minres. Choices: minres (minimum residual), ols (ordinary least squares), wls (weighted least squares), gls (generalized weighted least squares), pa (principal factor), ml (maximum likelihood, minchi (chi square), minrank (minimum rank), alpha (alpha). See documentation on psych.fa.
 
     Returns
     -------
     model_df : pandas.DataFrame, shape=(connections, parameters)
         Parameters to evaluate model fit.
-    score_df : pandas.DataFrame, shape=(subjects, connections)
-        Factor scores.
     load_df : pandas.DataFrame, shape=(connections, states)
         Factor loadings.
     '''
     n_subjs, n_states, n_connections = data.shape
+    # initiate output
     model_cols = ['fit', 'dof', 'tli', 'rmsea_pval', 'rmsea_pval_lwrci', \
                 'rmsea_pval_uprci', 'rms']
     connections = np.arange(n_connections, dtype=int)
     model_df = pd.DataFrame(index=connections, columns=model_cols)
-    score_df = pd.DataFrame(index=subjs, columns=connections)
     load_df = pd.DataFrame(index=connections, columns=states)
+    # run factor analysis separately for each connection k
     for k in connections:
         print('Running factor analysis on %i of %i connections' % (k, n_connections))
         k_data = data[:,:,k]
-        k_model_df, k_score_df, k_load_df = factor_analysis(k, k_data, subjs, states, n_factors)
+        k_model_df, k_load_df = factor_analysis(k, k_data, subjs, states, n_factors, fm)
         model_df.loc[k] = k_model_df.loc[k]
         load_df.loc[k] = k_load_df.loc[k]
-        score_df[k] = k_score_df[k]
-    return model_df, score_df, load_df
+    return model_df, load_df
 
-def run_loso_factor_analysis(data, subjs, states, n_factors=1):
+def run_loso_factor_analysis(data, subjs, states, n_factors=1, fm='minres'):
     '''
     Runs leave-one-state out factor analysis by connection, iteratively leaving out each state.
     Factor analysis accomplished using the psych.fa function in R.
@@ -61,19 +60,18 @@ def run_loso_factor_analysis(data, subjs, states, n_factors=1):
         States in the data matrix.
     n_factors : int
         Optional: Number of factors in model.
+    fm : str
+        Optional: Factoring method. Default=minres. Choices: minres (minimum residual), ols (ordinary least squares), wls (weighted least squares), gls (generalized weighted least squares), pa (principal factor), ml (maximum likelihood, minchi (chi square), minrank (minimum rank), alpha (alpha). See documentation on psych.fa.
 
     Returns
     -------
     model_df : pandas.DataFrame
         parameters to evaluate model fit, # connections x # parameters
-    score_df : pandas.DataFrame
-        factor scores, # subjects x # connections
     load_df : pandas.DataFrame
         factor loadings, # connections x # states
     '''
     n_subjs, n_states, n_connections = data.shape
     for state in states:
-        os.mkdir(loo_savedir)
         loo_states = list(states)
         idx = loo_states.index(state)
         loo_idx = range(n_states)
@@ -84,8 +82,7 @@ def run_loso_factor_analysis(data, subjs, states, n_factors=1):
         run_factor_analysis(loo_data, subjs, loo_states, n_factors)
     return
 
-def factor_analysis(k, k_data, subjs, states, n_factors, fm='minres', \
-                score_method='tenBerge'):
+def factor_analysis(k, k_data, subjs, states, n_factors, fm='minres'):
     '''Factor analysis accomplished using the psych.fa function in R.
     
      Parameters
@@ -102,15 +99,11 @@ def factor_analysis(k, k_data, subjs, states, n_factors, fm='minres', \
         Optional: Number of factors in model.
     fm : str
         Optional: Factoring method. Default=minres. Choices: minres (minimum residual), ols (ordinary least squares), wls (weighted least squares), gls (generalized weighted least squares), pa (principal factor), ml (maximum likelihood, minchi (chi square), minrank (minimum rank), alpha (alpha). See documentation on psych.fa.
-    score_method : str
-        Optional: Method for computing factor scores. Default=tenBerge. Choices: regression, Thurston, tenBerge, Anderson, Barlett. See documention on psych.factor.scores.
 
     Returns
     -------
     model_df : pandas.DataFrame, shape=(1, parameters)
         Parameters to evaluate model fit
-    score_df : pandas.DataFrame, shape=(subjects, 1)
-        factor scores
     load_df : pandas.DataFrame, shape=(1, states)
         factor loadings   
     '''
@@ -118,22 +111,18 @@ def factor_analysis(k, k_data, subjs, states, n_factors, fm='minres', \
     model_cols = ['fit', 'dof', 'tli', 'rmsea_pval', 'rmsea_pval_lwrci', \
                 'rmsea_pval_uprci']
     model_df = pd.DataFrame(columns=model_cols)
-    score_df = pd.DataFrame(index=subjs)
     load_df = pd.DataFrame(columns=states)
-    fa = psych.fa(r=k_data, nfactors=n_factors, fm=fm, n_obs=n_subjs, \
-                  scores=score_method)
+    fa = psych.fa(r=k_data, nfactors=n_factors, fm=fm, n_obs=n_subjs)
     model_params = [float(fa.rx('fit')[0][0]), float(fa.rx('dof')[0][0]), \
                     float(fa.rx('TLI')[0][0]), float(fa.rx('RMSEA')[0][0]), \
                     float(fa.rx('RMSEA')[0][1]), float(fa.rx('RMSEA')[0][2])]
     model_df.loc[k] = model_params
-    score_df[k] = np.array(fa.rx('scores')[0])
     load_df.loc[k] = np.array(fa.rx('loadings')[0]).T[0]
-    return model_df, score_df, load_df
+    return model_df, load_df
 
 def estimate_latent_connectivity(subj_data, load_df):
     '''
-    Estimate latent connectivity for a given subject as the \
-    factor score computed by the weighted average (weights=factor loadings).
+    Estimate latent connectivity for a given subject as the factor score computed by the weighted average (weights=factor loadings).
 
     Note: Alternate methods for estimating latent functional connectivity in psych.factor.scores.
 
