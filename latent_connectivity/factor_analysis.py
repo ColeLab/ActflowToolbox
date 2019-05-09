@@ -5,6 +5,44 @@ psych = importr('psych')
 import rpy2.robjects.numpy2ri
 rpy2.robjects.numpy2ri.activate()
 
+def factor_analysis(k, k_data, subjs, states, n_factors=1, fm='minres'):
+    '''Factor analysis accomplished using the psych.fa function in R.
+    
+     Parameters
+    ----------
+    k : int
+        Index of connection in data of shape=(subjects, states, connections).
+    k_data : array-like, shape=(subjects, states)
+        The data matrix of the connection k.
+    subjs : list
+        Subject IDs associated with the data matrix.
+    states : list
+        States associated with the data matrix.
+    n_factors : int
+        Optional: Number of factors in model.
+    fm : str
+        Optional: Factoring method. Default=minres. Choices: minres (minimum residual), ols (ordinary least squares), wls (weighted least squares), gls (generalized weighted least squares), pa (principal factor), ml (maximum likelihood, minchi (chi square), minrank (minimum rank), alpha (alpha). See documentation on psych.fa.
+
+    Returns
+    -------
+    model_df : pandas.DataFrame, shape=(1, parameters)
+        Parameters to evaluate model fit
+    load_df : pandas.DataFrame, shape=(1, states)
+        factor loadings   
+    '''
+    n_subjs, n_states = k_data.shape
+    model_cols = ['fit', 'dof', 'tli', 'rmsea_pval', 'rmsea_pval_lwrci', \
+                'rmsea_pval_uprci']
+    model_df = pd.DataFrame(columns=model_cols)
+    load_df = pd.DataFrame(columns=states)
+    fa = psych.fa(r=k_data, nfactors=n_factors, fm=fm, n_obs=n_subjs)
+    model_params = [float(fa.rx('fit')[0][0]), float(fa.rx('dof')[0][0]), \
+                    float(fa.rx('TLI')[0][0]), float(fa.rx('RMSEA')[0][0]), \
+                    float(fa.rx('RMSEA')[0][1]), float(fa.rx('RMSEA')[0][2])]
+    model_df.loc[k] = model_params
+    load_df.loc[k] = np.array(fa.rx('loadings')[0]).T[0]
+    return model_df, load_df
+
 def run_factor_analysis(data, subjs, states, n_factors=1, fm='minres'):
     '''
     Runs factor analysis by connection.
@@ -48,7 +86,6 @@ def run_factor_analysis(data, subjs, states, n_factors=1, fm='minres'):
 def run_loso_factor_analysis(data, subjs, states, n_factors=1, fm='minres'):
     '''
     Runs leave-one-state out factor analysis by connection, iteratively leaving out each state.
-    Factor analysis accomplished using the psych.fa function in R.
     
     Parameters
     ----------
@@ -79,46 +116,8 @@ def run_loso_factor_analysis(data, subjs, states, n_factors=1, fm='minres'):
         loo_states.remove(state)
         loo_data = data[:, loo_idx, :]
         print('Running LOO factor analysis for', state)
-        run_factor_analysis(loo_data, subjs, loo_states, n_factors)
+        run_factor_analysis(loo_data, subjs, loo_states, n_factors, fm)
     return
-
-def factor_analysis(k, k_data, subjs, states, n_factors, fm='minres'):
-    '''Factor analysis accomplished using the psych.fa function in R.
-    
-     Parameters
-    ----------
-    k : int
-        Index of connection in data of shape=(subjects, states, connections).
-    k_data : array-like, shape=(subjects, states)
-        The data matrix of the connection k.
-    subjs : list
-        Subject IDs associated with the data matrix.
-    states : list
-        States associated with the data matrix.
-    n_factors : int
-        Optional: Number of factors in model.
-    fm : str
-        Optional: Factoring method. Default=minres. Choices: minres (minimum residual), ols (ordinary least squares), wls (weighted least squares), gls (generalized weighted least squares), pa (principal factor), ml (maximum likelihood, minchi (chi square), minrank (minimum rank), alpha (alpha). See documentation on psych.fa.
-
-    Returns
-    -------
-    model_df : pandas.DataFrame, shape=(1, parameters)
-        Parameters to evaluate model fit
-    load_df : pandas.DataFrame, shape=(1, states)
-        factor loadings   
-    '''
-    n_subjs, n_states = k_data.shape
-    model_cols = ['fit', 'dof', 'tli', 'rmsea_pval', 'rmsea_pval_lwrci', \
-                'rmsea_pval_uprci']
-    model_df = pd.DataFrame(columns=model_cols)
-    load_df = pd.DataFrame(columns=states)
-    fa = psych.fa(r=k_data, nfactors=n_factors, fm=fm, n_obs=n_subjs)
-    model_params = [float(fa.rx('fit')[0][0]), float(fa.rx('dof')[0][0]), \
-                    float(fa.rx('TLI')[0][0]), float(fa.rx('RMSEA')[0][0]), \
-                    float(fa.rx('RMSEA')[0][1]), float(fa.rx('RMSEA')[0][2])]
-    model_df.loc[k] = model_params
-    load_df.loc[k] = np.array(fa.rx('loadings')[0]).T[0]
-    return model_df, load_df
 
 def estimate_latent_connectivity(subj_data, load_df):
     '''
