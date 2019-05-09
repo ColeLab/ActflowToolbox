@@ -96,9 +96,9 @@ def run_loso_factor_analysis(data, subjs, states, n_factors=1, fm='minres'):
     data : numpy.array
         The data matrix. shape=(subjects, states, connections)
     subjs : list
-        Subject IDs in the data matrix.
+        Subject IDs associated with the data matrix.
     states : list
-        States in the data matrix.
+        States associated with the data matrix.
     n_factors : int
         Optional: Number of factors in model.
     fm : str
