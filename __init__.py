@@ -8,6 +8,7 @@ from . import pipelines
 from . import preprocessing
 from . import simulations
 from . import tools
+from . import latent_connectivity
 
 __all__ = []
 __all__.append('actflowcomp')
