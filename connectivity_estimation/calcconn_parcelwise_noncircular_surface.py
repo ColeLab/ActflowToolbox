@@ -1,9 +1,9 @@
-
 # This function computes FC for parcel-to-parcel FC, while excluding vertices in the neighborhood of a given target parcel
 # Excludes all vertices within a 10mm dilated mask of the target parcel when computing parcel-to-parcel cortical FC.
 
 import numpy as np
 import nibabel as nib
+import h5py
 import os
 import pkg_resources
 from .multregconn import *
@@ -11,11 +11,11 @@ from .corrcoefconn import *
 
 dilateMM = 10
 
-partitiondir = pkg_resources.resource_filename('..dependencies', 'ColeAnticevicNetPartition/')
+partitiondir = pkg_resources.resource_filename('ActflowToolbox.dependencies', 'ColeAnticevicNetPartition/')
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
-dilatedmaskdir = pkg_resources.resource_filename('..network_definitions', 'Glasser2016/surfaceMasks/'')
+dilatedmaskdir = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'Glasser2016/surfaceMasks/')
 
-def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, loaddata_ifavailable=False, data_dir='./', verbose=False):
+def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, loaddata_ifavailable=False, data_dir='./', datasuffix='_noncirc_ts_data', verbose=False):
     """
     This function computes multiple regression FC for a parcellation scheme
     Takes in vertex-wise data and generates a parcel X parcel FC matrix based on multiple linear regression
@@ -38,7 +38,11 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
     unique_parcels = np.sort(np.unique(dlabels))
     # Only include cortex
     unique_parcels = unique_parcels[:nparcels]
-
+                                            
+    # Instantiate empty time series matrices
+    regular_ts_matrix = np.zeros((nparcels,data.shape[1]))
+    regular_ts_computed = np.zeros((nparcels,1))
+                                                 
     # Instantiate empty fc matrix
     fc_matrix = np.zeros((nparcels,nparcels))
 
@@ -71,14 +75,31 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
         i = 0
         for source in source_parcels:
             source_ind = np.where(source_indices==source)[0] # Find source parcel indices (from modified dlabel file)
-            # If the entire parcel is excluded (i.e, the time series is all 0s, then skip computing the mean for this parcel)
-            if len(source_ind)==0:
-                empty_source_row.append(i) # if this source is empty, remember its row (to delete it from the regressor matrix later)
-                i += 1
-                # Go to next source parcel
-                continue
+            sourceInt = int(source)-1
+            
+            #Determine if this source parcel was modified (if not, then use standard time series)
+            source_ind_orig = np.where(dlabels==source)[0]
+            if np.array_equal(source_ind,source_ind_orig):
+                
+                if regular_ts_computed[sourceInt]:
+                    source_parcel_ts[i,:] = regular_ts_matrix[sourceInt,:]
+                else:
+                    source_parcel_ts[i,:] = np.nanmean(np.real(data[source_ind,:]),axis=0) # compute averaged time series of source parcel
+                    #Save time series for future use
+                    regular_ts_matrix[sourceInt,:] = source_parcel_ts[i,:].copy()
+                    regular_ts_computed[sourceInt] = True
+            
+            else:
+                                                 
+                # If the entire parcel is excluded (i.e, the time series is all 0s), then skip computing the mean for this parcel
+                if len(source_ind)==0:
+                    empty_source_row.append(i) # if this source is empty, remember its row (to delete it from the regressor matrix later)
+                    i += 1
+                    # Go to next source parcel
+                    continue
 
-            source_parcel_ts[i,:] = np.nanmean(np.real(data[source_ind,:]),axis=0) # compute averaged time series of source parcel
+                source_parcel_ts[i,:] = np.nanmean(np.real(data[source_ind,:]),axis=0) # compute averaged time series of source parcel
+   
             i += 1
 
         # Delete source regions that have been entirely excluded from the source_parcels due to the dilation
@@ -87,7 +108,14 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
             source_parcels = np.delete(source_parcels,empty_source_row,axis=0) # Delete the 0-variance ROI from the list of sources
 
         # compute averaged time series of TARGET
-        target_parcel_ts = np.mean(np.real(data[target_ind,:]),axis=0)
+        parcelInt = int(parcel)-1
+        if regular_ts_computed[parcelInt]:
+            target_parcel_ts = regular_ts_matrix[parcelInt,:]
+        else:
+            target_parcel_ts = np.mean(np.real(data[target_ind,:]),axis=0)
+            #Save time series for future use
+            regular_ts_matrix[parcelInt,:] = target_parcel_ts.copy()
+            regular_ts_computed[parcelInt] = True
 
         # Find matrix indices for all source parcels
         source_cols = np.asarray((source_parcels - 1),dtype=int) # subtract by 1 since source_parcels are organized from 1-360, and need to transform to python indices
