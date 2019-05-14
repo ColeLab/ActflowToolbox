@@ -11,11 +11,9 @@ psych
 Installation recommendation:
 ----------------------------
 # Use anaconda to set up an environment with the dependencies
-# Note: Make sure anaconda packages are up-to-date
-#conda update conda
-#conda update anaconda
-conda update --all
 # create anaconda environment 'r-env'
 conda create --name r-env -c r python=3.4 anaconda rpy2 r-psych
+# Make sure anaconda packages are up-to-date
+conda update --all
 # activate anaconda environment
 source activate r-env
