@@ -1,5 +1,3 @@
-# This function computes FC for parcel-to-parcel FC, while excluding vertices in the neighborhood of a given target parcel
-# Excludes all vertices within a 10mm dilated mask of the target parcel when computing parcel-to-parcel cortical FC.
 
 import numpy as np
 import nibabel as nib
@@ -15,16 +13,20 @@ partitiondir = pkg_resources.resource_filename('ActflowToolbox.dependencies', 'C
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 dilatedmaskdir = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'Glasser2016/surfaceMasks/')
 
-def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, loaddata_ifavailable=False, data_dir='./', datasuffix='_noncirc_ts_data', verbose=False):
+def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, precomputedRegularTS=None, verbose=False):
     """
-    This function computes multiple regression FC for a parcellation scheme
-    Takes in vertex-wise data and generates a parcel X parcel FC matrix based on multiple linear regression
-    Currently only works for cortex FC
+    This function produces a parcel-to-parcel connectivity matrix while excluding vertices in the neighborhood of a given target parcel.
+    Excludes all vertices within a 10mm (default) dilated mask of the target parcel when computing parcel-to-parcel connectivity.
+    Takes in vertex-wise data and generates a parcel X parcel connectivity matrix based on provided connmethod
+    Currently only works for surface-based cortex connectivity
+    
     PARAMETERS:
         data            :       vertex-wise data... vertices x time; default assumes that data is 96k dense array
         connmethod        :        a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr'
         dlabelfile      :       parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
+        precomputedRegularTS:  optional input of precomputed 'regular' mean time series with original region set. This might cut down on computation time if provided.
+        verbose  :    indicate if additional print commands should be used to update user on progress
     RETURNS:
         fc_matrix       :       Target X Source FC Matrix. Sources-to-target mappings are organized as rows (targets) from each column (source)
     """
@@ -39,9 +41,13 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
     # Only include cortex
     unique_parcels = unique_parcels[:nparcels]
                                             
-    # Instantiate empty time series matrices
-    regular_ts_matrix = np.zeros((nparcels,data.shape[1]))
-    regular_ts_computed = np.zeros((nparcels,1))
+    # Instantiate empty time series matrix for regular mean time series, or load from memory if provided
+    if precomputedRegularTS is not None:
+        regular_ts_matrix = precomputedRegularTS
+        regular_ts_computed = np.ones((nparcels,1),dtype=bool)
+    else:
+        regular_ts_matrix = np.zeros((nparcels,data.shape[1]))
+        regular_ts_computed = np.zeros((nparcels,1))
                                                  
     # Instantiate empty fc matrix
     fc_matrix = np.zeros((nparcels,nparcels))

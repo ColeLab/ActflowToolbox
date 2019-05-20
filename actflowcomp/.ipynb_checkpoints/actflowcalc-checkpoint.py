@@ -11,7 +11,7 @@ def actflowcalc(actVect, fcMat, separate_activations_bytarget=False):
     separate_activations_bytarget: indicates if the input actVect matrix has a separate activation vector for each target (to-be-predicted) node (e.g., for the locally-non-circular approach)
     """
     
-    numRegions=np.shape(actVect)[0]
+    numRegions=len(actVect)
     actPredVector=np.zeros((numRegions,))
     if separate_activations_bytarget:
         for heldOutRegion in range(numRegions):
