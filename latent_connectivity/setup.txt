@@ -1,0 +1,19 @@
+Requirements:
+-------------
+python (version 3.x)
+numpy
+pandas
+rpy2
+R (version 3.2+)
+psych
+
+
+Installation recommendation:
+----------------------------
+# Use anaconda to set up an environment with the dependencies
+# create anaconda environment 'r-env'
+conda create --name r-env -c r python=3.4 anaconda rpy2 r-psych
+# Make sure anaconda packages are up-to-date
+conda update --all
+# activate anaconda environment
+source activate r-env

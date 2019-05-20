@@ -1,5 +1,11 @@
+# Katelyn Arnemann
+# May 14, 2019
+
+# Compute latent connectivity using factor analysis.
+
 import numpy as np
 import pandas as pd
+
 from rpy2.robjects.packages import importr
 psych = importr('psych')
 import rpy2.robjects.numpy2ri
