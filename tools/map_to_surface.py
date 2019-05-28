@@ -26,11 +26,9 @@ def map_to_surface(mat,filename):
 
         roicount = 0
         for roi in np.arange(nParcels):
+            vertex_ind = np.where(glasser2==roi+1)[0]
             for col in range(mat.shape[1]):
-                vertex_ind = np.where(glasser2==roi+1)[0]
-                out_mat[vertex_ind,0] = mat[roicount,0]
-                out_mat[vertex_ind,1] = mat[roicount,1]
-                out_mat[vertex_ind,2] = mat[roicount,2]
+                out_mat[vertex_ind,col] = mat[roicount,col]
 
             roicount += 1
 
