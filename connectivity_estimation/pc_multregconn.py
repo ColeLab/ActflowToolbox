@@ -37,7 +37,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None):
             #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
             reg = LinearRegression().fit(reduced_mat, y)
             #Convert regression betas from component space to node space
-            betasPCR = inverse_transform(reg.coef_)
+            betasPCR = pca.inverse_transform(reg.coef_)
             connectivity_mat[targetnode,othernodes]=betasPCR
     else:
         #Computing values for a single target node
@@ -50,7 +50,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None):
         #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
         reg = LinearRegression().fit(reduced_mat, y)
         #Convert regression betas from component space to node space
-        betasPCR = inverse_transform(reg.coef_)
+        betasPCR = pca.inverse_transform(reg.coef_)
         connectivity_mat=betasPCR
 
     return connectivity_mat
