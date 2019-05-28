@@ -1,4 +1,5 @@
 import numpy as np
+import nibabel as nib
 import os
 
 
@@ -24,7 +25,7 @@ def map_to_surface(mat,filename):
         out_mat = np.zeros((glasser2.shape[0],mat.shape[1]))
 
         roicount = 0
-        for roi in rois:
+        for roi in np.arange(nParcels):
             for col in range(mat.shape[1]):
                 vertex_ind = np.where(glasser2==roi+1)[0]
                 out_mat[vertex_ind,0] = mat[roicount,0]
