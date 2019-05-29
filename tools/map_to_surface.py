@@ -2,13 +2,9 @@ import numpy as np
 import nibabel as nib
 import os
 
+glasserfile2='./Q1-Q6_RelatedParcellation210.LR.CorticalAreas_dil_Colors.32k_fs_RL.dlabel.nii'
 
-nParcels = 360
-glasserfile2 = './Q1-Q6_RelatedParcellation210.LR.CorticalAreas_dil_Colors.32k_fs_RL.dlabel.nii'
-glasser2 = nib.load(glasserfile2).get_data()
-glasser2 = np.squeeze(glasser2)
-
-def map_to_surface(mat,filename):
+def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2):
     """
     Maps a region X column 2d matrix into a dscalar file with 64k vertices
     Uses the Glasser et al. 2016 ROI parcellation
@@ -20,18 +16,16 @@ def map_to_surface(mat,filename):
         filename:   a string indicating the directory + filename of the output. Do not include a suffix (e.g., ".dscalar.nii" to the file. Suffixes will be added automatically.
 
     """
+    #### Load glasser atlas
+    glasser2 = nib.load(glasserfile2).get_data()
+    glasser2 = np.squeeze(glasser2)
     #### Map back to surface
-    if mat.shape[0]==360:
+    if mat.shape[0]==nParcels:
         out_mat = np.zeros((glasser2.shape[0],mat.shape[1]))
-
-        roicount = 0
         for roi in np.arange(nParcels):
             vertex_ind = np.where(glasser2==roi+1)[0]
             for col in range(mat.shape[1]):
-                out_mat[vertex_ind,col] = mat[roicount,col]
-
-            roicount += 1
-
+                out_mat[vertex_ind,col] = mat[roi,col]
     else:
         out_mat = mat
 
