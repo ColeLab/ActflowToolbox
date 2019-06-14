@@ -6,6 +6,7 @@ import os
 import pkg_resources
 from .multregconn import *
 from .corrcoefconn import *
+from .pc_multregconn import *
 
 dilateMM = 10
 
@@ -21,9 +22,9 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
     Currently only works for surface-based cortex connectivity
     
     PARAMETERS:
-        data            :       vertex-wise data... vertices x time; default assumes that data is 96k dense array
-        connmethod        :        a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr'
-        dlabelfile      :       parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
+        data        : vertex-wise data... vertices x time; default assumes that data is 96k dense array
+        connmethod  : a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr', 'pc_multregconn'
+        dlabelfile  : parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
         precomputedRegularTS:  optional input of precomputed 'regular' mean time series with original region set. This might cut down on computation time if provided.
         verbose  :    indicate if additional print commands should be used to update user on progress
@@ -132,5 +133,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
             fc_matrix[target_row,source_cols] = multregconn(source_parcel_ts,target_parcel_ts)
         elif connmethod == 'pearsoncorr':
             fc_matrix[target_row,source_cols] = corrcoefconn(source_parcel_ts,target_parcel_ts)
+        elif connmethod == 'pc_multregconn':
+            fc_matrix[target_row,source_cols] = pc_multregconn(source_parcel_ts,target_parcel_ts)
 
     return fc_matrix
