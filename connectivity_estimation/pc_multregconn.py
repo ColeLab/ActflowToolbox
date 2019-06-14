@@ -14,11 +14,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None):
     nnodes = activity_matrix.shape[0]
     timepoints = activity_matrix.shape[1]
     
-<<<<<<< HEAD
     if n_components == None:
-=======
-    if n_components is None:
->>>>>>> 7d0e93ae994201c600195b58dd1487d4ae84ab7b
         n_components = np.min([nnodes-1, timepoints-1])
     else:
         if nnodes<n_components or timepoints<n_components:
