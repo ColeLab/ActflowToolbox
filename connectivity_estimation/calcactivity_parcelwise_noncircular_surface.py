@@ -26,7 +26,7 @@ def calcactivity_parcelwise_noncircular_surface(data, dlabelfile=defaultdlabelfi
     RETURNS:
         activation_matrix       :       Target X Source activity Matrix. Sources-to-target mappings are organized as rows (targets) from each column (source)
     """
-
+    
     nparcels = 360
     parcel_arr = np.arange(nparcels)
     # Load dlabel file (cifti)
@@ -56,10 +56,11 @@ def calcactivity_parcelwise_noncircular_surface(data, dlabelfile=defaultdlabelfi
             parcel_mask = np.squeeze(nib.load(dilatedmaskdir+'GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
 
         # get all target ROI indices
-        target_ind = np.squeeze(nib.load(dilatedmaskdir+'GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
-        target_ind = np.asarray(target_ind,dtype=bool)
+        target_ind = np.where(dlabels==parcel)[0] # Find target parcel indices (from dlabel file)
+        #target_ind = np.squeeze(nib.load(dilatedmaskdir+'GlasserParcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+        #target_ind = np.asarray(target_ind,dtype=bool)
 
-        # remove target parcel's mask from set of possible source vertices
+        # remove target parcel's (potentially dilated) mask from set of possible source vertices
         mask_ind = np.where(parcel_mask==1.0)[0] # find mask indices
         source_indices = dlabels.copy() # copy the original parcellation dlabel file
         source_indices[mask_ind] = 0 # modify original dlabel file to remove any vertices that are in the mask
@@ -102,7 +103,7 @@ def calcactivity_parcelwise_noncircular_surface(data, dlabelfile=defaultdlabelfi
 
         # Delete source regions that have been entirely excluded from the source_parcels due to the dilation
         if len(empty_source_row)>0:
-            source_parcel_ts = np.delete(source_parcel_ts,empty_source_row,axis=0) # delete all ROIs with all 0s from regressor matrix
+            source_parcel_ts = np.delete(source_parcel_ts,empty_source_row,axis=0) # delete all ROIs with all 0s
             source_parcels = np.delete(source_parcels,empty_source_row,axis=0) # Delete the 0-variance ROI from the list of sources
 
         # compute averaged time series of TARGET
@@ -110,7 +111,7 @@ def calcactivity_parcelwise_noncircular_surface(data, dlabelfile=defaultdlabelfi
         if regular_activation_computed[parcelInt]:
             target_parcel_ts = regular_activation_matrix[parcelInt,:]
         else:
-            target_parcel_ts = np.mean(np.real(data[target_ind,:]),axis=0)
+            target_parcel_ts = np.nanmean(np.real(data[target_ind,:]),axis=0)
             #Save time series for future use
             regular_activation_matrix[parcelInt,:] = target_parcel_ts.copy()
             regular_activation_computed[parcelInt] = True
