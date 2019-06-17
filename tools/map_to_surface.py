@@ -38,7 +38,7 @@ def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2):
     wb_file = filename + '.dscalar.nii'
     wb_command = 'wb_command -cifti-convert -from-text ' + filename + '.csv ' + glasserfile2 + ' ' + wb_file + ' -reset-scalars'
     #os.system(wb_command)
-    print(wb_command)
+    #print(wb_command)
     try:
         subprocess.call(wb_command)
         os.remove(filename + '.csv')
