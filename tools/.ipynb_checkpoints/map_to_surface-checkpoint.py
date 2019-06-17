@@ -2,8 +2,9 @@ import numpy as np
 import nibabel as nib
 import os
 import pkg_resources
+import subprocess
 
-toolsdir = pkg_resources.resource_filename('ActflowToolbox.tools', './')
+toolsdir = pkg_resources.resource_filename('ActflowToolbox.tools', '/')
 glasserfile2=toolsdir+'Q1-Q6_RelatedParcellation210.LR.CorticalAreas_dil_Colors.32k_fs_RL.dlabel.nii'
 
 def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2):
@@ -36,7 +37,12 @@ def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2):
     np.savetxt(filename + '.csv', out_mat,fmt='%s')
     wb_file = filename + '.dscalar.nii'
     wb_command = 'wb_command -cifti-convert -from-text ' + filename + '.csv ' + glasserfile2 + ' ' + wb_file + ' -reset-scalars'
-    os.system(wb_command)
-    os.remove(filename + '.csv')
-
-    print("CIFTI dscalar is output as:" + wb_file)
+    #os.system(wb_command)
+    try:
+        subprocess.call('module load connectome_wb/1.3.2-kholodvl')
+        subprocess.call(wb_command)
+        os.remove(filename + '.csv')
+        print("CIFTI dscalar is output as:" + wb_file)
+    except OSError:
+        print ('wb_command does not exist')
+    
