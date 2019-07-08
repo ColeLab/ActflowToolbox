@@ -5,7 +5,7 @@ from .actflowcalc import *
 
 def actflowtest(actVect_group, fcMat_group, print_by_condition=True, separate_activations_bytarget=False):
     """
-    Function to run activity flow mapping with spatial correlation predicted-to-actual testing across multiple tasks and subjects, either with a single (e.g., rest) connectivity matrix or with a separate connectivity matrix for each task. Returns stats at the group level.
+    Function to run activity flow mapping with spatial correlation predicted-to-actual testing across multiple tasks and subjects, either with a single (e.g., rest) connectivity matrix or with a separate connectivity matrix for each task. Returns statistics at the group level.
     
     actVect_group: node x condition x subject matrix with activation values
     fcMat_group: node x node x condition x subject matrix (or node x node x subject matrix) with connectiivty values
@@ -64,18 +64,20 @@ def actflowtest(actVect_group, fcMat_group, print_by_condition=True, separate_ac
     predAcc_bytask_avgfirst=[np.corrcoef(np.mean(actVect_actual_group[:,taskNum,:],axis=1),np.mean(actPredVector_bytask_bysubj[:,taskNum,:],axis=1))[0,1] for taskNum in range(nTasks)]
     
     print("==Correlation between predicted and actual activation patterns (mean across all tasks & subjects):")
-    print("--Average-then-compare (calculating prediction accuracies after cross-subject averaging):")
-    print("r=" + str("%.2f" % np.tanh(np.mean(np.arctanh(predAcc_bytask_avgfirst)))))
-    if print_by_condition:
-        print("By task condition:")
-        for taskNum in range(nTasks):
-            print("Condition " + str(taskNum+1) + ": r=" + str("%.2f" % predAcc_bytask_avgfirst[taskNum]))
+
     print("--Compare-then-average (calculating prediction accuracies before cross-subject averaging):")
     print("r=" + str("%.2f" % np.tanh(np.mean(np.mean(np.arctanh(predAcc_bytask_bysubj))))) + ", t-value vs. 0: " + str("%.2f" % tval_ActflowPredAcc_taskmean) + ", p-value vs. 0: " + str(pval_ActflowPredAcc_taskmean))
     if print_by_condition:
         print("By task condition:")
         for taskNum in range(nTasks):
             print("Condition " + str(taskNum+1) + ": r=" + str("%.2f" % np.tanh(np.mean(np.arctanh(predAcc_bytask_bysubj[taskNum])))) + ", t-value vs. 0: " + str("%.2f" % tval_ActflowPredAcc_bytask[taskNum]) + ", p-value vs. 0: " + str(pval_ActflowPredAcc_bytask[taskNum]))
+            
+    print("--Average-then-compare (calculating prediction accuracies after cross-subject averaging):")
+    print("r=" + str("%.2f" % np.tanh(np.mean(np.arctanh(predAcc_bytask_avgfirst)))))
+    if print_by_condition:
+        print("By task condition:")
+        for taskNum in range(nTasks):
+            print("Condition " + str(taskNum+1) + ": r=" + str("%.2f" % predAcc_bytask_avgfirst[taskNum]))
     
     
     
@@ -105,14 +107,24 @@ def actflowtest(actVect_group, fcMat_group, print_by_condition=True, separate_ac
         predAccRankCorr_bynode_bysubj_mod[np.abs(predAccRankCorr_bynode_bysubj_mod)==1] = 0.9999
         [tval_ActflowPredAccRankCorr_nodemean,pval_ActflowPredAccRankCorr_nodemean] = scipy.stats.ttest_1samp(np.mean(np.arctanh(predAccRankCorr_bynode_bysubj_mod),axis=0),0.0)
         #import pdb; pdb.set_trace()
+        
+        #Test for accuracy of actflow prediction, separately for each subject ("average-then-compare")
+        predAcc_bynode_avgthencomp=[np.corrcoef(np.mean(actVect_actual_group[nodeNum,:,:],axis=1),np.mean(actPredVector_bytask_bysubj[nodeNum,:,:],axis=1))[0,1] for nodeNum in range(nNodes)]
+        
+        predAccRankCorr_bynode_avgthencomp=[scipy.stats.spearmanr(np.mean(actVect_actual_group[nodeNum,:,:],axis=1),np.mean(actPredVector_bytask_bysubj[nodeNum,:,:],axis=1))[0] for nodeNum in range(nNodes)]
     
         print(" ")
         print("==Condition-wise correlations between predicted and actual activation patterns (calculated for each node separetely):==")
+        
         print("--Compare-then-average (calculating prediction accuracies before cross-subject averaging):")
         print("Each correlation based on N conditions: " + str(nTasks) + ", p-values based on N subjects (cross-subject variance in correlations): " + str(nSubjs))
         print("Mean Pearson r=" + str("%.2f" % np.tanh(np.mean(np.mean(np.arctanh(predAcc_bynode_bysubj))))) + ", t-value vs. 0: " + str("%.2f" % tval_ActflowPredAcc_nodemean) + ", p-value vs. 0: " + str(pval_ActflowPredAcc_nodemean))
         print("Mean rank-correlation rho=" + str("%.2f" % np.mean(np.mean(predAccRankCorr_bynode_bysubj))) + ", t-value vs. 0: " + str("%.2f" % tval_ActflowPredAccRankCorr_nodemean) + ", p-value vs. 0: " + str(pval_ActflowPredAccRankCorr_nodemean))
         
+        print("--Average-then-compare (calculating prediction accuracies after cross-subject averaging):")
+        print("Each correlation based on N conditions: " + str(nTasks))
+        print("Mean Pearson r=" + str("%.2f" % np.tanh(np.mean(np.arctanh(predAcc_bynode_avgthencomp)))))
+        print("Mean rank-correlation rho=" + str("%.2f" % np.mean(predAccRankCorr_bynode_avgthencomp)))
     
     
     output = {'actPredVector_bytask_bysubj':actPredVector_bytask_bysubj,
@@ -128,7 +140,9 @@ def actflowtest(actVect_group, fcMat_group, print_by_condition=True, separate_ac
               'tval_ActflowPredAcc_nodemean':tval_ActflowPredAcc_nodemean,
               'pval_ActflowPredAcc_nodemean':pval_ActflowPredAcc_nodemean,
               'tval_ActflowPredAccRankCorr_nodemean':tval_ActflowPredAccRankCorr_nodemean,
-              'pval_ActflowPredAccRankCorr_nodemean':pval_ActflowPredAccRankCorr_nodemean
+              'pval_ActflowPredAccRankCorr_nodemean':pval_ActflowPredAccRankCorr_nodemean,
+              'predAcc_bynode_avgthencomp':predAcc_bynode_avgthencomp,
+              'predAccRankCorr_bynode_avgthencomp':predAccRankCorr_bynode_avgthencomp
              }
     
     return output
