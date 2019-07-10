@@ -33,8 +33,10 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
         repeat_corr_conditionwise_compthenavg_bynode=np.zeros((nNodes,nSubjs))
         for scount in list(range(nSubjs)):
             for node_num in list(range(nNodes)):
-                run1_mean_activations=actvect_group[node_num,:,scount][run1_cond_indices]
-                run2_mean_activations=actvect_group[node_num,:,scount][run2_cond_indices]
+                #run1_mean_activations=actvect_group[node_num,:,scount][run1_cond_indices]
+                #run2_mean_activations=actvect_group[node_num,:,scount][run2_cond_indices]
+                run1_mean_activations=actvect_group[node_num,:,0,scount]
+                run2_mean_activations=actvect_group[node_num,:,1,scount]
                 repeat_corr_conditionwise_compthenavg_bynode[node_num,scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
 
         if print_report:
@@ -47,27 +49,36 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
         
         repeat_corr_conditionwise_avgthencomp_bynode=np.zeros((nNodes))
         for node_num in list(range(nNodes)):
-            run1_mean_activations=np.mean(actvect_group[node_num,:,1,:],axis=1)
-            run2_mean_activations=np.mean(actvect_group[node_num,:,2,:],axis=1)
-            repeat_corr_conditionwise_avgthencomp_byparcel[node_num] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
+            run1_mean_activations=np.mean(actvect_group[node_num,:,0,:],axis=1)
+            run2_mean_activations=np.mean(actvect_group[node_num,:,1,:],axis=1)
+            repeat_corr_conditionwise_avgthencomp_bynode[node_num] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
 
         if print_report:
             print('Average-then-compare condition-wise correlation between repetitions (cross-node & cross-subj mean):')
             print('r = ',np.mean(repeat_corr_conditionwise_avgthencomp_bynode))
             
-        
-    
+
     #nodewise_compthenavg - Compare-then-average cross-node correlation between repetitions (whole-brain activation patterns)
     if full_report or reliability_type=='nodewise_compthenavg':
-        #TODO
-        
+    
+        repeat_corr_nodewise_compthenavg = np.zeros((nSubjs))
+            for scount in list(range(nSubjs)):
+                run1_mean_activations=actvect_group[:,:,0,scount].flatten()
+                run2_mean_activations=actvect_group[:,:,1,scount].flatten()
+                repeat_corr_nodewise_compthenavg[scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
+
+        if print_report:
+            print('Compare-then-average subject-wise, cross-node correlations between repititions (whole brain activation patterns, cross-subject):')
+            print('r = ',np.nanmean(repeat_corr_nodewise_compthenavg))
+
+
     #nodewise_avgthencomp - Average-then-compare cross-node repeat reliability (whole-brain activation patterns)
     if full_report or reliability_type=='nodewise_avgthencomp':
         
-        run1_mean_activations=np.mean(actvect_group[:,:,1,:],axis=2).flatten()
-        run2_mean_activations=np.mean(actvect_group[:,:,2,:],axis=2).flatten()
+        run1_mean_activations=np.mean(actvect_group[:,:,0,:],axis=2).flatten()
+        run2_mean_activations=np.mean(actvect_group[:,:,1,:],axis=2).flatten()
         repeat_corr_nodewise_avgthencomp=np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
         
         if print_report:
             print("Average-then-compare cross-node repeat reliability (whole-brain activation patterns)")
-            print('r = ',repeat_corr_regionwise_avgthencomp)
+            print('r = ',repeat_corr_nodewise_avgthencomp)
