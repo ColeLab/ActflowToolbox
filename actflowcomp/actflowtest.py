@@ -3,12 +3,13 @@ import numpy as np
 import scipy.stats
 from .actflowcalc import *
 
-def actflowtest(actVect_group, fcMat_group, print_by_condition=True, separate_activations_bytarget=False):
+def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_condition=True, separate_activations_bytarget=False):
     """
     Function to run activity flow mapping with spatial correlation predicted-to-actual testing across multiple tasks and subjects, either with a single (e.g., rest) connectivity matrix or with a separate connectivity matrix for each task. Returns statistics at the group level.
     
     actVect_group: node x condition x subject matrix with activation values
     fcMat_group: node x node x condition x subject matrix (or node x node x subject matrix) with connectiivty values
+    actVect_group_test: independent data (e.g., a separate run) than actVect_group, used as separate "test" data for testing prediction accuracies. Node x condition x subject matrix with activation values. Note: In separate_activations_bytarget=True case, actVect_group_test should not have separate activations by target (just use original node x condition x subject version of data).
     separate_activations_bytarget: indicates if the input actVect_group matrix has a separate activation vector for each target (to-be-predicted) node (e.g., for the locally-non-circular approach)
     """
     
@@ -26,6 +27,7 @@ def actflowtest(actVect_group, fcMat_group, print_by_condition=True, separate_ac
     
     nNodes=np.shape(actVect_group)[0]
     
+    #Calculate activity flow predictions
     if len(np.shape(fcMat_group)) > 3:
         #If a separate FC state for each task
         if separate_activations_bytarget:
@@ -39,9 +41,13 @@ def actflowtest(actVect_group, fcMat_group, print_by_condition=True, separate_ac
             actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,taskNum,subjNum],fcMat_group[:,:,subjNum]) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
     actPredVector_bytask_bysubj=np.transpose(actPredVector_bytask_bysubj)
     
-    #Calculate actual activation values
+    #Calculate actual activation values (e.g., for when separate_activations_bytarget is True)
     actVect_actual_group = np.zeros((nNodes,nTasks,nSubjs))
-    if separate_activations_bytarget:
+    if actVect_group_test is not None:
+        #Setting target activations to be from the separate test data
+        #Note: In separate_activations_bytarget=True case, actVect_group_test should not have separate activations by target (just used original version of data)
+        actVect_actual_group = actVect_group_test
+    elif separate_activations_bytarget:
         for taskNum in range(nTasks):
             for subjNum in range(nSubjs):
                 actVect_actual_group[:,taskNum,subjNum] = actVect_group[:,:,taskNum,subjNum].diagonal()
