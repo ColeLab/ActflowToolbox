@@ -140,9 +140,13 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
         for taskNum in range(nTasks):
             print("Condition " + str(taskNum+1) + ": r=" + str("%.2f" % predAcc_bytask_avgfirst[taskNum]))
             
-   ##Accuracy of prediction using mean absolute error, separately for each subject ("compare-then average")
+  
     if mean_absolute_error == True:
+        ##Accuracy of prediction using mean absolute error, separately for each subject ("compare-then average")
         maeAcc_bytask_bysubj = [[np.mean(np.abs(np.subtract(actVect_actual_group[:,taskNum,subjNum],actPredVector_bytask_bysubj[:,taskNum,subjNum]))) for subjNum in range(nSubjs)] for taskNum in range(nTasks)]            
+        #averaging across subjects before comparing ("average-then-compare")
+        maeAcc_bytask_avgfirst=[np.mean(np.abs(np.subtract(np.mean(actVect_actual_group[:,taskNum,:],axis=1),np.mean(actPredVector_bytask_bysubj[:,taskNum,:],axis=1)))) for taskNum in range(nTasks)]
+        
         print(" ")
         print("==Parcel-wise (spatial) Mean Absolute Error (MAE) between predicted and actual activation patterns (calculated for each condition separateley):==")
         print("--Compare-then-average (calculating mean absolute error accuracies before cross-subjects averaging:)")
@@ -151,7 +155,13 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
             print("By task condition:")
             for taskNum in range(nTasks):
                 print("Condition " + str(taskNum+1) + ": mae=" + str("%.2f" % np.mean(maeAcc_bytask_bysubj[taskNum])))
-
+        
+        print("--Average-then-compare (calculating mean absolute error accuracies after cross-subject averaging):")
+        print("mae=" + str("%.2f" % np.mean(maeAcc_bytask_avgfirst)))
+        if print_by_condition:
+            print("By task condition:")
+            for taskNum in range(nTasks):
+                print("Condition " + str(taskNum+1) + ": mae=" + str("%.2f" % maeAcc_bytask_avgfirst[taskNum]))
 
 
 
@@ -174,6 +184,7 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
              }
     
     if mean_absolute_error == True:
-        output.update({'maeAcc_bytask_bysubj':maeAcc_bytask_bysubj})
+        output.update({'maeAcc_bytask_bysubj':maeAcc_bytask_bysubj,
+                      'maeAcc_bytask_avgfirst':maeAcc_bytask_avgfirst})
     
     return output
