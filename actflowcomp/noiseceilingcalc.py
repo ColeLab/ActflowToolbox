@@ -6,7 +6,7 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
     """
     Function to calculate the repeat reliability of the data in various ways. This is equivalent to calculating the "noise ceiling" for predictive models (such as encoding models like activity flow models), which identifies theoretical limits on the highest prediction accuracy (based on the assumption that the data predicting itself is the highest possible prediction accuracy).
     
-    Note that incorporation of spontaneous activity to predict activity might allow for predictions above the noise ceiling (since spontaneous activity is considered "noise" with the noise ceiling approach).
+    Note that incorporation of spontaneous activity to predict task-evoked activity might allow for predictions above the noise ceiling (since spontaneous activity is considered "noise" with the noise ceiling approach).
     
     INPUTS
     actvect_group: node x condition x repetition x subject matrix with activation values. Note that only the first 2 values in the 'repetition' dimension are used.
@@ -63,7 +63,7 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
 
         if print_report:
             print('Compare-then-average condition-wise correlation between repetitions (cross-node & cross-subj mean):')
-            print('r = ',np.mean(np.mean(repeat_corr_conditionwise_compthenavg_bynode)))
+            print('r = ', str("%.2f" % np.mean(np.mean(repeat_corr_conditionwise_compthenavg_bynode))))
 
         if reliability_type=='conditionwise_compthenavgthen':
             output = {'repeat_corr_conditionwise_compthenavg_bynode':repeat_corr_conditionwise_compthenavg_bynode,'repeat_corr_conditionwise_compthenavg_bynode_meanR':repeat_corr_conditionwise_compthenavg_bynode_meanR}
@@ -82,7 +82,7 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
 
         if print_report:
             print('Average-then-compare condition-wise correlation between repetitions (cross-node & cross-subj mean):')
-            print('r = ',np.mean(repeat_corr_conditionwise_avgthencomp_bynode))
+            print('r = ', str("%.2f" % np.mean(repeat_corr_conditionwise_avgthencomp_bynode)))
 
         if reliability_type=='conditionwise_avgthencomp':
                 output = {'repeat_corr_conditionwise_avgthencomp_bynode':repeat_corr_conditionwise_avgthencomp_bynode,'repeat_corr_conditionwise_avgthencomp_bynode_meanR':repeat_corr_conditionwise_avgthencomp_bynode_meanR}
@@ -91,16 +91,16 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
     if full_report or reliability_type=='nodewise_compthenavg':
     
         repeat_corr_nodewise_compthenavg = np.zeros((nSubjs))
-            for scount in list(range(nSubjs)):
-                run1_mean_activations=actvect_group[:,:,0,scount].flatten()
-                run2_mean_activations=actvect_group[:,:,1,scount].flatten()
-                repeat_corr_nodewise_compthenavg[scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
+        for scount in list(range(nSubjs)):
+            run1_mean_activations=actvect_group[:,:,0,scount].flatten()
+            run2_mean_activations=actvect_group[:,:,1,scount].flatten()
+            repeat_corr_nodewise_compthenavg[scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
     
         repeat_corr_nodewise_compthenavg_meanR = np.nanmean(repeat_corr_nodewise_compthenavg)
 
         if print_report:
             print('Compare-then-average subject-wise, cross-node correlations between repititions (whole brain activation patterns, cross-subject):')
-            print('r = ',np.nanmean(repeat_corr_nodewise_compthenavg))
+            print('r = ', str("%.2f" % np.nanmean(repeat_corr_nodewise_compthenavg)))
 
         if reliability_type=='nodewise_compthenavg':
             output = {'repeat_corr_nodewise_compthenavg':repeat_corr_nodewise_compthenavg,'repeat_corr_nodewise_compthenavg_meanR':repeat_corr_nodewise_compthenavg_meanR}
@@ -114,8 +114,8 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
         repeat_corr_nodewise_avgthencomp=np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
         
         if print_report:
-            print("Average-then-compare cross-node repeat reliability (whole-brain activation patterns)")
-            print('r = ',repeat_corr_nodewise_avgthencomp)
+            print("Average-then-compare cross-node repeat reliability (whole-brain activation patterns):")
+            print('r = ', str("%.2f" % repeat_corr_nodewise_avgthencomp))
 
         if reliability_type=='nodewise_avgthencomp':
             output = {'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
