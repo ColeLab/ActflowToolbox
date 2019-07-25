@@ -53,8 +53,6 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
         repeat_corr_conditionwise_compthenavg_bynode=np.zeros((nNodes,nSubjs))
         for scount in list(range(nSubjs)):
             for node_num in list(range(nNodes)):
-                #run1_mean_activations=actvect_group[node_num,:,scount][run1_cond_indices]
-                #run2_mean_activations=actvect_group[node_num,:,scount][run2_cond_indices]
                 run1_mean_activations=actvect_group[node_num,:,0,scount]
                 run2_mean_activations=actvect_group[node_num,:,1,scount]
                 repeat_corr_conditionwise_compthenavg_bynode[node_num,scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
