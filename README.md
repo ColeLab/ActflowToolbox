@@ -4,7 +4,7 @@
 ## Overview
 The purpose of this software package is to facilitate use of neuroscience methods linking connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M).
 
-Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation are also included. The primary focus is on fMRI data, but in principle these approaches can be applied to other kinds of data.
+Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation are also included. The primary focus is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.
 
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
