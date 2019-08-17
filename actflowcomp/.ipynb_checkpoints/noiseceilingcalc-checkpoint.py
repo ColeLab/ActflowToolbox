@@ -88,13 +88,14 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
     #nodewise_compthenavg - Compare-then-average cross-node correlation between repetitions (whole-brain activation patterns)
     if full_report or reliability_type=='nodewise_compthenavg':
     
-        repeat_corr_nodewise_compthenavg = np.zeros((nSubjs))
+        repeat_corr_nodewise_compthenavg = np.zeros((nConds,nSubjs))
         for scount in list(range(nSubjs)):
-            run1_mean_activations=actvect_group[:,:,0,scount].flatten()
-            run2_mean_activations=actvect_group[:,:,1,scount].flatten()
-            repeat_corr_nodewise_compthenavg[scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
+            for cond_num in list(range(nConds)):
+                run1_mean_activations=actvect_group[:,cond_num,0,scount].flatten()
+                run2_mean_activations=actvect_group[:,cond_num,1,scount].flatten()
+                repeat_corr_nodewise_compthenavg[cond_num,scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
     
-        repeat_corr_nodewise_compthenavg_meanR = np.nanmean(repeat_corr_nodewise_compthenavg)
+        repeat_corr_nodewise_compthenavg_meanR = np.nanmean(np.nanmean(repeat_corr_nodewise_compthenavg))
 
         if print_report:
             print('Compare-then-average subject-wise, cross-node correlations between repititions (whole brain activation patterns, cross-subject):')
@@ -107,9 +108,13 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
     #nodewise_avgthencomp - Average-then-compare cross-node repeat reliability (whole-brain activation patterns)
     if full_report or reliability_type=='nodewise_avgthencomp':
         
-        run1_mean_activations=np.mean(actvect_group[:,:,0,:],axis=2).flatten()
-        run2_mean_activations=np.mean(actvect_group[:,:,1,:],axis=2).flatten()
-        repeat_corr_nodewise_avgthencomp=np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
+        repeat_corr_nodewise_avgthencomp_bycond=np.zeros((nConds))
+        for cond_num in list(range(nConds)):
+            run1_mean_activations=np.mean(actvect_group[:,cond_num,0,:],axis=1).flatten()
+            run2_mean_activations=np.mean(actvect_group[:,cond_num,1,:],axis=1).flatten()
+            repeat_corr_nodewise_avgthencomp_bycond[cond_num]=np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
+            
+        repeat_corr_nodewise_avgthencomp=np.nanmean(repeat_corr_nodewise_avgthencomp_bycond)
         
         if print_report:
             print("Average-then-compare cross-node repeat reliability (whole-brain activation patterns):")
@@ -119,6 +124,6 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
             output = {'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
 
     if full_report:
-        output = {'repeat_corr_conditionwise_compthenavg_bynode':repeat_corr_conditionwise_compthenavg_bynode,'repeat_corr_conditionwise_compthenavg_bynode_meanR':repeat_corr_conditionwise_compthenavg_bynode_meanR,'repeat_corr_conditionwise_avgthencomp_bynode':repeat_corr_conditionwise_avgthencomp_bynode,'repeat_corr_conditionwise_avgthencomp_bynode_meanR':repeat_corr_conditionwise_avgthencomp_bynode_meanR,'repeat_corr_nodewise_compthenavg':repeat_corr_nodewise_compthenavg,'repeat_corr_nodewise_compthenavg_meanR':repeat_corr_nodewise_compthenavg_meanR,'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
+        output = {'repeat_corr_conditionwise_compthenavg_bynode':repeat_corr_conditionwise_compthenavg_bynode,'repeat_corr_conditionwise_compthenavg_bynode_meanR':repeat_corr_conditionwise_compthenavg_bynode_meanR,'repeat_corr_conditionwise_avgthencomp_bynode':repeat_corr_conditionwise_avgthencomp_bynode,'repeat_corr_conditionwise_avgthencomp_bynode_meanR':repeat_corr_conditionwise_avgthencomp_bynode_meanR,'repeat_corr_nodewise_compthenavg':repeat_corr_nodewise_compthenavg,'repeat_corr_nodewise_compthenavg_meanR':repeat_corr_nodewise_compthenavg_meanR,'repeat_corr_nodewise_avgthencomp_bycond':repeat_corr_nodewise_avgthencomp_bycond,'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
     
     return output
