@@ -36,6 +36,10 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 * Primary language: Python 3
 * Secondary language (for select functions, minimally maintained/updated): MATLAB
 * Versioning guidelines: Semantic Versioning 2.0.0 (https://semver.org/); used loosely prior to v1.0, strictly after
+* Using GitHub for version control
+	* Those new to Git should go through a tutorial for branching, etc.: https://guides.github.com/activities/hello-world/
+	* Use branching for adding new features, making sure code isn't broken by changes
+	* Considering using unit tests and Travis CI (https://travis-ci.org) in future
 * Style specifications:
 	* PEP8 style as general guidelines (loosely applied for now): https://www.python.org/dev/peps/pep-0008/
 	* Soft tabs (4 spaces) for indentations [ideally set "soft tabs" setting in editor, so pressing tab key produces 4 spaces]
