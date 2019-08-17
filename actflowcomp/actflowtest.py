@@ -47,7 +47,7 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
     actVect_actual_group = np.zeros((nNodes,nTasks,nSubjs))
     if actVect_group_test is not None:
         #Setting target activations to be from the separate test data
-        #Note: In separate_activations_bytarget=True case, actVect_group_test should not have separate activations by target (just used original version of data)
+        #Note: In separate_activations_bytarget=True case, actVect_group_test should not have separate activations by target (just use original version of data)
         actVect_actual_group = actVect_group_test
     elif separate_activations_bytarget:
         for taskNum in range(nTasks):
