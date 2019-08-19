@@ -24,12 +24,12 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
         [TODO: subjwise_compthenavg (each node & condition based on individual differences)]
     
     OUTPUT
-    output: a dictionary containing 1-7 variables, depending on user input for full_report & reliability_type
-        when full_report=True: output contains variables for all reliability_type runs (7 total). It is recommended to set full_report=False if setting a specific reliability_type. (see examples below)
+    output: a dictionary containing 1-8 variables, depending on user input for full_report & reliability_type
+        when full_report=True: output contains variables for all reliability_type runs (8 total). It is recommended to set full_report=False if setting a specific reliability_type. (see examples below)
         when full_report=False,reliability_type='conditionwise_compthenavgthen': output contains 2 variables, 1 node x subject matrix of r values and 1 grand mean r
         when full_report=False,reliability_type='conditionwise_avgthencomp': output contains 2 variables, 1 node x 1 vector of r values and 1 mean r
-        when full_report=False,reliability_type='conditionwise_compthenavgthen': output contains 2 variables, 1 subject x 1 vector of r values and 1 mean r
-        when full_report=False,reliability_type='conditionwise_compthenavgthen': output contains 1 variable, 1 r value
+        when full_report=False,reliability_type='nodewise_compthenavg': output contains 2 variables, 1 subject x 1 vector of r values and 1 mean r
+        when full_report=False,reliability_type='nodewise_avgthencomp': output contains 2 variables, condition-wise vector of r values and 1 cross-condition mean r value
     
     USAGE EXAMPLES
     import noiseceilingcalc as nc
@@ -121,7 +121,7 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
             print('r = ', str("%.2f" % repeat_corr_nodewise_avgthencomp))
 
         if reliability_type=='nodewise_avgthencomp':
-            output = {'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
+            output = {'repeat_corr_nodewise_avgthencomp_bycond':repeat_corr_nodewise_avgthencomp_bycond,'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
 
     if full_report:
         output = {'repeat_corr_conditionwise_compthenavg_bynode':repeat_corr_conditionwise_compthenavg_bynode,'repeat_corr_conditionwise_compthenavg_bynode_meanR':repeat_corr_conditionwise_compthenavg_bynode_meanR,'repeat_corr_conditionwise_avgthencomp_bynode':repeat_corr_conditionwise_avgthencomp_bynode,'repeat_corr_conditionwise_avgthencomp_bynode_meanR':repeat_corr_conditionwise_avgthencomp_bynode_meanR,'repeat_corr_nodewise_compthenavg':repeat_corr_nodewise_compthenavg,'repeat_corr_nodewise_compthenavg_meanR':repeat_corr_nodewise_compthenavg_meanR,'repeat_corr_nodewise_avgthencomp_bycond':repeat_corr_nodewise_avgthencomp_bycond,'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
