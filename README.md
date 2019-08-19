@@ -37,7 +37,7 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 * Secondary language (for select functions, minimally maintained/updated): MATLAB
 * Versioning guidelines: Semantic Versioning 2.0.0 (https://semver.org/); used loosely prior to v1.0, strictly after
 * Using GitHub for version control
-	* Those new to Git should go through a tutorial for branching, etc.: https://guides.github.com/activities/hello-world/
+	* Those new to Git should go through a tutorial for branching, etc.: https://www.youtube.com/watch?v=oFYyTZwMyAg and https://guides.github.com/activities/hello-world/
 	* Use branching for adding new features, making sure code isn't broken by changes
 	* Considering using unit tests and Travis CI (https://travis-ci.org) in future
 * Style specifications:
