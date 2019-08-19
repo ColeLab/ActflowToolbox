@@ -57,4 +57,5 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 * _Directory_: pipelines - Example pipelines for data analyses
 * _Directory_: preprocessing - Functions for preprocessing (after "minimal" preprocessing)
 * _Directory_: simulations - Simulations used for validating methods
+* _Directory_: tests - Code for testing various parts of the toolbox
 * _Directory_: tools - Miscellaneous tools
