@@ -119,7 +119,7 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
 
         
         
-    ## Parcel-wise analyses (as opposed to condition-wise)
+    ## Node-wise analyses (as opposed to condition-wise)
     
     print(" ")
     print("==Parcel-wise (spatial) correlations between predicted and actual activation patterns (calculated for each condition separetely):==")
