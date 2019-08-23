@@ -1,15 +1,18 @@
 
 import numpy as np
 import scipy.stats
+from ..model_compare import *
 
-def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliability_type='conditionwise_compthenavgthen'):
+def noiseceilingcalc(actvect_group_first, actvect_group_second, full_report=False, print_report=True, reliability_type='conditionwise_compthenavgthen'):
     """
     Function to calculate the repeat reliability of the data in various ways. This is equivalent to calculating the "noise ceiling" for predictive models (such as encoding models like activity flow models), which identifies theoretical limits on the highest prediction accuracy (based on the assumption that the data predicting itself is the highest possible prediction accuracy).
     
     Note that incorporation of spontaneous activity to predict task-evoked activity might allow for predictions above the noise ceiling (since spontaneous activity is considered "noise" with the noise ceiling approach).
     
     INPUTS
-    actvect_group: node x condition x repetition x subject matrix with activation values. Note that only the first 2 values in the 'repetition' dimension are used.
+    actvect_group_first: node x condition x subject matrix with activation values. This should be distinct data from actvect_group_second (ideally identical in all ways, except a repetition of data collection at a different time)
+    
+    actvect_group_second: node x condition x subject matrix with activation values. This should be distinct data from actvect_group_first (ideally identical in all ways, except a repetition of data collection at a different time)
     
     full_report: Calculate full report with all reliability types
     
@@ -24,14 +27,12 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
         [TODO: subjwise_compthenavg (each node & condition based on individual differences)]
     
     OUTPUT
-    output: a dictionary containing 1-8 variables, depending on user input for full_report & reliability_type
-        when full_report=True: output contains variables for all reliability_type runs (8 total). It is recommended to set full_report=False if setting a specific reliability_type. (see examples below)
-        when full_report=False,reliability_type='conditionwise_compthenavgthen': output contains 2 variables, 1 node x subject matrix of r values and 1 grand mean r
-        when full_report=False,reliability_type='conditionwise_avgthencomp': output contains 2 variables, 1 node x 1 vector of r values and 1 mean r
-        when full_report=False,reliability_type='nodewise_compthenavg': output contains 2 variables, 1 subject x 1 vector of r values and 1 mean r
-        when full_report=False,reliability_type='nodewise_avgthencomp': output contains 2 variables, condition-wise vector of r values and 1 cross-condition mean r value
+    output: a dictionary containing different variables depending on user input for full_report & reliability_type.
+        See documentation for model_compare function for details.
     
     USAGE EXAMPLES
+    [TODO: Update usage examples]
+    
     import noiseceilingcalc as nc
     output = nc.noiseceilingcalc(actvect_group,full_report=False,print_report=True,reliability_type='conditionwise_compthenavgthen')
     print('Noise ceiling variables available: ',list(output)) # will show all variables available from this usage of nc; in this case it will contain 2 variables corresponding to conditionwise_compthenavgthen (1 matrix of r values, 1 grand mean r value)
@@ -43,87 +44,6 @@ def noiseceilingcalc(actvect_group, full_report=False, print_report=True, reliab
     noiseCeilVal = output['repeat_corr_nodewise_avgthencomp'] # an example of accessing the r value associated with 'nodewise_avgthencomp'
     """
     
-    nNodes=np.shape(actvect_group)[0]
-    nConds=np.shape(actvect_group)[1]
-    nSubjs=np.shape(actvect_group)[3]
+    model_compare_output = model_compare(target_actvect=actvect_group_second, model1_actvect=actvect_group_first, model2_actvect=None, full_report=full_report, print_report=print_report)
     
-    #conditionwise_compthenavgthen - Compare-then-average, condition-wise repeat reliability
-    if full_report or reliability_type=='conditionwise_compthenavgthen':
-
-        repeat_corr_conditionwise_compthenavg_bynode=np.zeros((nNodes,nSubjs))
-        for scount in list(range(nSubjs)):
-            for node_num in list(range(nNodes)):
-                run1_mean_activations=actvect_group[node_num,:,0,scount]
-                run2_mean_activations=actvect_group[node_num,:,1,scount]
-                repeat_corr_conditionwise_compthenavg_bynode[node_num,scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
-    
-        repeat_corr_conditionwise_compthenavg_bynode_meanR = np.mean(np.mean(repeat_corr_conditionwise_compthenavg_bynode))
-
-        if print_report:
-            print('Compare-then-average condition-wise correlation between repetitions (cross-node & cross-subj mean):')
-            print('r = ', str("%.2f" % np.mean(np.mean(repeat_corr_conditionwise_compthenavg_bynode))))
-
-        if reliability_type=='conditionwise_compthenavgthen':
-            output = {'repeat_corr_conditionwise_compthenavg_bynode':repeat_corr_conditionwise_compthenavg_bynode,'repeat_corr_conditionwise_compthenavg_bynode_meanR':repeat_corr_conditionwise_compthenavg_bynode_meanR}
-        
-        
-    #conditionwise_avgthencomp - Average-then-compare condition-wise correlation between repetitions
-    if full_report or reliability_type=='conditionwise_avgthencomp':
-        
-        repeat_corr_conditionwise_avgthencomp_bynode=np.zeros((nNodes))
-        for node_num in list(range(nNodes)):
-            run1_mean_activations=np.mean(actvect_group[node_num,:,0,:],axis=1)
-            run2_mean_activations=np.mean(actvect_group[node_num,:,1,:],axis=1)
-            repeat_corr_conditionwise_avgthencomp_bynode[node_num] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
-        
-        repeat_corr_conditionwise_avgthencomp_bynode_meanR = np.mean(repeat_corr_conditionwise_avgthencomp_bynode)
-
-        if print_report:
-            print('Average-then-compare condition-wise correlation between repetitions (cross-node & cross-subj mean):')
-            print('r = ', str("%.2f" % np.mean(repeat_corr_conditionwise_avgthencomp_bynode)))
-
-        if reliability_type=='conditionwise_avgthencomp':
-                output = {'repeat_corr_conditionwise_avgthencomp_bynode':repeat_corr_conditionwise_avgthencomp_bynode,'repeat_corr_conditionwise_avgthencomp_bynode_meanR':repeat_corr_conditionwise_avgthencomp_bynode_meanR}
-
-    #nodewise_compthenavg - Compare-then-average cross-node correlation between repetitions (whole-brain activation patterns)
-    if full_report or reliability_type=='nodewise_compthenavg':
-    
-        repeat_corr_nodewise_compthenavg = np.zeros((nConds,nSubjs))
-        for scount in list(range(nSubjs)):
-            for cond_num in list(range(nConds)):
-                run1_mean_activations=actvect_group[:,cond_num,0,scount].flatten()
-                run2_mean_activations=actvect_group[:,cond_num,1,scount].flatten()
-                repeat_corr_nodewise_compthenavg[cond_num,scount] = np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
-    
-        repeat_corr_nodewise_compthenavg_meanR = np.nanmean(np.nanmean(repeat_corr_nodewise_compthenavg))
-
-        if print_report:
-            print('Compare-then-average subject-wise, cross-node correlations between repititions (whole brain activation patterns, cross-subject):')
-            print('r = ', str("%.2f" % np.nanmean(repeat_corr_nodewise_compthenavg)))
-
-        if reliability_type=='nodewise_compthenavg':
-            output = {'repeat_corr_nodewise_compthenavg':repeat_corr_nodewise_compthenavg,'repeat_corr_nodewise_compthenavg_meanR':repeat_corr_nodewise_compthenavg_meanR}
-
-
-    #nodewise_avgthencomp - Average-then-compare cross-node repeat reliability (whole-brain activation patterns)
-    if full_report or reliability_type=='nodewise_avgthencomp':
-        
-        repeat_corr_nodewise_avgthencomp_bycond=np.zeros((nConds))
-        for cond_num in list(range(nConds)):
-            run1_mean_activations=np.mean(actvect_group[:,cond_num,0,:],axis=1).flatten()
-            run2_mean_activations=np.mean(actvect_group[:,cond_num,1,:],axis=1).flatten()
-            repeat_corr_nodewise_avgthencomp_bycond[cond_num]=np.corrcoef(run1_mean_activations,run2_mean_activations)[0,1]
-            
-        repeat_corr_nodewise_avgthencomp=np.nanmean(repeat_corr_nodewise_avgthencomp_bycond)
-        
-        if print_report:
-            print("Average-then-compare cross-node repeat reliability (whole-brain activation patterns):")
-            print('r = ', str("%.2f" % repeat_corr_nodewise_avgthencomp))
-
-        if reliability_type=='nodewise_avgthencomp':
-            output = {'repeat_corr_nodewise_avgthencomp_bycond':repeat_corr_nodewise_avgthencomp_bycond,'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
-
-    if full_report:
-        output = {'repeat_corr_conditionwise_compthenavg_bynode':repeat_corr_conditionwise_compthenavg_bynode,'repeat_corr_conditionwise_compthenavg_bynode_meanR':repeat_corr_conditionwise_compthenavg_bynode_meanR,'repeat_corr_conditionwise_avgthencomp_bynode':repeat_corr_conditionwise_avgthencomp_bynode,'repeat_corr_conditionwise_avgthencomp_bynode_meanR':repeat_corr_conditionwise_avgthencomp_bynode_meanR,'repeat_corr_nodewise_compthenavg':repeat_corr_nodewise_compthenavg,'repeat_corr_nodewise_compthenavg_meanR':repeat_corr_nodewise_compthenavg_meanR,'repeat_corr_nodewise_avgthencomp_bycond':repeat_corr_nodewise_avgthencomp_bycond,'repeat_corr_nodewise_avgthencomp':repeat_corr_nodewise_avgthencomp}
-    
-    return output
+    return model_compare_output
