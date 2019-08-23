@@ -158,7 +158,7 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
                     meanRhoModel2=np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(rankcorr_conditionwise_compthenavg_bynode_model2))))
                     print("Model2 mean rank-correlation rho=" + str("%.2f" % meanRhoModel2))
                     meanRhoModelDiff=meanRhoModel1-meanRhoModel2
-                    print("Rho-value difference = " + str("%.2f" % meanRModelDiff))
+                    print("Rho-value difference = " + str("%.2f" % meanRhoModelDiff))
                     print("Model1 vs. Model2 T-value: " + str("%.2f" % tval_ActflowPredAccRankCorr_nodemean) + ", p-value: " + str(pval_ActflowPredAccRankCorr_nodemean))
                     
               

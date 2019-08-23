@@ -91,7 +91,8 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
               'predAcc_bynode_bysubj':model_compare_output['corr_nodewise_compthenavg_bycond'],
               'predAccRankCorr_bynode_bysubj':model_compare_output['rankcorr_conditionwise_compthenavg_bynode'],
               'predAcc_bynode_avgthencomp':model_compare_output['corr_conditionwise_avgthencomp_bynode'],
-              'predAccRankCorr_bynode_avgthencomp':model_compare_output['rankcorr_conditionwise_avgthencomp_bynode']
+              'predAccRankCorr_bynode_avgthencomp':model_compare_output['rankcorr_conditionwise_avgthencomp_bynode'],
+              'model_compare_output':model_compare_output
              }
     
     if mean_absolute_error:
