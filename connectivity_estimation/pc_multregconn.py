@@ -20,7 +20,11 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None):
         if nnodes<n_components or timepoints<n_components:
             print('activity_matrix shape: ',np.shape(activity_matrix))
             raise Exception('More components than nodes and/or timepoints! Use fewer components')
-            
+    
+    #De-mean time series
+    activity_matrix_mean = np.mean(activity_matrix,axis=1)
+    activity_matrix = activity_matrix - activity_matrix_mean[:, np.newaxis]
+    
     pca = PCA(n_components)
 
     if target_ts is None:
@@ -39,6 +43,8 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None):
             betasPCR = pca.inverse_transform(reg.coef_)
             connectivity_mat[targetnode,othernodes]=betasPCR
     else:
+        #Remove time series mean
+        target_ts = target_ts - np.mean(target_ts)
         #Computing values for a single target node
         connectivity_mat = np.zeros((nnodes,1))
         X = activity_matrix.T

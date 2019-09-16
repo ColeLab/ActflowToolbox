@@ -1,27 +1,30 @@
 
 from sklearn.linear_model import LinearRegression
 from sklearn.decomposition import PCA
-#from ..tools import regression
 import numpy as np
 
 def pc_multregconn(activity_matrix, target_ts=None, n_components=None):
     """
     activity_matrix:    Activity matrix should be nodes X time
     target_ts:             Optional, used when only a single target time series (returns 1 X nnodes matrix)
-    n_components:    Number of PCA components to use. If None, the smaller of number of nodes or number of time points (minus 1) will be selected.
+    n_components:  Optional. Number of PCA components to use. If None, the smaller of number of nodes or number of time points (minus 1) will be selected.
     Output: connectivity_mat, formatted targets X sources
     """
 
     nnodes = activity_matrix.shape[0]
     timepoints = activity_matrix.shape[1]
     
-    if n_components is None:
+    if n_components == None:
         n_components = np.min([nnodes-1, timepoints-1])
     else:
         if nnodes<n_components or timepoints<n_components:
             print('activity_matrix shape: ',np.shape(activity_matrix))
             raise Exception('More components than nodes and/or timepoints! Use fewer components')
-            
+    
+    #De-mean time series
+    activity_matrix_mean = np.mean(activity_matrix,axis=1)
+    activity_matrix = activity_matrix - activity_matrix_mean[:, np.newaxis]
+    
     pca = PCA(n_components)
 
     if target_ts is None:
@@ -40,6 +43,8 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None):
             betasPCR = pca.inverse_transform(reg.coef_)
             connectivity_mat[targetnode,othernodes]=betasPCR
     else:
+        #Remove time series mean
+        target_ts = target_ts - np.mean(target_ts)
         #Computing values for a single target node
         connectivity_mat = np.zeros((nnodes,1))
         X = activity_matrix.T

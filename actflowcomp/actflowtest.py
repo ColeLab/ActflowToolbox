@@ -4,7 +4,7 @@ import scipy.stats
 from .actflowcalc import *
 from ..model_compare import *
 
-def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_condition=True, separate_activations_bytarget=False, mean_absolute_error=False):
+def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_condition=True, separate_activations_bytarget=False, mean_absolute_error=False,transfer_func=None):
     """
     Function to run activity flow mapping with spatial correlation predicted-to-actual testing across multiple tasks and subjects, either with a single (e.g., rest) connectivity matrix or with a separate connectivity matrix for each task. Returns statistics at the group level.
     
@@ -34,14 +34,14 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
     if len(np.shape(fcMat_group)) > 3:
         #If a separate FC state for each task
         if separate_activations_bytarget:
-            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,:,taskNum,subjNum],fcMat_group[:,:,taskNum,subjNum], separate_activations_bytarget=True) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
+            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,:,taskNum,subjNum],fcMat_group[:,:,taskNum,subjNum], separate_activations_bytarget=True,transfer_func=transfer_func) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
         else:
-            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,taskNum,subjNum],fcMat_group[:,:,taskNum,subjNum]) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
+            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,taskNum,subjNum],fcMat_group[:,:,taskNum,subjNum],transfer_func=transfer_func) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
     else:
         if separate_activations_bytarget:
-            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,:,taskNum,subjNum],fcMat_group[:,:,subjNum], separate_activations_bytarget=True) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
+            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,:,taskNum,subjNum],fcMat_group[:,:,subjNum], separate_activations_bytarget=True,transfer_func=transfer_func) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
         else:
-            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,taskNum,subjNum],fcMat_group[:,:,subjNum]) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
+            actPredVector_bytask_bysubj=[[actflowcalc(actVect_group[:,taskNum,subjNum],fcMat_group[:,:,subjNum],transfer_func=transfer_func) for taskNum in range(nTasks)] for subjNum in range(nSubjs)]
     actPredVector_bytask_bysubj=np.transpose(actPredVector_bytask_bysubj)
     
     #Calculate actual activation values (e.g., for when separate_activations_bytarget is True)
@@ -58,29 +58,6 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
         model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=actVect_actual_group, full_report=True, print_report=print_by_condition, mean_absolute_error=mean_absolute_error)
     else:
         model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=print_by_condition, mean_absolute_error=mean_absolute_error)
-
-
-    #     if mean_absolute_error == True:
-    #         ##Accuracy of prediction using mean absolute error, separately for each subject ("compare-then average")
-    #         maeAcc_bytask_bysubj = [[np.nanmean(np.abs(np.subtract(actVect_actual_group[:,taskNum,subjNum],actPredVector_bytask_bysubj[:,taskNum,subjNum]))) for subjNum in range(nSubjs)] for taskNum in range(nTasks)]            
-    #         #averaging across subjects before comparing ("average-then-compare")
-    #         maeAcc_bytask_avgthencomp=[np.nanmean(np.abs(np.subtract(np.nanmean(actVect_actual_group[:,taskNum,:],axis=1),np.nanmean(actPredVector_bytask_bysubj[:,taskNum,:],axis=1)))) for taskNum in range(nTasks)]
-
-    #         print(" ")
-    #         print("==Parcel-wise (spatial) Mean Absolute Error (MAE) between predicted and actual activation patterns (calculated for each condition separateley):==")
-    #         print("--Compare-then-average (calculating MAE accuracies before cross-subjects averaging:)")
-    #         print("mae=" + str("%.2f" % np.nanmean(np.nanmean(maeAcc_bytask_bysubj))))
-    #         if print_by_condition:
-    #             print("By task condition:")
-    #             for taskNum in range(nTasks):
-    #                 print("Condition " + str(taskNum+1) + ": mae=" + str("%.2f" % np.nanmean(maeAcc_bytask_bysubj[taskNum])))
-
-    #         print("--Average-then-compare (calculating MAE accuracies after cross-subject averaging):")
-    #         print("mae=" + str("%.2f" % np.nanmean(maeAcc_bytask_avgthencomp)))
-    #         if print_by_condition:
-    #             print("By task condition:")
-    #             for taskNum in range(nTasks):
-    #                 print("Condition " + str(taskNum+1) + ": mae=" + str("%.2f" % maeAcc_bytask_avgthencomp[taskNum]))
 
 
 
