@@ -47,10 +47,12 @@ def actflowcalc(actVect, fcMat, separate_activations_bytarget=False, transfer_fu
 
 
 #Define input transfer function
-def transfer_function(activity, transfer_func='linear', threshold=0):
+def transfer_function(activity, transfer_func='linear', threshold=0, a=1):
     if transfer_func == 'linear':
         return activity
     elif transfer_func == 'relu':
         return activity*(activity>threshold)
     elif transfer_func == 'sigmoid':
         return 1 / (1 + np.exp(-activity))
+    elif transfer_func == 'logit':
+        return return (1/a)*np.log(activity/(1-activity))
