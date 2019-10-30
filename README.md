@@ -1,6 +1,8 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
 
+## Version 0.1.0 (alpha version)
+
 ## Overview
 The purpose of this software package is to facilitate use of neuroscience methods linking connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M).
 
@@ -8,20 +10,21 @@ Other included methods that can be used along with activity flow mapping (or not
 
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
-* Information transfer mapping (http://rdcu.be/wQ1M)
+* Information transfer mapping (http://rdcu.be/wQ1M) [planned]
 
 ### Included connectivity mapping methods
 * _All methods can be applied to resting-state or task-state data_
 * Correlation-based functional connectivity
-* Multiple regression and partial correlation function connectivity
-	* Multiple regression connectivity
+* Multiple-regression functional connectivity
+	* Ordinary least squares multiple regression connectivity
 	* Regularized multiple regression connectivity
 		* Principle components regression connectivity (PCR)
-	* Partial correlation
-	* Regularized partial correlation
+* Partial-correlation functional connectivity
+	* Inverse covariance-based partial correlation
+	* Regularized partial correlation [planned]
 * Special preprocessing for task-state functional connectivity
-	* Flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf)
-* Causal connectivity (fGES; https://doi.org/10.1007/s41060-016-0032-z)
+	* Flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf) [planned]
+* Causal connectivity (fGES; https://doi.org/10.1007/s41060-016-0032-z) [planned]
 
 ## How to install
 
@@ -30,12 +33,12 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 ## Conventions
 * Data matrices all node X time
 * Directed connectivity matrices all target X source
-* Primary (default) brain parcellation: CAB-NP (https://github.com/ColeLab/ColeAnticevicNetPartition), which uses the Glasser2016 parcellation for cortex (https://balsa.wustl.edu/study/show/RVVG)
+* Primary (default) brain parcellation: CAB-NP (https://github.com/ColeLab/ColeAnticevicNetPartition), which uses the Glasser2016 parcellation for cortex (https://balsa.wustl.edu/study/show/RVVG) and includes an additional 358 subcortical parcels
 
 ## Software development guidelines
 * Primary language: Python 3
 * Secondary language (for select functions, minimally maintained/updated): MATLAB
-* Versioning guidelines: Semantic Versioning 2.0.0 (https://semver.org/); used loosely prior to v1.0, strictly after
+* Versioning guidelines: Semantic Versioning 2.0.0 (https://semver.org/); used loosely prior to v1.0.0, strictly after
 * Using GitHub for version control
 	* Those new to Git should go through a tutorial for branching, etc.: https://www.youtube.com/watch?v=oFYyTZwMyAg and https://guides.github.com/activities/hello-world/
 	* Use branching for adding new features, making sure code isn't broken by changes
