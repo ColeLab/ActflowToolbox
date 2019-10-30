@@ -43,9 +43,10 @@ In principle, any measure of neural activity and any measure of neural connectiv
 * Causal connectivity (fGES; https://doi.org/10.1007/s41060-016-0032-z) [planned]
 
 ### Cite as:
-Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
-and https://github.com/ColeLab/ActflowToolbox/ 
-and the article that describes the specific toolbox functions used in most detail.
+1) Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
+2) https://github.com/ColeLab/ActflowToolbox/ 
+and
+3) The article that describes the specific toolbox functions being used in most detail
 
 ## How to install
 
