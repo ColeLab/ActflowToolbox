@@ -18,7 +18,7 @@ Activity flow mapping is a method validated and published in Nature Neuroscience
 
 <img width="350" src="images/actflowfigure1.png">
 
-2) _Testing prediction accuracy_: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity. Two examples of actual vs. predicted accuracy testing (from http://rdcu.be/kOJq):
+2) _Testing prediction accuracy_: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity. Two examples of predicted-to-actual accuracy testing (from http://rdcu.be/kOJq):
 
 <img width="350" src="images/actflowfigure_predictiontesting.png">
 
