@@ -36,11 +36,11 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 * Primary (default) brain parcellation: CAB-NP (https://github.com/ColeLab/ColeAnticevicNetPartition), which uses the Glasser2016 parcellation for cortex (https://balsa.wustl.edu/study/show/RVVG) and includes an additional 358 subcortical parcels
 
 ## Example
-Calculating activity flow mapping predictions using multiple-regression FC and standard task-evoked activations with fMRI data (in Python 3; assumes data already loaded):
+Calculating activity flow mapping predictions using multiple-regression FC and standard task-evoked activations with fMRI data (in Python 3; assumes task activations and resting-state fMRI data are already loaded):
 ```import ActflowToolbox as actflow
 restFC_mreg=actflow.connectivity_estimation.multregconn(restdata)
 print("==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions==")
-actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg_bysubj)
+actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg_bysubj, print_by_condition=False)
 ```
 Output:
 ```
