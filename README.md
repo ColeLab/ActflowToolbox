@@ -4,11 +4,21 @@
 ## Version 0.1.0 (alpha version)
 
 ## Overview
-The purpose of this software package is to facilitate use of neuroscience methods linking connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M). These approaches can be used to produce and test _network coding models_ (http://arxiv.org/abs/1907.03612).
+This toolbox facilitates linking brain connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M). These approaches can be used to create and test _network coding models_ (http://arxiv.org/abs/1907.03612), which are empirically-constrained neural network models.
 
-Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation are also included [planned]. The primary focus (for now) is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.
+Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation will also be included [planned]. The primary focus (for now) is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.
 
 This code repository was created by the Cole Neurocognition Lab at Rutgers University: http://www.colelab.org/ We are happy for others to contribute to the code as well (contact Michael Cole if you are interested).
+
+We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.google.com/forum/#!forum/coleneurolab_users), so you can be informed about major updates in this repository and others hosted by the Cole Neurocognition Lab.
+
+### Core algorithm and principles behind activity flow mapping
+Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see http://rdcu.be/kOJq), with multiple follow-up studies further validating the approach.
+
+Activity flow mapping has two major steps:
+1) Activity flow modeling: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard "propagation rule" and "activation rule" steps used in most neural network simulations (see http://arxiv.org/abs/1907.03612). In the standard approach each neural population's activity level is predicted based on the flow from every other recorded neural population:
+
+2) Testing prediction accuracy: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity.
 
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
