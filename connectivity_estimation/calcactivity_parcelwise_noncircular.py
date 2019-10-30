@@ -16,7 +16,6 @@ def calcactivity_parcelwise_noncircular_surface(data, dlabelfile=defaultdlabelfi
     This function produces a parcel-to-parcel activity (GLM beta) matrix while excluding vertices in the neighborhood of a given target parcel.
     Excludes all vertices within a 10mm (default) dilated mask of the target parcel when computing parcel-level mean activity.
     Takes in vertex-wise data and generates a parcelA X parcelB activity matrix, with parcelA being the to-be-predicted 'target' and parcelB being the 'source'
-    Currently only works for surface-based cortex data
     
     PARAMETERS:
         data            :       vertex-wise data... vertices x conditions; default assumes that data is 96k dense array
