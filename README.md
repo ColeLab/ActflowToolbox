@@ -35,6 +35,42 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 * Directed connectivity matrices all target X source
 * Primary (default) brain parcellation: CAB-NP (https://github.com/ColeLab/ColeAnticevicNetPartition), which uses the Glasser2016 parcellation for cortex (https://balsa.wustl.edu/study/show/RVVG) and includes an additional 358 subcortical parcels
 
+## Example
+Calculating activity flow mapping predictions using multiple-regression FC and standard task-evoked activations with fMRI data (in Python 3; assumes data already loaded):
+```import ActflowToolbox as actflow
+restFC_mreg=actflow.connectivity_estimation.multregconn(restdata)
+print("==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions==")
+actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg_bysubj)
+```
+Output:
+```
+==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions==
+===Comparing prediction accuracies between models (similarity between predicted and actual brain activation patterns)===
+ 
+==Condition-wise correlations between predicted and actual activation patterns (calculated for each node separetely):==
+--Compare-then-average (calculating prediction accuracies before cross-subject averaging):
+Each correlation based on N conditions: 24, p-values based on N subjects (cross-subject variance in correlations): 176
+Mean Pearson r=0.89, t-value vs. 0: 171.05, p-value vs. 0: 1.0573286644474424e-196
+Mean rank-correlation rho=0.79, t-value vs. 0: 173.30, p-value vs. 0: 1.0891488047331093e-197
+ 
+==Condition-wise correlations between predicted and actual activation patterns (calculated for each node separetely):==
+--Average-then-compare (calculating prediction accuracies after cross-subject averaging):
+Each correlation based on N conditions: 24
+Mean Pearson r=0.98
+Mean rank-correlation rho=0.94
+ 
+==Node-wise (spatial) correlations between predicted and actual activation patterns (calculated for each condition separetely):==
+--Compare-then-average (calculating prediction accuracies before cross-subject averaging):
+Each correlation based on N nodes: 360, p-values based on N subjects (cross-subject variance in correlations): 176
+Cross-condition mean r=0.87, t-value vs. 0: 152.54, p-value vs. 0: 4.6587650313354306e-188
+ 
+==Node-wise (spatial) correlations between predicted and actual activation patterns (calculated for each condition separetely):==
+--Average-then-compare (calculating prediction accuracies after cross-subject averaging):
+Each correlation based on N nodes: 360, p-values based on N subjects (cross-subject variance in correlations): 176
+Mean r=0.97
+```
+
+
 ## Software development guidelines
 * Primary language: Python 3
 * Secondary language (for select functions, minimally maintained/updated): MATLAB
@@ -50,14 +86,24 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 	* Add detailed comments to explain what code does (especially when not obvious)
 
 ## Contents
-* _Directory_: actflowcalc - Calculating activity flow mapping
+* _Directory_: actflowcomp - Calculating activity flow mapping
+	* actflowcalc.py - Main function for calculating activity flow mapping predictions
+	* actflowtest.py - A convenience function for calculating activity-flow-based predictions and testing prediction accuracies (across multiple subjects)
+	* noiseceilingcalc.py - A convenience function for calculating the theoretical limit on activity-flow-based prediction accuracies (based on noise in the data being used)
 * _Directory_: connectivity_estimation - Connectivity estimation methods
-	* calcconn_parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation). This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within 10 mm of each to-be-predicted parcel.
+	* calcactivity_parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation), focusing on task activations. This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within X mm (10 mm by default) of each to-be-predicted parcel.
+	* calcconn_parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation), focusing on connectivity estimation. This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within X mm (10 mm by default) of each to-be-predicted parcel.
+	* corrcoefconn.py: Calculation of Pearson correlation functional connectivity
+	* multregconn.py: Calculation of multiple-regression functional connectivity
+	* partial_corrconn.py: Calculation of partial-correlation functional connectivity
+	* pc_multregconn.py: Calculation of regularized multiple-regression functional connectivity using principle components regression (PCR). Useful when there are fewer time points than nodes, for instance.
 * _Directory_: dependencies - Other packages Actflow Toolbox depends on
 * _Directory_: infotransfermapping - Calculating information transfer mapping
 * _Directory_: latent_connectivity - Calculating latent functional connectivity via factor analysis [planned]
 * _Directory_: matlab_code - Limited functions for activity flow mapping in MATLAB
 * _Directory_: model_compare - Comparing prediction accuracies across models
+	* model_compare_predicted_to_actual.py - Calculation of predictive model performance
+	* model_compare.py - Reporting of model prediction performance, and comparison of prediction performance across models
 * _Directory_: network_definitions - Data supporting parcel/region sets and network definitions
 * _Directory_: pipelines - Example pipelines for data analyses
 * _Directory_: preprocessing - Functions for preprocessing (after "minimal" preprocessing)
