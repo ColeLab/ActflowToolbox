@@ -9,7 +9,7 @@ def actflowcalc(actVect, fcMat, separate_activations_bytarget=False, transfer_fu
     actVect: node vector with activation values
     fcMat: node x node matrix with connectiivty values
     separate_activations_bytarget: indicates if the input actVect matrix has a separate activation vector for each target (to-be-predicted) node (e.g., for the locally-non-circular approach)
-    transfer_func: The transfer function to apply to the outputs of all source regions. Assumes observed time series are primarily driven by inputs (e.g., local field potentials), such that the source time series need to be converted from inputs to outputs via a transfer function. Default is 'None', which specifies a linear transfer function wherein in the output is the same as the input (equivalent to no transfer function).
+    transfer_func: The transfer function to apply to the outputs of all source regions. Assumes observed time series are primarily driven by inputs (e.g., local field potentials), such that the source time series need to be converted from inputs to outputs via a transfer function. Default is 'None', which specifies a linear transfer function wherein the output is the same as the input.
     """
     
     numRegions=np.shape(actVect)[0]
@@ -55,4 +55,4 @@ def transfer_function(activity, transfer_func='linear', threshold=0, a=1):
     elif transfer_func == 'sigmoid':
         return 1 / (1 + np.exp(-activity))
     elif transfer_func == 'logit':
-        return return (1/a)*np.log(activity/(1-activity))
+        return (1/a)*np.log(activity/(1-activity))

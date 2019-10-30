@@ -3,7 +3,7 @@ from sklearn.linear_model import LinearRegression
 #from ..tools import regression
 import numpy as np
 
-def multregconn(activity_matrix, target_ts=None, transfer_func=None):
+def multregconn(activity_matrix, target_ts=None):
     """
     activity_matrix:    Activity matrix should be nodes X time
     target_ts:             Optional, used when only a single target time series (returns 1 X nnodes matrix)
@@ -22,10 +22,6 @@ def multregconn(activity_matrix, target_ts=None, transfer_func=None):
             othernodes = list(range(nnodes))
             othernodes.remove(targetnode) # Remove target node from 'other nodes'
             X = activity_matrix[othernodes,:].T
-            if transfer_func is 'relu':
-                X = X*(X>0)
-            elif transfer_func is 'logit':
-                X = logit(X)
             y = activity_matrix[targetnode,:]
             #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
             reg = LinearRegression().fit(X, y)
@@ -37,10 +33,6 @@ def multregconn(activity_matrix, target_ts=None, transfer_func=None):
         #Computing values for a single target node
         connectivity_mat = np.zeros((nnodes,1))
         X = activity_matrix.T
-        if transfer_func is 'relu':
-            X = X*(X>0)
-        elif transfer_func is 'logit':
-            X = logit(X)
         y = target_ts
         #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
         reg = LinearRegression().fit(X, y)

@@ -14,7 +14,7 @@ partitiondir = pkg_resources.resource_filename('ActflowToolbox.dependencies', 'C
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 dilatedmaskdir = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'Glasser2016/surfaceMasks/')
 
-def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, precomputedRegularTS=None, verbose=False, relu=False):
+def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, precomputedRegularTS=None, verbose=False):
     """
     This function produces a parcel-to-parcel connectivity matrix while excluding vertices in the neighborhood of a given target parcel.
     Excludes all vertices within a 10mm (default) dilated mask of the target parcel when computing parcel-to-parcel connectivity.
@@ -130,7 +130,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
 
         if connmethod == 'multreg':
             # run multiple regression, and add constant
-            fc_matrix[target_row,source_cols] = multregconn(source_parcel_ts,target_parcel_ts, relu=relu)
+            fc_matrix[target_row,source_cols] = multregconn(source_parcel_ts,target_parcel_ts)
         elif connmethod == 'pearsoncorr':
             fc_matrix[target_row,source_cols] = corrcoefconn(source_parcel_ts,target_parcel_ts)
         elif connmethod == 'pc_multregconn':
