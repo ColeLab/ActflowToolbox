@@ -13,7 +13,7 @@ This code repository was created by the Cole Neurocognition Lab at Rutgers Unive
 ### Core algorithm and principles behind activity flow mapping
 Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see http://rdcu.be/kOJq), with multiple follow-up studies further validating the approach.
 
-**Activity flow mapping has two major steps**:
+**Activity flow mapping has two basic steps**:
 1) _Activity flow modeling_: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard "propagation rule" and "activation rule" steps used in most neural network simulations (see http://arxiv.org/abs/1907.03612). In the standard approach each neural population's activity level is predicted based on the flow from every other recorded neural population (from http://rdcu.be/kOJq):
 
 <img width="350" src="images/actflowfigure1.png">
