@@ -10,15 +10,16 @@ Other included methods that can be used along with activity flow mapping (or not
 
 This code repository was created by the Cole Neurocognition Lab at Rutgers University: http://www.colelab.org/ We are happy for others to contribute to the code as well (contact Michael Cole if you are interested).
 
-We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.google.com/forum/#!forum/coleneurolab_users), so you can be informed about major updates in this repository and others hosted by the Cole Neurocognition Lab.
-
 ### Core algorithm and principles behind activity flow mapping
 Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see http://rdcu.be/kOJq), with multiple follow-up studies further validating the approach.
 
-Activity flow mapping has two major steps:
+**Activity flow mapping has two major steps**:
 1) Activity flow modeling: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard "propagation rule" and "activation rule" steps used in most neural network simulations (see http://arxiv.org/abs/1907.03612). In the standard approach each neural population's activity level is predicted based on the flow from every other recorded neural population:
+![Alt text](images/Figure1.jpg?raw=true "Illustration of activity flow mapping algorithm")
 
 2) Testing prediction accuracy: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity.
+
+In principle, any measure of neural activity and any measure of neural connectivity can be used with activity flow mapping. Some modifications are necessary for fast temporal resolution data such as EEG/MEG or multi-unit recording, but these should be available soon (we are working on it!).
 
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
@@ -38,9 +39,17 @@ Activity flow mapping has two major steps:
 	* Flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf) [planned]
 * Causal connectivity (fGES; https://doi.org/10.1007/s41060-016-0032-z) [planned]
 
+### Cite as:
+Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
+and https://github.com/ColeLab/ActflowToolbox/ 
+and the article that describes the specific toolbox functions used in most detail.
+
 ## How to install
 
 git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
+
+## Email list/forum
+We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.google.com/forum/#!forum/coleneurolab_users), so you can be informed about major updates in this repository and others hosted by the Cole Neurocognition Lab.
 
 ## Conventions
 * Data matrices all node X time
@@ -81,7 +90,6 @@ Cross-condition mean r=0.87, t-value vs. 0: 152.54, p-value vs. 0: 4.65876503133
 Each correlation based on N nodes: 360, p-values based on N subjects (cross-subject variance in correlations): 176
 Mean r=0.97
 ```
-
 
 ## Software development guidelines
 * Primary language: Python 3
