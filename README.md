@@ -109,6 +109,11 @@ Mean r=0.97
 	* Use intuitive variable and function names
 	* Add detailed comments to explain what code does (especially when not obvious)
 
+## Publications that have used activity flow mapping and/or this toolbox
+* Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
+* Ito T, Kulkarni KR, Schultz DH, Mill RD, Chen RH, Solomyak LI, Cole MW (2017). "Cognitive task information is transferred between brain regions via resting-state network topology". Nature Communications. 8:1027. http://dx.doi.org/10.1038/s41467-017-01000-w
+* Mill RD, Gordon BA, Balota DA, Zacks JM, Cole MW (Preprint). "Predicting dysfunctional age-related task activations from resting-state network alterations". bioRxiv. https://doi.org/10.1101/678086
+
 ## Contents
 * _Directory_: actflowcomp - Calculating activity flow mapping
 	* actflowcalc.py - Main function for calculating activity flow mapping predictions
