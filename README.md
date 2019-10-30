@@ -14,11 +14,13 @@ This code repository was created by the Cole Neurocognition Lab at Rutgers Unive
 Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see http://rdcu.be/kOJq), with multiple follow-up studies further validating the approach.
 
 **Activity flow mapping has two major steps**:
-1) _Activity flow modeling_: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard "propagation rule" and "activation rule" steps used in most neural network simulations (see http://arxiv.org/abs/1907.03612). In the standard approach each neural population's activity level is predicted based on the flow from every other recorded neural population:
+1) _Activity flow modeling_: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard "propagation rule" and "activation rule" steps used in most neural network simulations (see http://arxiv.org/abs/1907.03612). In the standard approach each neural population's activity level is predicted based on the flow from every other recorded neural population (from http://rdcu.be/kOJq):
 
-![Alt text](images/actflowfigure1.png "Illustration of activity flow mapping algorithm")
+<img width="350" src="images/actflowfigure1.png">
 
-2) _Testing prediction accuracy_: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity.
+2) _Testing prediction accuracy_: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity. Two examples of actual vs. predicted accuracy testing (from http://rdcu.be/kOJq):
+
+<img width="350" src="images/actflowfigure_predictiontesting.png">
 
 In principle, any measure of neural activity and any measure of neural connectivity can be used with activity flow mapping. Some modifications are necessary for fast temporal resolution data such as EEG/MEG or multi-unit recording, but these should be available soon (we are working on it!).
 
