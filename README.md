@@ -6,7 +6,7 @@
 ## Overview
 The purpose of this software package is to facilitate use of neuroscience methods linking connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M). These approaches can be used to produce and test _network coding models_ (http://arxiv.org/abs/1907.03612).
 
-Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation are also included. The primary focus is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.
+Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation are also included [planned]. The primary focus (for now) is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.
 
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
@@ -55,7 +55,9 @@ git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
 	* calcconn_parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation). This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within 10 mm of each to-be-predicted parcel.
 * _Directory_: dependencies - Other packages Actflow Toolbox depends on
 * _Directory_: infotransfermapping - Calculating information transfer mapping
+* _Directory_: latent_connectivity - Calculating latent functional connectivity via factor analysis [planned]
 * _Directory_: matlab_code - Limited functions for activity flow mapping in MATLAB
+* _Directory_: model_compare - Comparing prediction accuracies across models
 * _Directory_: network_definitions - Data supporting parcel/region sets and network definitions
 * _Directory_: pipelines - Example pipelines for data analyses
 * _Directory_: preprocessing - Functions for preprocessing (after "minimal" preprocessing)
