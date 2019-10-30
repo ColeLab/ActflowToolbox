@@ -19,7 +19,6 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
     This function produces a parcel-to-parcel connectivity matrix while excluding vertices in the neighborhood of a given target parcel.
     Excludes all vertices within a 10mm (default) dilated mask of the target parcel when computing parcel-to-parcel connectivity.
     Takes in vertex-wise data and generates a parcel X parcel connectivity matrix based on provided connmethod
-    Currently only works for surface-based cortex connectivity
     
     PARAMETERS:
         data        : vertex-wise data... vertices x time; default assumes that data is 96k dense array
