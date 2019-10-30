@@ -15,7 +15,7 @@ Activity flow mapping is a method validated and published in Nature Neuroscience
 
 **Activity flow mapping has two major steps**:
 1) Activity flow modeling: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard "propagation rule" and "activation rule" steps used in most neural network simulations (see http://arxiv.org/abs/1907.03612). In the standard approach each neural population's activity level is predicted based on the flow from every other recorded neural population:
-![Alt text](images/Figure1.jpg?raw=true "Illustration of activity flow mapping algorithm")
+![Alt text](images/actflowfigure1.jpg?raw=true "Illustration of activity flow mapping algorithm")
 
 2) Testing prediction accuracy: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity.
 
