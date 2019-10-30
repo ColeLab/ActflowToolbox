@@ -8,6 +8,8 @@ The purpose of this software package is to facilitate use of neuroscience method
 
 Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation are also included [planned]. The primary focus (for now) is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.
 
+This code repository was created by the Cole Neurocognition Lab at Rutgers University: http://www.colelab.org/ We are happy for others to contribute to the code as well (contact Michael Cole if you are interested).
+
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
 * Information transfer mapping (http://rdcu.be/wQ1M) [planned]
