@@ -60,10 +60,16 @@ We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.g
 * Directed connectivity matrices all target X source
 * Primary (default) brain parcellation: CAB-NP (https://github.com/ColeLab/ColeAnticevicNetPartition), which uses the Glasser2016 parcellation for cortex (https://balsa.wustl.edu/study/show/RVVG) and includes an additional 358 subcortical parcels. Cortex-only analyses with only the Glasser2016 parcels are easily implemented. Other parcellations can be used, and we anticipate integrating other parcellations in the future.
 
-## Example
-Calculating activity flow mapping predictions using multiple-regression FC and standard task-evoked activations with fMRI data (in Python 3; assumes task activations and resting-state fMRI data are already loaded):
-```import ActflowToolbox as actflow
-restFC_mreg=actflow.connectivity_estimation.multregconn(restdata)
+## Examples
+A Jupyter Notebook with example analyses is viewable here: [HPCExample.ipynb](examples/HPCExample.ipynb)
+
+Example of calculating activity flow mapping predictions using multiple-regression FC and standard task-evoked activations with fMRI data (in Python 3; assumes task activations and resting-state fMRI data are already loaded):
+```
+import ActflowToolbox as actflow
+import numpy as np
+restFC_mreg=np.zeros((np.shape(restdata)[0],np.shape(restdata)[0],np.shape(restdata)[2]))
+for scount in np.arange(np.shape(restdata)[2]):
+    restFC_mreg[:,:,scount]=actflow.connectivity_estimation.multregconn(restdata[:,:,scount])
 print("==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions==")
 actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg, print_by_condition=False)
 ```
@@ -127,6 +133,7 @@ Mean r=0.97
 	* partial_corrconn.py: Calculation of partial-correlation functional connectivity
 	* pc_multregconn.py: Calculation of regularized multiple-regression functional connectivity using principle components regression (PCR). Useful when there are fewer time points than nodes, for instance.
 * _Directory_: dependencies - Other packages Actflow Toolbox depends on
+* _Directory_: examples - Examples analyses that use the Actflow Toolbox
 * _Directory_: infotransfermapping - Calculating information transfer mapping
 * _Directory_: latent_connectivity - Calculating latent functional connectivity via factor analysis [planned]
 * _Directory_: matlab_code - Limited functions for activity flow mapping in MATLAB
