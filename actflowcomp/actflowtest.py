@@ -15,6 +15,7 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
     mean_absolute_error: if True, compute the absolute mean error: mean(abs(a-p)), where a are the actual activations
     and p the predicted activations across all the nodes.
     """
+
     
     #Add empty task dimension if only 1 task
     if separate_activations_bytarget:
@@ -55,9 +56,9 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
 
     ## Compare predicted to actual activations
     if actVect_group_test is not None:
-        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=actVect_actual_group, full_report=True, print_report=print_by_condition, mean_absolute_error=mean_absolute_error)
+        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=actVect_actual_group, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
     else:
-        model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=print_by_condition, mean_absolute_error=mean_absolute_error)
+        model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
 
 
 
