@@ -133,7 +133,7 @@ Mean r=0.97
 	* partial_corrconn.py: Calculation of partial-correlation functional connectivity
 	* pc_multregconn.py: Calculation of regularized multiple-regression functional connectivity using principle components regression (PCR). Useful when there are fewer time points than nodes, for instance.
 * _Directory_: dependencies - Other packages Actflow Toolbox depends on
-* _Directory_: examples - Examples analyses that use the Actflow Toolbox
+* _Directory_: examples - Example analyses that use the Actflow Toolbox
 * _Directory_: infotransfermapping - Calculating information transfer mapping
 * _Directory_: latent_connectivity - Calculating latent functional connectivity via factor analysis [planned]
 * _Directory_: matlab_code - Limited functions for activity flow mapping in MATLAB
