@@ -61,7 +61,7 @@ We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.g
 * Primary (default) brain parcellation: CAB-NP (https://github.com/ColeLab/ColeAnticevicNetPartition), which uses the Glasser2016 parcellation for cortex (https://balsa.wustl.edu/study/show/RVVG) and includes an additional 358 subcortical parcels. Cortex-only analyses with only the Glasser2016 parcels are easily implemented. Other parcellations can be used, and we anticipate integrating other parcellations in the future.
 
 ## Examples
-A Jupyter Notebook with example analyses is viewable here: [HPCExample.ipynb](examples/HPCExample.ipynb)
+A Jupyter Notebook with example analyses is viewable here: [HCPExample.ipynb](examples/HCPExample.ipynb)
 
 Example of calculating activity flow mapping predictions using multiple-regression FC and standard task-evoked activations with fMRI data (in Python 3; assumes task activations and resting-state fMRI data are already loaded):
 ```
