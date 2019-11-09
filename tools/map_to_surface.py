@@ -2,10 +2,12 @@ import numpy as np
 import nibabel as nib
 import os
 import pkg_resources
-import subprocess
+#import subprocess
 
-toolsdir = pkg_resources.resource_filename('ActflowToolbox.tools', '/')
-glasserfile2=toolsdir+'Q1-Q6_RelatedParcellation210.LR.CorticalAreas_dil_Colors.32k_fs_RL.dlabel.nii'
+#toolsdir = pkg_resources.resource_filename('ActflowToolbox.tools', '/')
+#glasserfile2=toolsdir+'Q1-Q6_RelatedParcellation210.LR.CorticalAreas_dil_Colors.32k_fs_RL.dlabel.nii'
+dependenciesdir = pkg_resources.resource_filename('ActflowToolbox.dependencies', '/')
+glasserfile2=dependenciesdir+'ColeAnticevicNetPartition/CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 
 def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2):
     """
@@ -38,9 +40,11 @@ def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2):
     wb_file = filename + '.dscalar.nii'
     wb_command = 'wb_command -cifti-convert -from-text ' + filename + '.csv ' + glasserfile2 + ' ' + wb_file + ' -reset-scalars'
     #os.system(wb_command)
-    #print(wb_command)
+    print('Command:')
+    print(wb_command)
     try:
-        subprocess.call(wb_command)
+        #subprocess.call(wb_command)
+        os.system(wb_command)
         os.remove(filename + '.csv')
         print("CIFTI dscalar is output as:" + wb_file)
     except OSError:
