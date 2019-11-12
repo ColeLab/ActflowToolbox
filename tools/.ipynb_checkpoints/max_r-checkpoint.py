@@ -90,7 +90,7 @@ def max_r(data_arr, behav_arr, alpha=.05, tail=2, permutations=1000, nproc=1, pv
         # Return p-values from maxT_dist using our empirical CDF (FWE-corrected p-values)
         p_fwe = ecdf(trueR)
 
-        if tail == 1:
+        if tail == 1 or tail == 2:
             p_fwe = 1.0 - p_fwe
         
         #if tail!=0:

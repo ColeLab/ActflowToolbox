@@ -83,7 +83,7 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
         if tail == 1 or tail == 2:
             p_fwe = 1.0 - p_fwe
         
-        return t, maxT_thresh, p_fwe, maxT_dist
+        return t, maxT_thresh, p_fwe
 
     else:
         return t, maxT_thresh
