@@ -1,7 +1,7 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
 
-## Version 0.1.0 (alpha version)
+## Version 0.2.0 (beta version)
 
 ## Overview
 This toolbox facilitates linking brain connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M). These approaches can be used to create and test _network coding models_ (http://arxiv.org/abs/1907.03612), which are empirically-constrained neural network models.
@@ -28,6 +28,13 @@ In principle, any measure of neural activity and any measure of neural connectiv
 * Activity flow mapping (http://rdcu.be/kOJq)
 * Information transfer mapping (http://rdcu.be/wQ1M) [planned]
 
+### Included preprocessing methods
+* General linear models (GLM) for fMRI data
+	* Finite impulse response (FIR) GLM models, which can provide flexible mean task-evoked response removal for task-state functional connectivity (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf)
+	* Standard (canonical hemodynamic response function) GLM (e.g., for calculating the to-be-predicted task activations in activity flow mapping)
+* Nusiance regression approaches for removing fMRI data artifacts, such as for resting-state functional connectivity (or task-state functional connectivity)
+	* The Ciric et al. (2017) validated preprocessing pipelines (https://www.sciencedirect.com/science/article/pii/S1053811917302288)
+
 ### Included connectivity mapping methods
 * _All methods can be applied to resting-state or task-state data_
 * Correlation-based functional connectivity
@@ -39,7 +46,7 @@ In principle, any measure of neural activity and any measure of neural connectiv
 	* Inverse covariance-based partial correlation
 	* Regularized partial correlation [planned]
 * Special preprocessing for task-state functional connectivity
-	* Flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf) [planned]
+	* Flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf) (see FIR GLM preprocessing)
 * Causal connectivity (fGES; https://doi.org/10.1007/s41060-016-0032-z) [planned]
 
 ### Cite as:
@@ -143,6 +150,7 @@ Mean r=0.97
 * _Directory_: network_definitions - Data supporting parcel/region sets and network definitions
 * _Directory_: pipelines - Example pipelines for data analyses
 * _Directory_: preprocessing - Functions for preprocessing (after "minimal" preprocessing)
+	* _Directory_: glmScripts - Functions to implement nuisance regression, standard GLM, and FIR GLM analyses
 * _Directory_: simulations - Simulations used for validating methods
 * _Directory_: tests - Code for testing various parts of the toolbox
 * _Directory_: tools - Miscellaneous tools
