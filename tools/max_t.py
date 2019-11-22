@@ -9,7 +9,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 from functools import partial
 
 
-def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, pvals=True):
+def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, pvals=True, nan_policy='propagate'):
     """
     Performs family-wise ersror correction using permutation testing (Nichols & Holmes 2002).
     This function runs a one-sample t-test vs. 0 or, equivalently, a paired t-test (if the user subtracts two conditions prior to input).
@@ -25,15 +25,16 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
                         paired t-test case.
     Optional Parameters:
         nullmean    =   Expected value of the null hypothesis {default = 0, for a t-test against 0}
-        alpha       =   alpha value to return the maxT threshold {default = .05}
-        tail        =   [0, 1, or -1] 
+        alpha       =   Optional. alpha value to return the maxT threshold {default = .05}
+        tail        =   Optional. [0, 1, or -1] 
                         If tail = 1, reject the null hypothesis if the statistic is greater than the null dist (upper tailed test).  
                         If tail = -1, reject the null hypothesis if the statistic is less than the null dist (lower tailed test). 
                         If tail = 2, reject the null hypothesis for a two-tailed test
                         {default : 2} 
-        permutations =  Number of permutations to perform {default = 1000}
-        nproc       =   number of processes to run in parallel {default = 1}
-        pvals       =   if True, returns equivalent p-value distribution for all t-values {default = True}
+        permutations =  Optional. Number of permutations to perform {default = 1000}
+        nproc       =   Optional. number of processes to run in parallel {default = 1}
+        pvals       =   Optional. if True, returns equivalent p-value distribution for all t-values {default = True}
+        nan_policy  =   Optional. What to do with NaN values when being sent to the t-test function. See scipy.stats.ttest_1samp (https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html) for details. The default is to pass NaN values into the t-test function rather than ignoring them. {default = 'propagate'}
 
     Returns:
         t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
@@ -71,7 +72,7 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
         maxT_thresh = maxT_dist_sorted[topPercVal_maxT_inx]
 
     # Obtain real t-values 
-    t = stats.ttest_1samp(input_arr, nullmean, axis=1)[0]
+    t = stats.ttest_1samp(input_arr, nullmean, axis=1, nan_policy=nan_policy)[0]
 
     if pvals:
         # Construct ECDF from maxT_dist
@@ -107,7 +108,7 @@ def _maxTpermutation(seed,input_arr,nullmean,tail):
     input_arr = np.multiply(input_arr, shufflemat)
 
     # Take t-test against 0 for each independent test 
-    t_matrix = stats.ttest_1samp(input_arr,nullmean,axis=1)[0] 
+    t_matrix = stats.ttest_1samp(input_arr,nullmean,axis=1, nan_policy=nan_policy)[0] 
 
     if tail==1:
         maxT = np.max(t_matrix)
