@@ -50,7 +50,7 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
        seeds[i] = np.random.randint(0,100000,1)[0]
 
     pool = mp.Pool(processes=nproc)
-    _maxTpermutation_partial=partial(_maxTpermutation, input_arr=input_arr, nullmean=nullmean, tail=tail)
+    _maxTpermutation_partial=partial(_maxTpermutation, input_arr=input_arr, nullmean=nullmean, tail=tail, nan_policy=nan_policy)
     result = pool.map_async(_maxTpermutation_partial,seeds).get()
     pool.close()
     pool.join()
@@ -90,7 +90,7 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
         return t, maxT_thresh
 
 
-def _maxTpermutation(seed,input_arr,nullmean,tail):
+def _maxTpermutation(seed,input_arr,nullmean,tail,nan_policy='propagate'):
     """
     Helper function to perform a single permutation
     """
