@@ -32,7 +32,7 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
                         If tail = 2, reject the null hypothesis for a two-tailed test
                         {default : 2} 
         permutations =  Optional. Number of permutations to perform {default = 1000}
-        nproc       =   Optional. number of processes to run in parallel {default = 1}
+        nproc       =   Optional. number of processes to run in parallel {default = 1}. NOTE: Could crash your Python session if it's set to a number over 1; it appears there is a bug that needs to be fixed.
         pvals       =   Optional. if True, returns equivalent p-value distribution for all t-values {default = True}
         nan_policy  =   Optional. What to do with NaN values when being sent to the t-test function. See scipy.stats.ttest_1samp (https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.ttest_1samp.html) for details. The default is to pass NaN values into the t-test function rather than ignoring them. {default = 'propagate'}
 
@@ -75,14 +75,22 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
     t = stats.ttest_1samp(input_arr, nullmean, axis=1, nan_policy=nan_policy)[0]
 
     if pvals:
-        # Construct ECDF from maxT_dist
-        ecdf = ECDF(maxT_dist)
-
-        # Return p-values from maxT_dist using our empirical CDF (FWE-corrected p-values)
-        p_fwe = ecdf(t)
-
-        if tail == 1 or tail == 2:
-            p_fwe = 1.0 - p_fwe
+        #         # Construct ECDF from maxT_dist
+        #         ecdf = ECDF(maxT_dist)
+        #         # Return p-values from maxT_dist using our empirical CDF (FWE-corrected p-values)
+        #         p_fwe = ecdf(t)
+        #         if tail == 1 or tail == 2:
+        #             p_fwe = 1.0 - p_fwes
+         
+        if tail==1:
+            #Percent of null t-values greater than observed t-value
+            p_fwe = np.array([np.mean(maxT_dist>=tval) for tval in t])
+        elif tail==-1:
+            #Percent of null t-values less than observed t-value
+            p_fwe = np.array([np.mean(maxT_dist<=tval) for tval in t])
+        elif tail==2:
+            #Percent of null t-values greater or less than observed t-value (the abs value in null distribution accounts for 2 tails)
+            p_fwe = np.array([np.mean(maxT_dist>=np.abs(tval)) for tval in t])
         
         return t, maxT_thresh, p_fwe
 

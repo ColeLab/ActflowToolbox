@@ -10,7 +10,7 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
     
     actVect_group: node x condition x subject matrix with activation values
     fcMat_group: node x node x condition x subject matrix (or node x node x subject matrix) with connectiivty values
-    actVect_group_test: independent data (e.g., a separate run) than actVect_group, used as separate "test" data for testing prediction accuracies. Node x condition x subject matrix with activation values. Note: In separate_activations_bytarget=True case, actVect_group_test should not have separate activations by target (just use original node x condition x subject version of data).
+    actVect_group_test: independent data (e.g., a separate run) than actVect_group, used as separate "test" data for testing prediction accuracies. The data in actVect_group is used in the activity flow model, while the predictions are tested against the data in actVect_group_test. Node x condition x subject matrix with activation values. Note: In separate_activations_bytarget=True case, actVect_group_test should not have separate activations by target (just use original node x condition x subject version of data).
     separate_activations_bytarget: indicates if the input actVect_group matrix has a separate activation vector for each target (to-be-predicted) node (e.g., for the locally-non-circular approach)
     mean_absolute_error: if True, compute the absolute mean error: mean(abs(a-p)), where a are the actual activations
     and p the predicted activations across all the nodes.
@@ -56,7 +56,8 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
 
     ## Compare predicted to actual activations
     if actVect_group_test is not None:
-        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=actVect_actual_group, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
+        #model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=actVect_actual_group, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
+        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
     else:
         model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
 
