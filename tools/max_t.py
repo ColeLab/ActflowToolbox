@@ -9,7 +9,7 @@ from statsmodels.distributions.empirical_distribution import ECDF
 from functools import partial
 
 
-def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, pvals=True, nan_policy='propagate'):
+def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, pvals=True, output_nulldist=False, nan_policy='propagate'):
     """
     Performs family-wise ersror correction using permutation testing (Nichols & Holmes 2002).
     This function runs a one-sample t-test vs. 0 or, equivalently, a paired t-test (if the user subtracts two conditions prior to input).
@@ -40,6 +40,7 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
         t: Array of T-values of correct contrast map (Mx1 vector, for M tests)
         maxTThreshold   : The t-value threshold corresponding to the corrected alpha value. If a two-tailed test is specified, the maxR is provided as an absolute value
         p (optional)    : Array of FWE-corrected p-values (Mx1 vector, for M tests);
+        maxT_dist (optional): Array of maxT null distribution values
 
     """
     # Focus on difference matrix -- more computationally feasible (and less data to feed into parallel processing)
@@ -92,10 +93,16 @@ def max_t(input_arr, nullmean=0, alpha=.05, tail=2, permutations=1000, nproc=1, 
             #Percent of null t-values greater or less than observed t-value (the abs value in null distribution accounts for 2 tails)
             p_fwe = np.array([np.mean(maxT_dist>=np.abs(tval)) for tval in t])
         
-        return t, maxT_thresh, p_fwe
+        if output_nulldist:
+            return t, maxT_thresh, p_fwe, maxT_dist
+        else:
+            return t, maxT_thresh, p_fwe
 
     else:
-        return t, maxT_thresh
+        if output_nulldist:
+            return t, maxT_thresh, maxT_dist
+        else:
+            return t, maxT_thresh
 
 
 def _maxTpermutation(seed,input_arr,nullmean,tail,nan_policy='propagate'):
