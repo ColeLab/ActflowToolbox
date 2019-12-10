@@ -1,7 +1,8 @@
 import numpy as np
 import scipy.stats
+import sklearn as sklearn
 
-def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_type='conditionwise_compthenavg', mean_absolute_error=False):
+def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_type='conditionwise_compthenavg'):
     
     nNodes=np.shape(target_actvect)[0]
     nConds=np.shape(target_actvect)[1]
@@ -12,16 +13,13 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
 
         #Test for accuracy of actflow prediction, separately for each subject ("compare-then-average")
         corr_conditionwise_compthenavg_bynode = [[np.corrcoef(target_actvect[nodeNum,:,subjNum],pred_actvect[nodeNum,:,subjNum])[0,1] for subjNum in range(nSubjs)] for nodeNum in range(nNodes)]
-        #Rank correlation
-        rankcorr_conditionwise_compthenavg_bynode = [[scipy.stats.spearmanr(target_actvect[nodeNum,:,subjNum],pred_actvect[nodeNum,:,subjNum])[0] for subjNum in range(nSubjs)] for nodeNum in range(nNodes)]
+        #R2 coefficient of determination, https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score
+        R2_conditionwise_compthenavg_bynode = [[sklearn.metrics.r2_score(target_actvect[nodeNum,:,subjNum],pred_actvect[nodeNum,:,subjNum]) for subjNum in range(nSubjs)] for nodeNum in range(nNodes)]
         
         ## mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
-        if mean_absolute_error:
-            maeAcc_bynode_compthenavg = [[np.nanmean(np.abs(np.subtract(target_actvect[nodeNum,:,subjNum],pred_actvect[nodeNum,:,subjNum]))) for subjNum in range(nSubjs)] for nodeNum in range(nNodes)]
+        maeAcc_bynode_compthenavg = [[np.nanmean(np.abs(np.subtract(target_actvect[nodeNum,:,subjNum],pred_actvect[nodeNum,:,subjNum]))) for subjNum in range(nSubjs)] for nodeNum in range(nNodes)]
 
-            output = {'corr_conditionwise_compthenavg_bynode':corr_conditionwise_compthenavg_bynode,'rankcorr_conditionwise_compthenavg_bynode':rankcorr_conditionwise_compthenavg_bynode,'maeAcc_bynode_compthenavg':maeAcc_bynode_compthenavg}
-        else:
-            output = {'corr_conditionwise_compthenavg_bynode':corr_conditionwise_compthenavg_bynode,'rankcorr_conditionwise_compthenavg_bynode':rankcorr_conditionwise_compthenavg_bynode}
+        output = {'corr_conditionwise_compthenavg_bynode':corr_conditionwise_compthenavg_bynode,'R2_conditionwise_compthenavg_bynode':R2_conditionwise_compthenavg_bynode,'maeAcc_bynode_compthenavg':maeAcc_bynode_compthenavg}
         
         
 
@@ -30,15 +28,13 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
         
         corr_conditionwise_avgthencomp_bynode=[np.corrcoef(np.nanmean(target_actvect[nodeNum,:,:],axis=1),np.nanmean(pred_actvect[nodeNum,:,:],axis=1))[0,1] for nodeNum in range(nNodes)]
 
-        rankcorr_conditionwise_avgthencomp_bynode=[scipy.stats.spearmanr(np.nanmean(target_actvect[nodeNum,:,:],axis=1),np.nanmean(pred_actvect[nodeNum,:,:],axis=1))[0] for nodeNum in range(nNodes)]
+        #R2 coefficient of determination, https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score
+        R2_conditionwise_avgthencomp_bynode = [sklearn.metrics.r2_score(np.nanmean(target_actvect[nodeNum,:,:],axis=1),np.nanmean(pred_actvect[nodeNum,:,:],axis=1)) for nodeNum in range(nNodes)]
         
         ## mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
-        if mean_absolute_error:
-            maeAcc_bynode_avgthencomp =[np.nanmean(np.abs(np.subtract(np.nanmean(target_actvect[nodeNum,:,:],axis=1),np.nanmean(pred_actvect[nodeNum,:,:],axis=1)))) for nodeNum in range(nNodes)]
+        maeAcc_bynode_avgthencomp =[np.nanmean(np.abs(np.subtract(np.nanmean(target_actvect[nodeNum,:,:],axis=1),np.nanmean(pred_actvect[nodeNum,:,:],axis=1)))) for nodeNum in range(nNodes)]
 
-            output = {'corr_conditionwise_avgthencomp_bynode':corr_conditionwise_avgthencomp_bynode,'rankcorr_conditionwise_avgthencomp_bynode':rankcorr_conditionwise_avgthencomp_bynode,'maeAcc_bynode_avgthencomp':maeAcc_bynode_avgthencomp}
-        else:
-            output = {'corr_conditionwise_avgthencomp_bynode':corr_conditionwise_avgthencomp_bynode,'rankcorr_conditionwise_avgthencomp_bynode':rankcorr_conditionwise_avgthencomp_bynode}
+        output = {'corr_conditionwise_avgthencomp_bynode':corr_conditionwise_avgthencomp_bynode,'R2_conditionwise_avgthencomp_bynode':R2_conditionwise_avgthencomp_bynode,'maeAcc_bynode_avgthencomp':maeAcc_bynode_avgthencomp}
     
     
     
@@ -47,8 +43,14 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
     
         #Test for accuracy of actflow prediction, separately for each subject ("compare-then-average")
         corr_nodewise_compthenavg_bycond=[[np.corrcoef(target_actvect[:,taskNum,subjNum], pred_actvect[:,taskNum,subjNum])[0,1] for subjNum in range(nSubjs)] for taskNum in range(nConds)]
+                                               
+        #R2 coefficient of determination, https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score
+        R2_nodewise_compthenavg_bycond = [[sklearn.metrics.r2_score(target_actvect[:,taskNum,subjNum], pred_actvect[:,taskNum,subjNum]) for subjNum in range(nSubjs)] for taskNum in range(nConds)]
+        
+        ## mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
+        maeAcc_nodewise_compthenavg_bycond = [[np.nanmean(np.abs(np.subtract(target_actvect[:,taskNum,subjNum], pred_actvect[:,taskNum,subjNum]))) for subjNum in range(nSubjs)] for taskNum in range(nConds)]
 
-        output = {'corr_nodewise_compthenavg_bycond':corr_nodewise_compthenavg_bycond}
+        output = {'corr_nodewise_compthenavg_bycond':corr_nodewise_compthenavg_bycond,'R2_nodewise_compthenavg_bycond':R2_nodewise_compthenavg_bycond,'maeAcc_nodewise_compthenavg_bycond':maeAcc_nodewise_compthenavg_bycond}
     
     
     ## nodewise_avgthencomp - Average-then-compare cross-node correlation between predicted and actual activations (whole-brain activation patterns)
@@ -58,6 +60,14 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
         corr_nodewise_avgthencomp_bycond=[np.corrcoef(np.nanmean(target_actvect[:,taskNum,:],axis=1),np.nanmean(pred_actvect[:,taskNum,:],axis=1))[0,1] for taskNum in range(nConds)]
         
         output = {'corr_nodewise_avgthencomp_bycond':corr_nodewise_avgthencomp_bycond}
+                                               
+        #R2 coefficient of determination, https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score
+        R2_nodewise_avgthencomp_bycond = [sklearn.metrics.r2_score(np.nanmean(target_actvect[:,taskNum,:],axis=1),np.nanmean(pred_actvect[:,taskNum,:],axis=1)) for taskNum in range(nConds)]
+        
+        ## mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
+        maeAcc_nodewise_avgthencomp_bycond = [np.nanmean(np.abs(np.subtract(np.nanmean(target_actvect[:,taskNum,:],axis=1),np.nanmean(pred_actvect[:,taskNum,:],axis=1)))) for taskNum in range(nConds)]
+
+        output = {'corr_nodewise_avgthencomp_bycond':corr_nodewise_avgthencomp_bycond,'R2_nodewise_avgthencomp_bycond':R2_nodewise_avgthencomp_bycond,'maeAcc_nodewise_avgthencomp_bycond':maeAcc_nodewise_avgthencomp_bycond}
         
         
     return output
