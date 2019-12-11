@@ -2,7 +2,7 @@ import numpy as np
 import scipy.stats
 from .model_compare_predicted_to_actual import *
 
-def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_report=False, print_report=True, print_by_condition=True, comparison_type='conditionwise_compthenavg', avgthencomp_fixedeffects=False, mean_absolute_error=True):
+def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_report=False, print_report=True, print_by_condition=True, comparison_type='fullcompare_compthenavg', avgthencomp_fixedeffects=False, mean_absolute_error=True):
     """
     Function to compare prediction accuracies between models. If model2_actvect=None then the predictions are compared against a simple null model (e.g., r=0 for Pearson correlation). Note that this function cannot yet handle time series prediction testing.
     
@@ -21,6 +21,7 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
     
     comparison_type: The kind of comparison to calculate (when full_report=False). Options are:
     
+        fullcompare_compthenavg – Compare-then-average correlation between predicted and actual activations across all conditions and nodes simultaneously. Variance between conditions and between nodes are treated equally via collapsing the data across those dimensions (e.g., 2 conditions across 360 nodes = 720 values). The comparisons are computed separately for each subject, then results are summarized via averaging.
         conditionwise_compthenavg - Compare-then-average condition-wise correlation between predicted and actual activations. This is run separately for each node, computing the correlation between the activations across conditions (which characterizes each node's response profile). The comparisons are computed separately for each subject, then results are summarized via averaging.
         conditionwise_avgthencomp - Average-then-compare condition-wise correlation between predicted and actual activations. This is run separately for each node, computing the correlation between the cross-condition activation patterns (which characterizes each node's response profile). Activations are averaged across subjects prior to comparison (sometimes called a "fixed effects" analysis), boosting signal-to-noise ratio but likely reducing dimensionality (through inter-subject averaging) and reducing the ability to assess the consistency of the result across subjects relative to compare-then-average.
         nodewise_compthenavg - Compare-then-average cross-node correlation between predicted and actual activations (whole-brain activation patterns). This is run separately for each condition, computing the correlation between the cross-node activation patterns (which characterizes each condition's response profile). The comparisons are computed separately for each subject, then results are summarized via averaging (sometimes called a "random effects" analysis).
@@ -75,10 +76,70 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
     nConds=np.shape(target_actvect)[1]
     nSubjs=np.shape(target_actvect)[2]
     
+    scaling_note = "Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 and MAE are not. R^2 units: percentage of the to-be-predicted data's unscaled variance, ranging from negative infinity (because prediction errors can be arbitrarily large) to positive 1. See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html for more info."
+    
     output = {}
     
     if print_report:
         print("===Comparing prediction accuracies between models (similarity between predicted and actual brain activation patterns)===")
+        
+    ### Full comparison (condition-wise and node-wise combined) analyses
+    
+    ## fullcompare_compthenavg - Compare-then-average across all conditions and all nodes between predicted and actual activations
+    if full_report or comparison_type=='fullcompare_compthenavg':
+        
+        #Test for accuracy of actflow prediction, separately for each subject ("compare-then-average")
+        fullcomp_compthenavg_output = model_compare_predicted_to_actual(target_actvect, model1_actvect, comparison_type='fullcompare_compthenavg')
+            
+        #Add to output dictionary
+        output.update({'fullcomp_compthenavg_output':fullcomp_compthenavg_output,
+                       'corr_fullcomp_compthenavg':fullcomp_compthenavg_output['corr_vals'], 
+                       'R2_fullcomp_compthenavg':fullcomp_compthenavg_output['R2_vals'], 
+                       'maeAcc_fullcomp_compthenavg':fullcomp_compthenavg_output['mae_vals']})
+        
+        
+        if model2_actvect is None:
+            ## Test against null model
+                
+            #Grand mean (across task) t-test
+            [tval_ActflowPredAcc_fullcomp,pval_ActflowPredAcc_fullcomp] = scipy.stats.ttest_1samp(np.ma.arctanh(fullcomp_compthenavg_output['corr_vals']),0.0)
+                
+            #Add to output dictionary
+            output.update({'tval_ActflowPredAcc_fullcomp':tval_ActflowPredAcc_fullcomp, 
+                            'pval_ActflowPredAcc_fullcomp':pval_ActflowPredAcc_fullcomp})
+                
+        else:
+            ## Test model1 vs. model2 prediction accuracy
+                
+            # Test for accuracy of MODEL2 actflow prediction, separately for each subject ("compare-then-average")
+            fullcomp_compthenavg_output_model2 = model_compare_predicted_to_actual(target_actvect, model2_actvect, comparison_type='fullcompare_compthenavg')
+            
+            #Grand mean (across task) t-test, model1 vs. model2 prediction accuracy
+            model1_means = np.ma.arctanh(fullcomp_compthenavg_output['corr_vals'])
+            model2_means = np.ma.arctanh(fullcomp_compthenavg_output_model2['corr_vals'])
+            [tval_ActflowPredAcc_corr_fullcomp_modelcomp,pval_ActflowPredAcc_corr_fullcomp_modelcomp] = scipy.stats.ttest_1samp(np.subtract(model1_means,model2_means),0.0)
+                
+            #Add to output dictionary
+            output.update({'fullcomp_compthenavg_output_model2':fullcomp_compthenavg_output_model2,
+                           'corr_fullcomp_compthenavg_model2':fullcomp_compthenavg_output_model2['corr_vals'],
+                           'R2_fullcomp_compthenavg_model2':fullcomp_compthenavg_output_model2['R2_vals'],
+                           'maeAcc_fullcomp_compthenavg_model2':fullcomp_compthenavg_output_model2['mae_vals'],
+                           'tval_ActflowPredAcc_corr_fullcomp_modelcomp':tval_ActflowPredAcc_corr_fullcomp_modelcomp, 
+                           'pval_ActflowPredAcc_corr_fullcomp_modelcomp':pval_ActflowPredAcc_corr_fullcomp_modelcomp})
+        
+        if print_report:
+                print(" ")
+                print("==Comparisons between predicted and actual activation patterns, across all conditions and nodes:==")
+                print("--Compare-then-average (calculating prediction accuracies before cross-subject averaging):")
+                print("Each comparison based on " + str(nConds) + " conditions across " + str(nNodes) + " nodes, p-values based on " + str(nSubjs) + " subjects (cross-subject variance in comparisons)")
+                
+                if model2_actvect is None:
+                    print_comparison_results(fullcomp_compthenavg_output, None, tval_ActflowPredAcc_fullcomp, pval_ActflowPredAcc_fullcomp, scaling_note=scaling_note)
+                else:
+                    print_comparison_results(fullcomp_compthenavg_output, fullcomp_compthenavg_output_model2, tval_ActflowPredAcc_corr_fullcomp_modelcomp, pval_ActflowPredAcc_corr_fullcomp_modelcomp, scaling_note=scaling_note)
+
+                    
+    
     
     ### Condition-wise analyses (as opposed to node-wise)
         
@@ -93,14 +154,17 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
             conditionwise_compthenavg_output = model_compare_predicted_to_actual(target_actvect, model1_actvect, comparison_type='conditionwise_compthenavg')
             
             #Add to output dictionary
-            output.update({'conditionwise_compthenavg_output':conditionwise_compthenavg_output, 'corr_conditionwise_compthenavg_bynode':conditionwise_compthenavg_output['corr_conditionwise_compthenavg_bynode'], 'R2_conditionwise_compthenavg_bynode':conditionwise_compthenavg_output['R2_conditionwise_compthenavg_bynode']})
+            output.update({'conditionwise_compthenavg_output':conditionwise_compthenavg_output, 
+                           'corr_conditionwise_compthenavg_bynode':conditionwise_compthenavg_output['corr_vals'], 
+                           'R2_conditionwise_compthenavg_bynode':conditionwise_compthenavg_output['R2_vals'],
+                           'mae_conditionwise_compthenavg_bynode':conditionwise_compthenavg_output['mae_vals']})
 
             
             if model2_actvect is None:
                 ## Test against null model
                 
                 #Grand mean (across task) t-test
-                [tval_ActflowPredAcc_nodemean,pval_ActflowPredAcc_nodemean] = scipy.stats.ttest_1samp(np.nanmean(np.ma.arctanh(conditionwise_compthenavg_output['corr_conditionwise_compthenavg_bynode']),axis=0),0.0)
+                [tval_ActflowPredAcc_nodemean,pval_ActflowPredAcc_nodemean] = scipy.stats.ttest_1samp(np.nanmean(np.ma.arctanh(conditionwise_compthenavg_output['corr_vals']),axis=0),0.0)
                 
                 
             else:
@@ -110,72 +174,27 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
                 conditionwise_compthenavg_output_model2 = model_compare_predicted_to_actual(target_actvect, model2_actvect, comparison_type='conditionwise_compthenavg')
                 
                 #Grand mean (across task) t-test, model1 vs. model2 prediction accuracy
-                model1_means = np.nanmean(np.ma.arctanh(conditionwise_compthenavg_output['corr_conditionwise_compthenavg_bynode']),axis=0)
-                model2_means = np.nanmean(np.ma.arctanh(conditionwise_compthenavg_output_model2['corr_conditionwise_compthenavg_bynode']),axis=0)
+                model1_means = np.nanmean(np.ma.arctanh(conditionwise_compthenavg_output['corr_vals']),axis=0)
+                model2_means = np.nanmean(np.ma.arctanh(conditionwise_compthenavg_output_model2['corr_vals']),axis=0)
                 [tval_ActflowPredAcc_nodemean,pval_ActflowPredAcc_nodemean] = scipy.stats.ttest_1samp(np.subtract(model1_means,model2_means),0.0)
                 
                 #Add to output dictionary
-                output.update({'conditionwise_compthenavg_output_model2':conditionwise_compthenavg_output_model2, 'corr_conditionwise_compthenavg_bynode_model2':conditionwise_compthenavg_output_model2['corr_conditionwise_compthenavg_bynode'], 'R2_conditionwise_compthenavg_bynode_model2':conditionwise_compthenavg_output_model2['R2_conditionwise_compthenavg_bynode']})
+                output.update({'conditionwise_compthenavg_output_model2':conditionwise_compthenavg_output_model2,
+                               'corr_conditionwise_compthenavg_bynode_model2':conditionwise_compthenavg_output_model2['corr_vals'],
+                               'R2_conditionwise_compthenavg_bynode_model2':conditionwise_compthenavg_output_model2['R2_vals'],
+                               'mae_conditionwise_compthenavg_bynode_model2':conditionwise_compthenavg_output_model2['mae_vals']})
                 
-            
             
             if print_report:
                 print(" ")
-                print("==Condition-wise correlations between predicted and actual activation patterns (calculated for each node separetely):==")
+                print("==Condition-wise comparisons between predicted and actual activation patterns (calculated for each node separetely):==")
                 print("--Compare-then-average (calculating prediction accuracies before cross-subject averaging):")
                 print("Each correlation based on N conditions: " + str(nConds) + ", p-values based on N subjects (cross-subject variance in correlations): " + str(nSubjs))
                 
                 if model2_actvect is None:
-                    print("Mean Pearson r=" + str("%.2f" % np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(conditionwise_compthenavg_output['corr_conditionwise_compthenavg_bynode']))))) + ", t-value vs. 0: " + str("%.2f" % tval_ActflowPredAcc_nodemean) + ", p-value vs. 0: " + str(pval_ActflowPredAcc_nodemean))
-                    print(" ")
-                    print("Mean % variance explained (R^2 score, coeff. of determination)=" + str("%.2f" % np.nanmean(np.nanmean(conditionwise_compthenavg_output['R2_conditionwise_compthenavg_bynode']))))
-                    print("Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 is not. R^2 units: percentage of the to-be-predicted data's unscaled variance. Range is from negative infinity (because prediction errors can be arbitrarily large) to positive 1. See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html for more info.")                                                                                 
-                    
+                    print_comparison_results(conditionwise_compthenavg_output, None, tval_ActflowPredAcc_nodemean, pval_ActflowPredAcc_nodemean, scaling_note=scaling_note)
                 else:
-                    meanRModel1=np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(corr_conditionwise_compthenavg_bynode))))
-                    print("Model1 mean Pearson r=" + str("%.2f" % meanRModel1))
-                    meanRModel2=np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(corr_conditionwise_compthenavg_bynode_model2))))
-                    print("Model2 mean Pearson r=" + str("%.2f" % meanRModel2))
-                    meanRModelDiff=meanRModel1-meanRModel2
-                    print("R-value difference = " + str("%.2f" % meanRModelDiff))
-                    print("Model1 vs. Model2 T-value: " + str("%.2f" % tval_ActflowPredAcc_nodemean) + ", p-value: " + str(pval_ActflowPredAcc_nodemean))
-                    
-                    print(" ")
-                    meanR2Model1 = np.nanmean(np.nanmean(conditionwise_compthenavg_output['R2_conditionwise_compthenavg_bynode']))
-                    print("Model1 mean % predicted variance explained R2=" + str("%.2f" % meanR2Model1))
-                    meanR2Model2 = np.nanmean(np.nanmean(conditionwise_compthenavg_output_model2['R2_conditionwise_compthenavg_bynode']))
-                    print("Model2 mean % predicted variance explained R2=" + str("%.2f" % meanR2Model2))                           
-                    meanR2ModelDiff=meanR2Model1-meanR2Model2
-                    print("R^2 difference = " + str("%.2f" % meanR2ModelDiff))
-                    print("Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 is not. R^2 units: percentage of the to-be-predicted data's unscaled variance. Range is from negative infinity (because prediction errors can be arbitrarily large) to positive 1. See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html for more info.")  
-                    
-              
-            if mean_absolute_error:
-            
-                maeAcc_bynode_compthenavg = conditionwise_compthenavg_output['maeAcc_bynode_compthenavg']
-                
-                #Add to output dictionary
-                output.update({'maeAcc_bynode_compthenavg':maeAcc_bynode_compthenavg})
-                
-                if model2_actvect is not None:
-                    maeAcc_bynode_compthenavg_model2 = conditionwise_compthenavg_output_model2['maeAcc_bynode_compthenavg']
-                    
-                    #Add to output dictionary
-                    output.update({'maeAcc_bynode_compthenavg_model2':maeAcc_bynode_compthenavg_model2})
-            
-                if print_report:
-                    print(" ")
-                    print("==Condition-wise Mean Absolute Error (MAE) between predicted and actual activation patterns (calculated for each node separateley):==")
-
-                    print("--Compare-then-average (calculating MAE accuracies before cross-subject averaging):")
-                    print("Each MAE based on N conditions: " + str(nConds))
-                    
-                    if model2_actvect is None:
-                        print("Mean MAE = " + str("%.2f" % np.nanmean(np.nanmean(maeAcc_bynode_compthenavg))))
-                    else:
-                        print("Model1 mean MAE = " + str("%.2f" % np.nanmean(np.nanmean(maeAcc_bynode_compthenavg))))
-                        print("Model2 mean MAE = " + str("%.2f" % np.nanmean(np.nanmean(maeAcc_bynode_compthenavg_model2))))
-                        print("Model1 vs. Model2 mean MAE difference = " + str("%.2f" % np.subtract(np.nanmean(np.nanmean(maeAcc_bynode_compthenavg)), np.nanmean(np.nanmean(maeAcc_bynode_compthenavg_model2)))))
+                    print_comparison_results(conditionwise_compthenavg_output, conditionwise_compthenavg_output_model2, tval_ActflowPredAcc_nodemean, pval_ActflowPredAcc_nodemean, scaling_note=scaling_note)
                         
 
     
@@ -245,10 +264,13 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
         
         #Test for accuracy of actflow prediction, separately for each subject ("compare-then-average")
         nodewise_compthenavg_output = model_compare_predicted_to_actual(target_actvect, model1_actvect, comparison_type='nodewise_compthenavg')
-        corr_nodewise_compthenavg_bycond = nodewise_compthenavg_output['corr_nodewise_compthenavg_bycond']
+        corr_nodewise_compthenavg_bycond = nodewise_compthenavg_output['corr_vals']
         
         #Add to output dictionary
-        output.update({'nodewise_compthenavg_output':nodewise_compthenavg_output, 'corr_nodewise_compthenavg_bycond':corr_nodewise_compthenavg_bycond})
+        output.update({'nodewise_compthenavg_output':nodewise_compthenavg_output, 
+                       'corr_nodewise_compthenavg_bycond':nodewise_compthenavg_output['corr_vals'],
+                       'R2_nodewise_compthenavg_bycond':nodewise_compthenavg_output['R2_vals'],
+                       'mae_nodewise_compthenavg_bycond':nodewise_compthenavg_output['mae_vals']})
         
         if model2_actvect is None:
             ## Test against null model
@@ -267,10 +289,13 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
 
             # Test for accuracy of MODEL2 actflow prediction, separately for each subject ("compare-then-average")
             nodewise_compthenavg_output_model2 = model_compare_predicted_to_actual(target_actvect, model2_actvect, comparison_type='nodewise_compthenavg')
-            corr_nodewise_compthenavg_bycond_model2 = nodewise_compthenavg_output_model2['corr_nodewise_compthenavg_bycond']
+            corr_nodewise_compthenavg_bycond_model2 = nodewise_compthenavg_output_model2['corr_vals']
             
             #Add to output dictionary
-            output.update({'nodewise_compthenavg_output_model2':nodewise_compthenavg_output_model2, 'corr_nodewise_compthenavg_bycond_model2':corr_nodewise_compthenavg_bycond_model2})
+            output.update({'nodewise_compthenavg_output_model2':nodewise_compthenavg_output_model2, 
+                       'corr_nodewise_compthenavg_bycond_model2':nodewise_compthenavg_output_model2['corr_vals'],
+                       'R2_nodewise_compthenavg_bycond_model2':nodewise_compthenavg_output_model2['R2_vals'],
+                       'mae_nodewise_compthenavg_bycond_model2':nodewise_compthenavg_output_model2['mae_vals']})
             
             #Run t-tests to quantify cross-subject consistency, by condition, Pearson correlations
             tval_ActflowPredAccCorr_Model1Vs2_bycond=np.zeros(nConds)
@@ -289,8 +314,8 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
             print(" ")
             print("==Node-wise (spatial) correlations between predicted and actual activation patterns (calculated for each condition separetely):==")
             print("--Compare-then-average (calculating prediction accuracies before cross-subject averaging):")
-            print("Each correlation based on N nodes: " + str(nNodes) + ", p-values based on N subjects (cross-subject variance in correlations): " + str(nSubjs))
-                
+            print("Each correlation based on N nodes: " + str(nNodes) + ", p-values based on N subjects (cross-subject variance in correlations): " + str(nSubjs))                    
+            
             if model2_actvect is None:
                     
                 print("Cross-condition mean r=" + str("%.2f" % np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(corr_nodewise_compthenavg_bycond))))) + ", t-value vs. 0: " + str("%.2f" % tval_ActflowPredAcc_condmean) + ", p-value vs. 0: " + str(pval_ActflowPredAcc_condmean))
@@ -370,3 +395,38 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
     return output              
                 
                 
+
+        
+def print_comparison_results(comparison_output, comparison_output_model2, tvals, pvals, scaling_note=""):
+    
+    if comparison_output_model2 is None:
+        print(" ")
+        print("Mean Pearson r = " + str("%.2f" % np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(comparison_output['corr_vals']))))) + ", t-value vs. 0: " + str("%.2f" % tvals) + ", p-value vs. 0: " + str(pvals))
+        print(" ")
+        print("Mean % variance explained (R^2 score, coeff. of determination) = " + str("%.2f" % np.nanmean(np.nanmean(comparison_output['R2_vals']))))
+        print(" ")
+        print("Mean MAE (mean absolute error) = " + str("%.2f" % np.nanmean(np.nanmean(comparison_output['mae_vals']))))
+        print(" ")
+        print(scaling_note)
+    else:
+        print(" ")
+        meanRModel1=np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(comparison_output['corr_vals']))))
+        print("Model1 mean Pearson r=" + str("%.2f" % meanRModel1))
+        meanRModel2=np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(comparison_output_model2['corr_vals']))))
+        print("Model2 mean Pearson r=" + str("%.2f" % meanRModel2))
+        meanRModelDiff=meanRModel1-meanRModel2
+        print("R-value difference = " + str("%.2f" % meanRModelDiff))
+        print("Model1 vs. Model2 T-value: " + str("%.2f" % tvals) + ", p-value: " + str(pvals))
+        print(" ")
+        meanR2Model1 = np.nanmean(np.nanmean(comparison_output['R2_vals']))
+        print("Model1 mean % predicted variance explained R^2=" + str("%.2f" % meanR2Model1))
+        meanR2Model2 = np.nanmean(np.nanmean(comparison_output_model2['R2_vals']))
+        print("Model2 mean % predicted variance explained R^2=" + str("%.2f" % meanR2Model2))                           
+        meanR2ModelDiff=meanR2Model1-meanR2Model2
+        print("R^2 difference = " + str("%.2f" % meanR2ModelDiff))
+        print(" ")
+        print("Model1 mean MAE = " + str("%.2f" % np.nanmean(np.nanmean(comparison_output['mae_vals']))))
+        print("Model2 mean MAE = " + str("%.2f" % np.nanmean(np.nanmean(comparison_output_model2['mae_vals']))))
+        print("Model1 vs. Model2 mean MAE difference = " + str("%.2f" % np.subtract(np.nanmean(np.nanmean(comparison_output['mae_vals'])), np.nanmean(np.nanmean(comparison_output_model2['mae_vals'])))))
+        print(" ")
+        print(scaling_note)

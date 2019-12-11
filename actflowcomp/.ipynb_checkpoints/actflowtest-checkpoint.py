@@ -71,7 +71,7 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
              }
     
     if mean_absolute_error:
-        output.update({'maeAcc_bynode_bysubj':model_compare_output['maeAcc_bynode_compthenavg']})
+        output.update({'maeAcc_bynode_bysubj':model_compare_output['mae_conditionwise_compthenavg_bynode']})
         
         if avgthencomp_fixedeffects:
             output.update({'maeAcc_bynode_avgthencomp':model_compare_output['maeAcc_bynode_avgthencomp']})

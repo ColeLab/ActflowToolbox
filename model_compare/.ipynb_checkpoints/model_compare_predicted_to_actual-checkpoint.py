@@ -8,6 +8,19 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
     nConds=np.shape(target_actvect)[1]
     nSubjs=np.shape(target_actvect)[2]
     
+    
+    ## fullcompare_compthenavg - Compare-then-average across all conditions and all nodes between predicted and actual activations
+    if comparison_type=='fullcompare_compthenavg':
+        
+        #Test for accuracy of actflow prediction, separately for each subject ("compare-then-average")
+        corr_fullcomp_compthenavg = [np.corrcoef(target_actvect[:,:,subjNum].flatten(),pred_actvect[:,:,subjNum].flatten())[0,1] for subjNum in range(nSubjs)]
+        #R2 coefficient of determination, https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score
+        R2_fullcomp_compthenavg = [sklearn.metrics.r2_score(target_actvect[:,:,subjNum].flatten(),pred_actvect[:,:,subjNum].flatten()) for subjNum in range(nSubjs)]
+        #mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
+        maeAcc_fullcomp_compthenavg = [np.nanmean(np.abs(np.subtract(target_actvect[:,:,subjNum].flatten(),pred_actvect[:,:,subjNum].flatten()))) for subjNum in range(nSubjs)]
+
+        output = {'corr_vals':corr_fullcomp_compthenavg,'R2_vals':R2_fullcomp_compthenavg,'mae_vals':maeAcc_fullcomp_compthenavg}
+    
     ## conditionwise_compthenavg - Compare-then-average condition-wise correlation between predicted and actual activations
     if comparison_type=='conditionwise_compthenavg':
 
@@ -19,7 +32,7 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
         ## mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
         maeAcc_bynode_compthenavg = [[np.nanmean(np.abs(np.subtract(target_actvect[nodeNum,:,subjNum],pred_actvect[nodeNum,:,subjNum]))) for subjNum in range(nSubjs)] for nodeNum in range(nNodes)]
 
-        output = {'corr_conditionwise_compthenavg_bynode':corr_conditionwise_compthenavg_bynode,'R2_conditionwise_compthenavg_bynode':R2_conditionwise_compthenavg_bynode,'maeAcc_bynode_compthenavg':maeAcc_bynode_compthenavg}
+        output = {'corr_vals':corr_conditionwise_compthenavg_bynode,'R2_vals':R2_conditionwise_compthenavg_bynode,'mae_vals':maeAcc_bynode_compthenavg}
         
         
 
@@ -50,7 +63,7 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
         ## mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
         maeAcc_nodewise_compthenavg_bycond = [[np.nanmean(np.abs(np.subtract(target_actvect[:,taskNum,subjNum], pred_actvect[:,taskNum,subjNum]))) for subjNum in range(nSubjs)] for taskNum in range(nConds)]
 
-        output = {'corr_nodewise_compthenavg_bycond':corr_nodewise_compthenavg_bycond,'R2_nodewise_compthenavg_bycond':R2_nodewise_compthenavg_bycond,'maeAcc_nodewise_compthenavg_bycond':maeAcc_nodewise_compthenavg_bycond}
+        output = {'corr_vals':corr_nodewise_compthenavg_bycond,'R2_vals':R2_nodewise_compthenavg_bycond,'mae_vals':maeAcc_nodewise_compthenavg_bycond}
     
     
     ## nodewise_avgthencomp - Average-then-compare cross-node correlation between predicted and actual activations (whole-brain activation patterns)
