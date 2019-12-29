@@ -33,8 +33,8 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     
     if target_ts is None:
         
-        #Cross-validation to find optimal number of components
-        if n_components_min is not None:
+        #Cross-validation to find optimal number of components (based on mean MSE across all nodes)
+        if n_comp_search:
             if n_components_max is None:
                 n_components_max = np.min([nnodes-1, timepoints-1])
             componentnum_set=np.arange(n_components_min,n_components_max+1)
@@ -44,15 +44,23 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
                 othernodes.remove(targetnode) # Remove target node from 'other nodes'
                 X = activity_matrix[othernodes,:].T
                 y = activity_matrix[targetnode,:]
+                #Run PCA
+                pca = PCA()
+                Xreg_allPCs = pca.fit_transform(X)
                 mscv_vals=np.zeros(np.shape(componentnum_set)[0])
                 comp_count=0
                 for comp_num in componentnum_set:
-                    mscv_vals[comp_count] = pcr_cvtest(X,y, pc=comp_num, cv=10)
+                    regr = LinearRegression()
+                    Xreg = Xreg_allPCs[:,:comp_num]
+                    regr.fit(Xreg, y)
+                    # Cross-validation
+                    y_cv = cross_val_predict(regr, Xreg, y, cv=10)
+                    mscv_vals[comp_count] = mean_squared_error(y, y_cv)
                     comp_count=comp_count+1
                 mse_regionbycomp[:,targetnode] = mscv_vals
-            min_comps_means = np.mean(mse_regionbycomp, axis=0)
-            n_components=componentnum_set[np.where(min_comps_means,np.min(min_comps_means))[0][0]]
-            n_component_used = n_components
+            min_comps_means = np.mean(mse_regionbycomp, axis=1)
+            n_components=componentnum_set[np.where(min_comps_means==np.min(min_comps_means))[0][0]]
+            print('n_components = ' + str(n_components))
         
         connectivity_mat = np.zeros((nnodes,nnodes))
         for targetnode in range(nnodes):
@@ -78,14 +86,14 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
         X = activity_matrix.T
         y = target_ts
         #Cross-validation to find optimal number of components
-        if n_components_min is not None:
+        if n_comp_search:
             componentnum_set=np.arange(n_components_min,n_components_max+1)
             mscv_vals=np.zeros(np.shape(componentnum_set)[0])
             comp_count=0
             for comp_num in componentnum_set:
                 mscv_vals[comp_count] = pcr_cvtest(X,y, pc=comp_num, cv=10)
                 comp_count=comp_count+1
-            n_components=componentnum_set[np.where(componentnum_set,np.min(mscv_vals))[0][0]]
+            n_components=componentnum_set[np.where(mscv_vals==np.min(mscv_vals))[0][0]]
         #Run PCA on source time series
         pca = PCA(n_components)
         reduced_mat = pca.fit_transform(X) # Time X Features
@@ -96,7 +104,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
         betasPCR = pca.inverse_transform(reg.coef_)
         connectivity_mat=betasPCR
 
-    return connectivity_mat, n_components
+    return connectivity_mat
 
 
 def pcr_cvtest(X,y,pc,cv):
