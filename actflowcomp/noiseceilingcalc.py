@@ -3,7 +3,7 @@ import numpy as np
 import scipy.stats
 from ..model_compare import *
 
-def noiseceilingcalc(actvect_group_first, actvect_group_second, full_report=False, print_report=True, reliability_type='conditionwise_compthenavgthen'):
+def noiseceilingcalc(actvect_group_first, actvect_group_second, full_report=False, print_report=True, reliability_type='conditionwise_compthenavgthen', avgthencomp_fixedeffects=False):
     """
     Function to calculate the repeat reliability of the data in various ways. This is equivalent to calculating the "noise ceiling" for predictive models (such as encoding models like activity flow models), which identifies theoretical limits on the highest prediction accuracy (based on the assumption that the data predicting itself is the highest possible prediction accuracy).
     
@@ -44,6 +44,6 @@ def noiseceilingcalc(actvect_group_first, actvect_group_second, full_report=Fals
     noiseCeilVal = output['repeat_corr_nodewise_avgthencomp'] # an example of accessing the r value associated with 'nodewise_avgthencomp'
     """
     
-    model_compare_output = model_compare(target_actvect=actvect_group_second, model1_actvect=actvect_group_first, model2_actvect=None, full_report=full_report, print_report=print_report)
+    model_compare_output = model_compare(target_actvect=actvect_group_second, model1_actvect=actvect_group_first, model2_actvect=None, full_report=full_report, print_report=print_report, avgthencomp_fixedeffects=avgthencomp_fixedeffects)
     
     return model_compare_output

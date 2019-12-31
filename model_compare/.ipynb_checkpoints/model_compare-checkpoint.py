@@ -209,19 +209,17 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
             #Test for accuracy of actflow prediction, separately for each subject ("average-then-compare")
             conditionwise_avgthencomp_output = model_compare_predicted_to_actual(target_actvect, model1_actvect, comparison_type='conditionwise_avgthencomp')
             corr_conditionwise_avgthencomp_bynode = conditionwise_avgthencomp_output['corr_conditionwise_avgthencomp_bynode']
-            rankcorr_conditionwise_avgthencomp_bynode = conditionwise_avgthencomp_output['rankcorr_conditionwise_avgthencomp_bynode']
             
             #Add to output dictionary
-            output.update({'conditionwise_avgthencomp_output':conditionwise_avgthencomp_output, 'corr_conditionwise_avgthencomp_bynode':corr_conditionwise_avgthencomp_bynode, 'rankcorr_conditionwise_avgthencomp_bynode':rankcorr_conditionwise_avgthencomp_bynode})
+            output.update({'conditionwise_avgthencomp_output':conditionwise_avgthencomp_output, 'corr_conditionwise_avgthencomp_bynode':corr_conditionwise_avgthencomp_bynode})
             
             if model2_actvect is not None:
                 # Test for accuracy of MODEL2 actflow prediction, after averaging across subjects ("average-then-compare")
                 conditionwise_avgthencomp_output_model2 = model_compare_predicted_to_actual(target_actvect, model2_actvect, comparison_type='conditionwise_avgthencomp')
                 corr_conditionwise_avgthencomp_bynode_model2 = conditionwise_avgthencomp_output_model2['corr_conditionwise_avgthencomp_bynode']
-                rankcorr_conditionwise_avgthencomp_bynode_model2 = conditionwise_avgthencomp_output_model2['rankcorr_conditionwise_avgthencomp_bynode']
                 
                 #Add to output dictionary
-                output.update({'conditionwise_avgthencomp_output_model2':conditionwise_avgthencomp_output_model2, 'corr_conditionwise_avgthencomp_bynode_model2':corr_conditionwise_avgthencomp_bynode_model2, 'rankcorr_conditionwise_avgthencomp_bynode_model2':rankcorr_conditionwise_avgthencomp_bynode_model2})
+                output.update({'conditionwise_avgthencomp_output_model2':conditionwise_avgthencomp_output_model2, 'corr_conditionwise_avgthencomp_bynode_model2':corr_conditionwise_avgthencomp_bynode_model2})
 
             if print_report:
                 print(" ")
@@ -231,7 +229,6 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
                 
                 if model2_actvect is None:
                     print("Mean Pearson r=" + str("%.2f" % np.tanh(np.nanmean(np.ma.arctanh(corr_conditionwise_avgthencomp_bynode)))))
-                    print("Mean rank-correlation rho=" + str("%.2f" % np.nanmean(rankcorr_conditionwise_avgthencomp_bynode)))
                 else:
                     meanRModel1=np.tanh(np.nanmean(np.nanmean(np.ma.arctanh(corr_conditionwise_avgthencomp_bynode))))
                     print("Model1 Mean Pearson r=" + str("%.2f" % meanRModel1))
