@@ -29,6 +29,7 @@ In principle, any measure of neural activity and any measure of neural connectiv
 * Information transfer mapping (http://rdcu.be/wQ1M) [planned]
 
 ### Included preprocessing methods
+* Note: The toolbox is compatible with existing preprocessing software such as the HCP Pipelines (https://humanconnectome.org/software/hcp-mr-pipelines/) or fMRIPrep (https://fmriprep.readthedocs.io/en/stable/)
 * General linear models (GLM) for fMRI data
 	* Finite impulse response (FIR) GLM models, which can provide flexible mean task-evoked response removal for task-state functional connectivity (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf)
 	* Standard (canonical hemodynamic response function) GLM (e.g., for calculating the to-be-predicted task activations in activity flow mapping)
