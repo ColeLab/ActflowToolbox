@@ -1,7 +1,7 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
 
-## Version 0.2.0 (beta version)
+## Version 0.2.1 (beta version)
 
 ## Overview
 This toolbox facilitates linking brain connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M). These approaches can be used to create and test _network coding models_ (http://arxiv.org/abs/1907.03612), which are empirically-constrained neural network models.
