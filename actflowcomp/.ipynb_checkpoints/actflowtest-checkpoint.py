@@ -56,9 +56,9 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
 
     ## Compare predicted to actual activations
     if actVect_group_test is not None:
-        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
+        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error, avgthencomp_fixedeffects=avgthencomp_fixedeffects)
     else:
-        model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error)
+        model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error, avgthencomp_fixedeffects=avgthencomp_fixedeffects)
 
 
 
@@ -74,7 +74,7 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
         output.update({'maeAcc_bynode_bysubj':model_compare_output['mae_conditionwise_compthenavg_bynode']})
         
         if avgthencomp_fixedeffects:
-            output.update({'maeAcc_bynode_avgthencomp':model_compare_output['maeAcc_bynode_avgthencomp']})
+            output.update({'maeAcc_bynode_avgthencomp':model_compare_output['maeAcc_nodewise_avgthencomp_bycond']})
     
     if avgthencomp_fixedeffects:
         output.update({'predAcc_bytask_avgthencomp':model_compare_output['corr_nodewise_avgthencomp_bycond'],
