@@ -26,7 +26,7 @@ In principle, any measure of neural activity and any measure of neural connectiv
 
 ### Included connectivity-activity mapping methods
 * Activity flow mapping (http://rdcu.be/kOJq)
-* Information transfer mapping (http://rdcu.be/wQ1M) [planned]
+* Information transfer mapping (http://rdcu.be/wQ1M) (https://github.com/ColeLab/informationtransfermapping) [planned]
 
 ### Included preprocessing methods
 * Note: The toolbox is compatible with existing preprocessing software such as the HCP Pipelines (https://humanconnectome.org/software/hcp-mr-pipelines/) or fMRIPrep (https://fmriprep.readthedocs.io/en/stable/)
