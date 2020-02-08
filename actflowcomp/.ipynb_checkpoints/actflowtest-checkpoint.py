@@ -4,7 +4,7 @@ import scipy.stats
 from .actflowcalc import *
 from ..model_compare import *
 
-def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_condition=True, separate_activations_bytarget=False, mean_absolute_error=True, transfer_func=None, avgthencomp_fixedeffects=False):
+def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_condition=True, full_report=False, separate_activations_bytarget=False, transfer_func=None, avgthencomp_fixedeffects=False):
     """
     Function to run activity flow mapping with spatial correlation predicted-to-actual testing across multiple tasks and subjects, either with a single (e.g., rest) connectivity matrix or with a separate connectivity matrix for each task. Returns statistics at the group level.
     
@@ -56,28 +56,24 @@ def actflowtest(actVect_group, fcMat_group, actVect_group_test=None, print_by_co
 
     ## Compare predicted to actual activations
     if actVect_group_test is not None:
-        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error, avgthencomp_fixedeffects=avgthencomp_fixedeffects)
+        model_compare_output = model_compare(target_actvect=actVect_group_test, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=full_report, comparison_type='fullcompare_compthenavg', print_report=True, print_by_condition=print_by_condition, avgthencomp_fixedeffects=avgthencomp_fixedeffects)
     else:
-        model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=True, print_report=True, print_by_condition=print_by_condition, mean_absolute_error=mean_absolute_error, avgthencomp_fixedeffects=avgthencomp_fixedeffects)
+        model_compare_output = model_compare(target_actvect=actVect_actual_group, model1_actvect=actPredVector_bytask_bysubj, model2_actvect=None, full_report=full_report, comparison_type='fullcompare_compthenavg', print_report=True, print_by_condition=print_by_condition, avgthencomp_fixedeffects=avgthencomp_fixedeffects)
 
 
-
-    output = {'actPredVector_bytask_bysubj':actPredVector_bytask_bysubj,
-              'predAcc_bytask_bysubj':model_compare_output['corr_conditionwise_compthenavg_bynode'],
-              'actVect_actual_group':actVect_actual_group,
-              'predAcc_bynode_bysubj':model_compare_output['corr_nodewise_compthenavg_bycond'],
-              'R2_conditionwise_compthenavg_bynode':model_compare_output['R2_conditionwise_compthenavg_bynode'],
-              'model_compare_output':model_compare_output
-             }
-    
-    if mean_absolute_error:
-        output.update({'maeAcc_bynode_bysubj':model_compare_output['mae_conditionwise_compthenavg_bynode']})
-        
-        if avgthencomp_fixedeffects:
-            output.update({'maeAcc_bynode_avgthencomp':model_compare_output['maeAcc_nodewise_avgthencomp_bycond']})
-    
-    if avgthencomp_fixedeffects:
-        output.update({'predAcc_bytask_avgthencomp':model_compare_output['corr_nodewise_avgthencomp_bycond'],
-                      'predAcc_bynode_avgthencomp':model_compare_output['corr_conditionwise_avgthencomp_bynode']})
+    if full_report:
+        output = {'actPredVector_bytask_bysubj':actPredVector_bytask_bysubj,
+                  'predAcc_bytask_bysubj':model_compare_output['corr_conditionwise_compthenavg_bynode'],
+                  'actVect_actual_group':actVect_actual_group,
+                  'predAcc_bynode_bysubj':model_compare_output['corr_nodewise_compthenavg_bycond'],
+                  'R2_conditionwise_compthenavg_bynode':model_compare_output['R2_conditionwise_compthenavg_bynode'],
+                  'maeAcc_bynode_bysubj':model_compare_output['mae_conditionwise_compthenavg_bynode'],
+                  'model_compare_output':model_compare_output
+                 }
+    else:
+        output = {'actPredVector_bytask_bysubj':actPredVector_bytask_bysubj,
+                  'actVect_actual_group':actVect_actual_group,
+                  'model_compare_output':model_compare_output
+                 }
     
     return output
