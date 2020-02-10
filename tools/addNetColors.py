@@ -8,8 +8,15 @@ import seaborn as sns
 def addNetColors(fcMatrix):
     
     """ A function to generate a heatmap figure with CAB-NP colors added along axes of FC matrix; python 3
+        INPUT 
         fcMatrix: a node x node matrix of FC estimates (in the Glasser parcellation, this would be 360 x 360, and presumably the 'grand mean' across subjects and states)
-        Note: fcMatrix nodes should be sorted into their network order
+            Note: fcMatrix nodes should be sorted into their network order
+        
+        OUTPUT
+        fig: a handle for the generated figure, can be used to save it, ex python code: 
+            fig = addNetColors(fcMatrix)
+            figDirectory = '/path/to/your/figure/directory/here/'; 
+            figFileName = figDirectory + 'figureName.png'; fig.savefig(figFileName, bbox_inches='tight', format='png', dpi=250);
     """ 
     
     # CAB-NP & Glasser parcellation variables 
@@ -56,7 +63,8 @@ def addNetColors(fcMatrix):
     #plt.clim(round(cbLim*-1,1),round(cbLim,1)); cBarH.outline.set_visible(False); 
     plt.rc('ytick',labelsize=10); plt.rc('xtick',labelsize=10); 
     ax.tick_params(axis=u'both', which=u'both',length=0); plt.box(0); 
-    return plt.show()
+    plt.show()
+    return fig; # can use this output to save generated figure in Jupyter notebook, etc. 
 
 
 class MidpointNormalize(colors.Normalize):
