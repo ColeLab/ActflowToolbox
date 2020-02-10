@@ -1,8 +1,15 @@
 def addNetColors_Seaborn(fcMatrix):
     
-    """ A function to generate a heatmap figure with CAB-NP colors added along axes of FC matrix; python 3
+    """ A function to generate a Seaborn heatmap figure with CAB-NP colors added along axes of FC matrix; python 3
+        INPUT 
         fcMatrix: a node x node matrix of FC estimates (in the Glasser parcellation, this would be 360 x 360, and presumably the 'grand mean' across subjects and states)
         Note: fcMatrix nodes should be sorted into their network order
+        
+        OUTPUT
+        fig: a handle for the generated figure, can be used to save it, ex python code: 
+            fig = addNetColors(fcMatrix)
+            figDirectory = '/path/to/your/figure/directory/here/'; 
+            figFileName = figDirectory + 'figureName.png'; fig.savefig(figFileName, bbox_inches='tight', format='png', dpi=250);
     """ 
     
     import numpy as np; 
@@ -28,7 +35,7 @@ def addNetColors_Seaborn(fcMatrix):
 
     # Generate figure 
     sns.set(style="white");
-    f, ax = plt.subplots(figsize=(10,7)); cmap = sns.diverging_palette(220, 10, as_cmap=True);
+    fig, ax = plt.subplots(figsize=(10,7)); cmap = sns.diverging_palette(220, 10, as_cmap=True);
     tickLabels = np.arange(0,nParcels,50); 
     sns.heatmap(fcMatrixWithBuffer,center=0,cmap='seismic',square=True,cbar_kws={'label': 'FC Estimates'},xticklabels=tickLabels,yticklabels=tickLabels);
     plt.ylabel('Regions',fontsize=20); plt.xlabel('Regions',fontsize=20);
@@ -48,4 +55,5 @@ def addNetColors_Seaborn(fcMatrix):
     plt.box(0); ax.set_xticks(tickLabels); ax.set_yticks(tickLabels); 
     plt.rc('ytick',labelsize=10); plt.rc('xtick',labelsize=10); 
     ax.tick_params(axis=u'both', which=u'both',length=0); plt.box(0); 
-    return plt.show()
+    plt.show()
+    return fig;
