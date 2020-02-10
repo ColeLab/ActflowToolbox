@@ -1,7 +1,7 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
 
-## Version 0.2.1 (beta version)
+## Version 0.2.2 (beta version)
 
 ## Overview
 This toolbox facilitates linking brain connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on _activity flow mapping_ (http://rdcu.be/kOJq) and related methods such as _information transfer mapping_ (http://rdcu.be/wQ1M). These approaches can be used to create and test _network coding models_ (http://arxiv.org/abs/1907.03612), which are empirically-constrained neural network models.
@@ -24,18 +24,6 @@ Activity flow mapping is a method validated and published in Nature Neuroscience
 
 In principle, any measure of neural activity and any measure of neural connectivity can be used with activity flow mapping. Some modifications are necessary for fast temporal resolution data such as EEG/MEG or multi-unit recording, but these should be available soon (we are working on it!).
 
-### Included connectivity-activity mapping methods
-* Activity flow mapping (http://rdcu.be/kOJq)
-* Information transfer mapping (http://rdcu.be/wQ1M) (https://github.com/ColeLab/informationtransfermapping) [planned]
-
-### Included preprocessing methods
-* Note: The toolbox is compatible with existing preprocessing software such as the HCP Pipelines (https://humanconnectome.org/software/hcp-mr-pipelines/) or fMRIPrep (https://fmriprep.readthedocs.io/en/stable/)
-* General linear models (GLM) for fMRI data
-	* Finite impulse response (FIR) GLM models, which can provide flexible mean task-evoked response removal for task-state functional connectivity (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf)
-	* Standard (canonical hemodynamic response function) GLM (e.g., for calculating the to-be-predicted task activations in activity flow mapping)
-* Nusiance regression approaches for removing fMRI data artifacts, such as for resting-state functional connectivity (or task-state functional connectivity)
-	* The Ciric et al. (2017) validated preprocessing pipelines (https://www.sciencedirect.com/science/article/pii/S1053811917302288)
-
 ### Included connectivity mapping methods
 * _All methods can be applied to resting-state or task-state data_
 * Correlation-based functional connectivity
@@ -49,6 +37,13 @@ In principle, any measure of neural activity and any measure of neural connectiv
 * Special preprocessing for task-state functional connectivity
 	* Flexible mean task-evoked response removal (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf) (see FIR GLM preprocessing)
 * Causal connectivity (fGES; https://doi.org/10.1007/s41060-016-0032-z) [planned]
+
+### Preprocessing
+* The toolbox is compatible with existing preprocessing software such as the HCP Pipelines (https://humanconnectome.org/software/hcp-mr-pipelines/) or fMRIPrep (https://fmriprep.readthedocs.io/en/stable/)
+* Task functional connectivity:
+	* Finite impulse response (FIR) regressed task data is recommended, which provides flexible mean task-evoked response removal for task-state functional connectivity (http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf). 
+* We recommend empirically validated nusiance regression approaches for removing fMRI data artifacts, such as for resting-state functional connectivity (or task-state functional connectivity)
+	* Example: The Ciric et al. (2017) validated preprocessing pipelines (https://www.sciencedirect.com/science/article/pii/S1053811917302288)
 
 ### Cite as:
 1) Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
@@ -127,6 +122,9 @@ Mean r=0.97
 * Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
 * Ito T, Kulkarni KR, Schultz DH, Mill RD, Chen RH, Solomyak LI, Cole MW (2017). "Cognitive task information is transferred between brain regions via resting-state network topology". Nature Communications. 8:1027. http://dx.doi.org/10.1038/s41467-017-01000-w
 * Mill RD, Gordon BA, Balota DA, Zacks JM, Cole MW (Preprint). "Predicting dysfunctional age-related task activations from resting-state network alterations". bioRxiv. https://doi.org/10.1101/678086
+
+## Other related tools
+* Information transfer mapping (https://github.com/ColeLab/informationtransfermapping)
 
 ## Contents
 * _Directory_: actflowcomp - Calculating activity flow mapping
