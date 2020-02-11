@@ -107,7 +107,7 @@ ax = sns.heatmap(np.mean(activations_bycond,axis=2)[netorder,:],center=0,cmap='s
 ax.figure.suptitle('Actual activations (24 conditions)')
 ax.set(ylabel='Regions')
 ```
-Output:
+Output:<br>
 <img width="350" src="images/example_multregpred.jpg"><img width="350" src="images/example_multregactual.jpg">
 
 ## Software development guidelines
