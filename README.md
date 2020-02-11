@@ -70,9 +70,13 @@ Example of calculating activity flow mapping predictions using multiple-regressi
 ```
 import ActflowToolbox as actflow
 import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
 restFC_mreg=np.zeros((np.shape(restdata)[0],np.shape(restdata)[0],np.shape(restdata)[2]))
 for scount in np.arange(np.shape(restdata)[2]):
     restFC_mreg[:,:,scount]=actflow.connectivity_estimation.multregconn(restdata[:,:,scount])
+
 print("==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions==")
 actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg)
 ```
@@ -108,7 +112,9 @@ ax.figure.suptitle('Actual activations (24 conditions)')
 ax.set(ylabel='Regions')
 ```
 Output:<br>
-<img width="350" src="images/example_multregpred.jpg"><img width="350" src="images/example_multregactual.jpg">
+<p float="left">
+	<img width="350" src="images/example_multregpred.jpg"><img width="350" src="images/example_multregactual.jpg">
+</p>
 
 ## Software development guidelines
 * Primary language: Python 3
