@@ -154,3 +154,5 @@ Mean r=0.97
 * _Directory_: tests - Code for testing various parts of the toolbox
 * _Directory_: tools - Miscellaneous tools
 
+[//]: # (This is tracking code for keeping track of visits to the repo; MWC)
+[![Analytics](https://ga-beacon.appspot.com/UA-158202396-2/ga-beacon/ActflowToolbox/readme?pixel)](https://github.com/igrigorik/ga-beacon)
