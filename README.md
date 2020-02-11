@@ -74,35 +74,41 @@ restFC_mreg=np.zeros((np.shape(restdata)[0],np.shape(restdata)[0],np.shape(restd
 for scount in np.arange(np.shape(restdata)[2]):
     restFC_mreg[:,:,scount]=actflow.connectivity_estimation.multregconn(restdata[:,:,scount])
 print("==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions==")
-actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg, print_by_condition=False)
+actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg)
 ```
 Output:
 ```
 ==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions==
 ===Comparing prediction accuracies between models (similarity between predicted and actual brain activation patterns)===
  
-==Condition-wise correlations between predicted and actual activation patterns (calculated for each node separetely):==
+==Comparisons between predicted and actual activation patterns, across all conditions and nodes:==
 --Compare-then-average (calculating prediction accuracies before cross-subject averaging):
-Each correlation based on N conditions: 24, p-values based on N subjects (cross-subject variance in correlations): 176
-Mean Pearson r=0.89, t-value vs. 0: 171.05, p-value vs. 0: 1.0573286644474424e-196
-Mean rank-correlation rho=0.79, t-value vs. 0: 173.30, p-value vs. 0: 1.0891488047331093e-197
+Each comparison based on 24 conditions across 360 nodes, p-values based on 30 subjects (cross-subject variance in comparisons)
  
-==Condition-wise correlations between predicted and actual activation patterns (calculated for each node separetely):==
---Average-then-compare (calculating prediction accuracies after cross-subject averaging):
-Each correlation based on N conditions: 24
-Mean Pearson r=0.98
-Mean rank-correlation rho=0.94
+Mean Pearson r = 0.78, t-value vs. 0: 62.27, p-value vs. 0: 1.9635597302245892e-32
  
-==Node-wise (spatial) correlations between predicted and actual activation patterns (calculated for each condition separetely):==
---Compare-then-average (calculating prediction accuracies before cross-subject averaging):
-Each correlation based on N nodes: 360, p-values based on N subjects (cross-subject variance in correlations): 176
-Cross-condition mean r=0.87, t-value vs. 0: 152.54, p-value vs. 0: 4.6587650313354306e-188
+Mean % variance explained (R^2 score, coeff. of determination) = 0.57
  
-==Node-wise (spatial) correlations between predicted and actual activation patterns (calculated for each condition separetely):==
---Average-then-compare (calculating prediction accuracies after cross-subject averaging):
-Each correlation based on N nodes: 360, p-values based on N subjects (cross-subject variance in correlations): 176
-Mean r=0.97
+Mean MAE (mean absolute error) = 7.54
+ 
+Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 and MAE are not. R^2 units: percentage of the to-be-predicted data's unscaled variance, ranging from negative infinity (because prediction errors can be arbitrarily large) to positive 1. See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html for more info.
 ```
+
+Visualizing the results:
+```
+#Visualize predicted and actual activation patterns, with multiple-regression FC
+plt.figure(figsize=[7,5])
+ax = sns.heatmap(np.mean(actflowOutput_restFCMReg_bycond['actPredVector_bytask_bysubj'],axis=2)[netorder,:],center=0,cmap='seismic',cbar=True,yticklabels=100,xticklabels=taskConditions)
+ax.figure.suptitle('Predicted activations, multreg FC actflow')
+ax.set(ylabel='Regions')
+
+plt.figure(figsize=[7,5])
+ax = sns.heatmap(np.mean(activations_bycond,axis=2)[netorder,:],center=0,cmap='seismic',cbar=True,yticklabels=100,xticklabels=taskConditions)
+ax.figure.suptitle('Actual activations (24 conditions)')
+ax.set(ylabel='Regions')
+```
+Output:
+<img width="350" src="images/example_multregpred.jpg"><img width="350" src="images/example_multregactual.jpg">
 
 ## Software development guidelines
 * Primary language: Python 3
