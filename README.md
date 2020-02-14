@@ -169,7 +169,7 @@ Output:<br>
 	* map_to_surface.py - Maps 2D matrix data onto a dscalar surface file (64k vertices); uses Glasser et al. 2016 ROI parcellation
 	* max_r.py - Permutation testing to control for FWE (as in Nichols & Holmes, 2002 max-t); individual difference correlations (r)
 	* max_t.py - Permutation testing to control for FWE (as in Nichols & Holmes, 2002); t-test variants (t)
-	* regression.py - Compute multiple linear reggression (with L2 regularization option)
+	* regression.py - Compute multiple linear regression (with L2 regularization option)
 
 [//]: # (This is tracking code for keeping track of visits to the repo; MWC)
 [![Analytics](https://ga-beacon.appspot.com/UA-158202396-2/ga-beacon/ActflowToolbox/readme?pixel)](https://github.com/igrigorik/ga-beacon)
