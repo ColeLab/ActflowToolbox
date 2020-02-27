@@ -8,10 +8,10 @@ This toolbox facilitates linking brain connectivity with cognitive/behavioral fu
 
 Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation will also be included [planned]. The primary focus (for now) is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.
 
-This code repository was created by the Cole Neurocognition Lab at Rutgers University: http://www.colelab.org/ We are happy for others to contribute to the code as well (contact Michael Cole if you are interested).
+This code repository was created by the Cole Neurocognition Lab at Rutgers University: [http://www.colelab.org/](http://www.colelab.org/) We are happy for others to contribute to the code as well (contact Michael Cole if you are interested).
 
 ### Core algorithm and principles behind activity flow mapping
-Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see http://rdcu.be/kOJq), with multiple follow-up studies further validating the approach.
+Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see [http://rdcu.be/kOJq](http://rdcu.be/kOJq)), with multiple follow-up studies further validating the approach.
 
 **Activity flow mapping has two basic steps**:
 1) _Activity flow modeling_: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard "propagation rule" and "activation rule" steps used in most neural network simulations (see http://arxiv.org/abs/1907.03612). In the standard approach each neural population's activity level is predicted based on the flow from every other recorded neural population (from http://rdcu.be/kOJq):
