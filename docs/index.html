@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html lang="en">
 <HEAD>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-158202396-2"></script>
@@ -8,23 +10,50 @@
 
       gtag('config', 'UA-158202396-2');
     </script>
+
+    <meta charset="utf-8">
+
+    <title>ActflowToolbox</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
 </HEAD>
 
-<h1 id="actflowtoolbox">ActflowToolbox</h1>
-<h2 id="the-brain-activity-flow-actflow-toolbox">The Brain Activity Flow (&quot;Actflow&quot;) Toolbox</h2>
-<h2 id="version-0-2-2-beta-version-">Version 0.2.2 (beta version)</h2>
+<div class="container">
+
+<h1 id="the-brain-activity-flow-actflow-toolbox">The Brain Activity Flow (&quot;Actflow&quot;) Toolbox</h1>
+
+<h2 id="version-0-2-2-beta-version-">Version 0.2.3 (beta version)</h2>
+
+<br>
+<p>
+<button type="button" class="btn btn-primary btn-lg">View on GitHub</button>
+</p>
+<br>
+
 <h2 id="overview">Overview</h2>
-<p>This toolbox facilitates linking brain connectivity with cognitive/behavioral functions and task-evoked activity. The primary focus is on <em>activity flow mapping</em> (<a href="http://rdcu.be/kOJq">http://rdcu.be/kOJq</a>) and related methods such as <em>information transfer mapping</em> (<a href="http://rdcu.be/wQ1M">http://rdcu.be/wQ1M</a>). These approaches can be used to create and test <em>network coding models</em> (<a href="http://arxiv.org/abs/1907.03612">http://arxiv.org/abs/1907.03612</a>), which are empirically-constrained neural network models.</p>
-<p>Other included methods that can be used along with activity flow mapping (or not) include advanced versions of task-state functional connectivity, resting-state functional connectivity, and general linear modeling (multiple regression). Supporting methods such as preprocessing and simulations for validation will also be included [planned]. The primary focus (for now) is on fMRI and EEG/MEG data, but in principle these approaches can be applied to other kinds of data.</p>
-<p>This code repository was created by the Cole Neurocognition Lab at Rutgers University: <a href="http://www.colelab.org/">http://www.colelab.org/</a> We are happy for others to contribute to the code as well (contact Michael Cole if you are interested).</p>
+
+<p class="lead">This toolbox facilitates linking brain connectivity with task-evoked activity and associated cognitive/behavioral functions. The primary focus is on <em>activity flow mapping</em> and related methods (<a href="http://rdcu.be/kOJq">Cole et al. (2016)</a> & <a href="http://rdcu.be/wQ1M">Ito et al. (2017)</a>).</p>
+
+<p class="lead">Activity flow mapping is based on core principles underlying brain network simulations, applying these principles to empirical neural/neuroimaging data. It is a highly flexible framework that is constantly being improved via better connectivity methods and creative uses of the approach to better understand brain function.</p>
+
+<p class="lead">Activity flow mapping can be used, for instance, to infer whether one or more brain connections are involved in producing a particular function. This method can also be used to relate multiple task-evoked activations to each other (e.g., predicting one neural population's activity from another's activity). More generally, activity flow mapping can be thought of as creating <em>network coding models</em> (<a href="http://www.colelab.org/pubs/2019_ItoHearne_TiCS.pdf">Ito et al. (2020)</a>), which are empirically-constrained neural network models.</p>
+
+<p class="lead">Other methods included in the toolbox (which can optionally be used along with activity flow mapping) are advanced versions of resting-state functional connectivity and task-state functional connectivity. The primary focus (for now) is on fMRI data, but in principle these approaches can be applied to any kind of neural data.</p>
+
+<p class="lead">This code repository was created by the Cole Neurocognition Lab at Rutgers University: <a href="http://www.colelab.org/">http://www.colelab.org/</a>
+<br>We are happy for others to contribute to the code as well.</p>
+
 <h3 id="core-algorithm-and-principles-behind-activity-flow-mapping">Core algorithm and principles behind activity flow mapping</h3>
-<p>Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see <a href="http://rdcu.be/kOJq">http://rdcu.be/kOJq</a>), with multiple follow-up studies further validating the approach.</p>
-<p><strong>Activity flow mapping has two basic steps</strong>:
-1) <em>Activity flow modeling</em>: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard &quot;propagation rule&quot; and &quot;activation rule&quot; steps used in most neural network simulations (see <a href="http://arxiv.org/abs/1907.03612">http://arxiv.org/abs/1907.03612</a>). In the standard approach each neural population&#39;s activity level is predicted based on the flow from every other recorded neural population (from <a href="http://rdcu.be/kOJq">http://rdcu.be/kOJq</a>):</p>
-<p><img width="350" src="images/actflowfigure1.png"></p>
-<p>2) <em>Testing prediction accuracy</em>: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity. Two examples of predicted-to-actual accuracy testing (from <a href="http://rdcu.be/kOJq">http://rdcu.be/kOJq</a>):</p>
-<p><img width="350" src="images/actflowfigure_predictiontesting.png"></p>
+<p class="lead">Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>), with multiple follow-up studies further validating the approach.</p>
+<h4>Activity flow mapping has two basic steps:</h4>
+<p>1) <em>Activity flow modeling</em>: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard &quot;propagation rule&quot; and &quot;activation rule&quot; steps used in most neural network simulations (see <a href="http://www.colelab.org/pubs/2019_ItoHearne_TiCS.pdf">Ito et al. (2020)</a>). In the standard approach each neural population&#39;s activity level is predicted based on the flow from every other recorded neural population (from <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>):</p>
+<p><img width="350" src="../images/actflowfigure1.png"></p>
+<p>2) <em>Testing prediction accuracy</em>: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity. Two examples of predicted-to-actual accuracy testing with fMRI data (from <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>):</p>
+<p><img width="350" src="../images/actflowfigure_predictiontesting.png"></p>
 <p>In principle, any measure of neural activity and any measure of neural connectivity can be used with activity flow mapping. Some modifications are necessary for fast temporal resolution data such as EEG/MEG or multi-unit recording, but these should be available soon (we are working on it!).</p>
+
 <h3 id="included-connectivity-mapping-methods">Included connectivity mapping methods</h3>
 <ul>
 <li><em>All methods can be applied to resting-state or task-state data</em></li>
@@ -42,17 +71,18 @@
 <li>Regularized partial correlation [planned]</li>
 </ul>
 </li>
-<li>Special preprocessing for task-state functional connectivity<ul>
-<li>Flexible mean task-evoked response removal (<a href="http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf">http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf</a>) (see FIR GLM preprocessing)</li>
-</ul>
-</li>
-<li>Causal connectivity (fGES; <a href="https://doi.org/10.1007/s41060-016-0032-z">https://doi.org/10.1007/s41060-016-0032-z</a>) [planned]</li>
+<li>Causal connectivity
+  <ul>
+    <li>CombinedFC [planned]</li>
+    <li>fGES; <a href="https://doi.org/10.1007/s41060-016-0032-z">https://doi.org/10.1007/s41060-016-0032-z</a>) [planned]</li>
+  </ul>
+  </li>
 </ul>
 <h3 id="preprocessing">Preprocessing</h3>
 <ul>
 <li>The toolbox is compatible with existing preprocessing software such as the HCP Pipelines (<a href="https://humanconnectome.org/software/hcp-mr-pipelines/">https://humanconnectome.org/software/hcp-mr-pipelines/</a>) or fMRIPrep (<a href="https://fmriprep.readthedocs.io/en/stable/">https://fmriprep.readthedocs.io/en/stable/</a>)</li>
 <li>Task functional connectivity:<ul>
-<li>Finite impulse response (FIR) regressed task data is recommended, which provides flexible mean task-evoked response removal for task-state functional connectivity (<a href="http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf">http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf</a>). </li>
+<li>Finite impulse response (FIR) regressed task data is recommended, which provides flexible mean task-evoked response removal for task-state functional connectivity (<a href="http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf">Cole et al. (2019)</a>). </li>
 </ul>
 </li>
 <li>We recommend empirically validated nusiance regression approaches for removing fMRI data artifacts, such as for resting-state functional connectivity (or task-state functional connectivity)<ul>
@@ -61,12 +91,17 @@
 </li>
 </ul>
 <h3 id="cite-as-">Cite as:</h3>
-<p>1) Cole MW, Ito T, Bassett DS, Schultz DH (2016). &quot;Activity flow over resting-state networks shapes cognitive task activations&quot;. Nature Neuroscience. 19:1718–1726.<a href="http://dx.doi.org/10.1038/nn.4406">http://dx.doi.org/10.1038/nn.4406</a>
-2) <a href="https://github.com/ColeLab/ActflowToolbox/">https://github.com/ColeLab/ActflowToolbox/</a> 
-and
-3) The article that describes the specific toolbox functions being used in most detail</p>
+<p>
+  <ol>
+  <li>Cole MW, Ito T, Bassett DS, Schultz DH (2016). &quot;Activity flow over resting-state networks shapes cognitive task activations&quot;. Nature Neuroscience. 19:1718–1726. doi.org/10.1038/nn.4406</li>
+  <li>https://colelab.github.io/ActflowToolbox/</li>
+  and
+  <li>The article that describes the specific toolbox functions being used in most detail</li>
+  </ol>
+</p>
+
 <h2 id="how-to-install">How to install</h2>
-<p>git clone --recurse-submodules <a href="https://github.com/ColeLab/ActflowToolbox.git">https://github.com/ColeLab/ActflowToolbox.git</a></p>
+<p>git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git</p>
 <h2 id="email-list-forum">Email list/forum</h2>
 <p>We strongly encourage you to join the ColeNeuroLab Users Group (<a href="https://groups.google.com/forum/#!forum/coleneurolab_users">https://groups.google.com/forum/#!forum/coleneurolab_users</a>), so you can be informed about major updates in this repository and others hosted by the Cole Neurocognition Lab.</p>
 <h2 id="conventions">Conventions</h2>
@@ -75,9 +110,11 @@ and
 <li>Directed connectivity matrices all target X source</li>
 <li>Primary (default) brain parcellation: CAB-NP (<a href="https://github.com/ColeLab/ColeAnticevicNetPartition">https://github.com/ColeLab/ColeAnticevicNetPartition</a>), which uses the Glasser2016 parcellation for cortex (<a href="https://balsa.wustl.edu/study/show/RVVG">https://balsa.wustl.edu/study/show/RVVG</a>) and includes an additional 358 subcortical parcels. Cortex-only analyses with only the Glasser2016 parcels are easily implemented. Other parcellations can be used, and we anticipate integrating other parcellations in the future.</li>
 </ul>
+
 <h2 id="examples">Examples</h2>
-<p>A Jupyter Notebook with example analyses is viewable here: <a href="examples/HCP_example.ipynb">HCP_example.ipynb</a></p>
+<p class="lead">A Jupyter Notebook with example analyses (and example data) is viewable here: <a href="../examples/HCP_example.ipynb">HCP_example.ipynb</a></p>
 <p>Example of calculating activity flow mapping predictions using multiple-regression FC and standard task-evoked activations with fMRI data (in Python 3; assumes task activations and resting-state fMRI data are already loaded):</p>
+
 <pre><code><span class="hljs-keyword">import</span> ActflowToolbox <span class="hljs-keyword">as</span> actflow
 <span class="hljs-keyword">import</span> numpy <span class="hljs-keyword">as</span> np
 <span class="hljs-keyword">import</span> matplotlib.pyplot <span class="hljs-keyword">as</span> plt
@@ -104,7 +141,9 @@ Mean % variance explained (R^<span class="hljs-number">2</span> score, coeff. <s
 Mean MAE (mean absolute <span class="hljs-literal">error</span>) = <span class="hljs-number">7.54</span>
 
 <span class="hljs-literal">Note</span>: Pearson r <span class="hljs-keyword">and</span> Pearson r^<span class="hljs-number">2</span> are scale-invariant, <span class="hljs-keyword">while</span> R^<span class="hljs-number">2</span> <span class="hljs-keyword">and</span> MAE are <span class="hljs-keyword">not</span>. R^<span class="hljs-number">2</span> <span class="hljs-keyword">units</span>: percentage <span class="hljs-keyword">of</span> the <span class="hljs-keyword">to</span>-be-predicted data<span class="hljs-symbol">'s</span> unscaled variance, ranging from negative infinity (because prediction errors can be arbitrarily large) <span class="hljs-keyword">to</span> <span class="hljs-built_in">positive</span> <span class="hljs-number">1</span>. See https://scikit-learn.org/stable/modules/generated/sklearn.metrics.r2_score.html <span class="hljs-keyword">for</span> more info.
-</code></pre><p>Visualizing the results:</p>
+</code></pre>
+
+<p>Visualizing the results:</p>
 <pre><code><span class="hljs-selector-id">#Visualize</span> predicted and actual activation patterns, with multiple-regression FC
 plt.figure(figsize=[<span class="hljs-number">7</span>,<span class="hljs-number">5</span>])
 ax = sns.heatmap(np.mean(actflowOutput_restFCMReg_bycond[<span class="hljs-string">'actPredVector_bytask_bysubj'</span>],axis=<span class="hljs-number">2</span>)[netorder,:],center=<span class="hljs-number">0</span>,cmap=<span class="hljs-string">'seismic'</span>,cbar=True,yticklabels=<span class="hljs-number">100</span>,xticklabels=taskConditions)
@@ -117,7 +156,7 @@ ax<span class="hljs-selector-class">.figure</span><span class="hljs-selector-cla
 ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 </code></pre><p>Output:<br></p>
 <p float="left">
-    <img width="350" src="images/example_multregpred.jpg"><img width="350" src="../images/example_multregactual.jpg">
+    <img width="350" src="../images/example_multregpred.jpg"><img width="350" src="../images/example_multregactual.jpg">
 </p>
 
 <h2 id="software-development-guidelines">Software development guidelines</h2>
@@ -147,7 +186,10 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 </ul>
 <h2 id="other-related-tools">Other related tools</h2>
 <ul>
-<li>Information transfer mapping (<a href="https://github.com/ColeLab/informationtransfermapping">https://github.com/ColeLab/informationtransfermapping</a>)</li>
+<li><a href="https://github.com/ColeLab/informationtransfermapping">Information transfer mapping</a></li>
+<li><a href="https://github.com/ColeLab/TaskFCRemoveMeanActivity">Task FC Mean Activity Removal</a> for task-state functional connectivity estimation</li>
+<li><a href="https://github.com/ColeLab/ColeAnticevicNetPartition">The Cole-Anticevic Brain-wide Network Partition (CAB-NP)</a></li>
+<li><a href="http://www.colelab.org/#resources">Other tools released by the Cole Neurocognition Lab</a></li>
 </ul>
 <h2 id="contents">Contents</h2>
 <ul>
@@ -195,4 +237,5 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 </ul>
 </li>
 </ul>
-<p><a href="https://github.com/igrigorik/ga-beacon"><img src="https://ga-beacon.appspot.com/UA-158202396-2/ga-beacon/ActflowToolbox/readme?pixel" alt="Analytics"></a></p>
+
+</div>
