@@ -49,9 +49,9 @@
 <p class="lead">Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>), with multiple follow-up studies further validating the approach.</p>
 <h4>Activity flow mapping has two basic steps:</h4>
 <p>1) <em>Activity flow modeling</em>: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard &quot;propagation rule&quot; and &quot;activation rule&quot; steps used in most neural network simulations (see <a href="http://www.colelab.org/pubs/2019_ItoHearne_TiCS.pdf">Ito et al. (2020)</a>). In the standard approach each neural population&#39;s activity level is predicted based on the flow from every other recorded neural population (from <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>):</p>
-<p><img width="350" src="/images/actflowfigure1.png"></p>
+<p><img width="350" src="images/actflowfigure1.png"></p>
 <p>2) <em>Testing prediction accuracy</em>: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity. Two examples of predicted-to-actual accuracy testing with fMRI data (from <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>):</p>
-<p><img width="350" src="/images/actflowfigure_predictiontesting.png"></p>
+<p><img width="350" src="images/actflowfigure_predictiontesting.png"></p>
 <p>In principle, any measure of neural activity and any measure of neural connectivity can be used with activity flow mapping. Some modifications are necessary for fast temporal resolution data such as EEG/MEG or multi-unit recording, but these should be available soon (we are working on it!).</p>
 
 <h3 id="included-connectivity-mapping-methods">Included connectivity mapping methods</h3>
@@ -156,7 +156,7 @@ ax<span class="hljs-selector-class">.figure</span><span class="hljs-selector-cla
 ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 </code></pre><p>Output:<br></p>
 <p float="left">
-    <img width="350" src="../images/example_multregpred.jpg"><img width="350" src="../images/example_multregactual.jpg">
+    <img width="350" src="images/example_multregpred.jpg"><img width="350" src="images/example_multregactual.jpg">
 </p>
 
 <h2 id="software-development-guidelines">Software development guidelines</h2>
