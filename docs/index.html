@@ -100,7 +100,6 @@
   and
   <li>The article that describes the specific toolbox functions being used in most detail</li>
   </ol>
-</p>
 
 <h2 id="how-to-install">How to install</h2>
 <p>git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git</p>
@@ -160,6 +159,24 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 <p float="left">
     <img width="350" src="images/example_multregpred.jpg"><img width="350" src="images/example_multregactual.jpg">
 </p>
+
+
+<h2>General guidelines for activity flow mapping</h2>
+<ul>
+  <li>Avoid <a href="https://wiki.biac.duke.edu/lib/exe/fetch.php?media=biac:kriegeskorte_et_al_2009.pdf">circularity</a>:
+    <ul>
+      <li><strong>Use connectivity independent of the current state when possible</strong>, such as resting-state functional connectivity. This implicitly tests for generalization across brain states (when predicting task activations), which is important given that connectivity is mostly invariant across states. There is substantial evidence for the dominant effect of intrinsic/state-general connectivity (see <a href="http://www.colelab.org/pubs/2014_Cole_Neuron.pdf">Cole et al. (2014)</a> and <a href="https://doi.org/10.1016/j.neuron.2018.03.035">Gratton et al. (2018)</a>). Using structural connectivity avoids this issue, though some details (e.g., the aggregate effects of synaptic weights) are lost with most structural connectivity methods.</li>
+      <li><strong>Ensure statistical independence of activation and functional connectivity estimates</strong> when the same state is used for estimating both. The recommended approach is to use finite impulse response (FIR) regression as a preprocessing step, removing the to-be-predicted mean task activations prior to estimating task-state functional connectivity. Note that this leaves most of the task-related variance in the time series, since mean task effects are only a small (but important!) portion of the data. See <a href="http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf">Cole et al. (2019)</a> for more info.</li>
+      <li><strong>Spatial smoothness of the data can introduce circularity</strong>, since this results in the same underlying neural activity being assigned to multiple spatial locations (such as multiple voxels in fMRI). We therefore recommend excluding activity flow source data within approximately 10 mm from the to-be-predicted neural signal with fMRI data (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>). This is less of a concern with brain region level data, since it would only apply to voxels/vertices at the border of each region. We nonetheless implemented a "non-circular" version of region-level activity analysis (excluding voxels/vertices within 10 mm of the to-be-predicted region), which we will be documenting soon. The vast majority of results do not change with vs. withou the "non-circular" region-level approach. Note that standard activity flow mapping should not be used with EEG/MEG or related methods at this time, since the source spread implicit in those approaches is so substantial (even when using source localization) that it would result in substantial circularity. (We are working on an approach to get around this problem, however.)</li>
+    </ul>
+    </li>
+  <li>Compare-then-average vs. average-then-compare:
+    <ul>
+      <li><strong>We recommend compare-then-average statistics for most analyses</strong> (the default option in the actflowtest function). Compare-then-average compares each subject's predicted to actual activity prior to aggregating results across subjects, such that the group-level estimate is representative of individual subject results (i.e., what would be expected if the analysis was run with a new random subject). In contrast, the average-then-compare approach averages results across subjects prior to comparing predicted to actual activity. This typically boosts predicted-to-actual similarity due to more data being included in both the predicted and actual estimates, as well as due to "bluring"/smoothing the data from cross-subject averaging. It also prevents computation of meaningful p-values, since there is no inter-subject variance in prediction accuracy to use for t-tests and similar approaches. Note, however, that visualizing group results (plotting predicted and actual activation patterns next to each other) effectively results in the average-then-compare approach, since results are averaged prior to the reader comparing the results by eye. Thus, predicted-to-actual similarity typically appears higher in these plots than they are at the individual subject level.
+    </ul>
+    </li>
+</ul>
+<p>
 
 <h2 id="software-development-guidelines">Software development guidelines</h2>
 <ul>
