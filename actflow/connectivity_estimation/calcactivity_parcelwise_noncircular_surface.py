@@ -6,13 +6,12 @@ import pkg_resources
 
 dilateMM = 10
 
-partitiondir = pkg_resources.resource_filename('ActflowToolbox.dependencies', 'ColeAnticevicNetPartition/')
+partitiondir = pkg_resources.resource_filename('actflow', 'dependencies/ColeAnticevicNetPartition/')
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
-dilatedmaskdir = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/CIFTIMasks/')
 # maskdir cortex
-dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'Glasser2016/surfaceMasks/')
+dilatedmaskdir_cortex = pkg_resources.resource_filename('actflow', 'network_definitions/Glasser2016/surfaceMasks/')
 # maskdir subcortex
-dilatedmaskdir_subcortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/volumeMasks/')
+dilatedmaskdir_subcortex = pkg_resources.resource_filename('actflow', 'network_definitions/CAB-NP/volumeMasks/')
 
 def calcactivity_parcelwise_noncircular_surface(data, dlabelfile=defaultdlabelfile, dilated_parcels=True,subcortex=False, verbose=False):
     """

@@ -6,7 +6,7 @@ import pkg_resources
 
 #toolsdir = pkg_resources.resource_filename('ActflowToolbox.tools', '/')
 #glasserfile2=toolsdir+'Q1-Q6_RelatedParcellation210.LR.CorticalAreas_dil_Colors.32k_fs_RL.dlabel.nii'
-dependenciesdir = pkg_resources.resource_filename('ActflowToolbox.dependencies', '/')
+dependenciesdir = pkg_resources.resource_filename('actflow', 'dependencies')
 glasserfile2=dependenciesdir+'ColeAnticevicNetPartition/CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 
 def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2,fliphemispheres=False):

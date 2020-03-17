@@ -9,12 +9,13 @@ from .pc_multregconn import *
 
 dilateMM = 10
 
-partitiondir = pkg_resources.resource_filename('ActflowToolbox.dependencies', 'ColeAnticevicNetPartition/')
+partitiondir = pkg_resources.resource_filename('actflow', 'dependencies/ColeAnticevicNetPartition/')
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 # maskdir cortex
-dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'Glasser2016/surfaceMasks/')
+dilatedmaskdir_cortex = pkg_resources.resource_filename('actflow', 'network_definitions/Glasser2016/surfaceMasks/')
 # maskdir subcortex
-dilatedmaskdir_subcortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/volumeMasks/')
+dilatedmaskdir_subcortex = pkg_resources.resource_filename('actflow', 'network_definitions/CAB-NP/volumeMasks/')
+
 
 def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, precomputedRegularTS=None, subcortex=False, verbose=False):
     """
