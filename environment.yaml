@@ -1,0 +1,12 @@
+name: actflowdev
+channels:
+    - conda-forge
+dependencies:
+    - numpy
+    - scipy
+    - scikit-learn
+    - matplotlib
+    - seaborn
+    - nibabel
+    - ipython
+    - ipykernel
