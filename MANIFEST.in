@@ -1,0 +1,3 @@
+include README.md
+include actflow/network_definitions/*/*/*.nii
+include actflow/dependencies/ColeAnticevicNetPartition/*.nii
