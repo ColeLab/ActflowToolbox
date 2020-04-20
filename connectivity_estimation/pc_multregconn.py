@@ -1,11 +1,11 @@
 
 from sklearn.linear_model import LinearRegression
 from sklearn.decomposition import PCA
-from sklearn.model_selection import cross_val_predict
+from sklearn.model_selection import cross_val_predict, GroupKFold, LeaveOneGroupOut
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 
-def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_search=False, n_components_min=1, n_components_max=None):
+def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_search=False, n_components_min=1, n_components_max=None, n_comp_search_cvs=5):
     """
     activity_matrix:    Activity matrix should be nodes X time
     target_ts:             Optional, used when only a single target time series (returns 1 X nnodes matrix)
@@ -13,6 +13,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     n_comp_search: Optional. Boolean indicating whether to search for the best number of components based on cross-validation generalization (to reduce overfitting).
     n_components_min: Optional. The smallest number to test in the n_comp_search.
     n_components_max: Optional. The largest number to test in the n_comp_search.
+    n_comp_search_cvs: Optional. The number of cross-validation folds to use for the n_comp_search. More folds will take longer, but likely improve generalization accuracy. Note that the time series are also split into the number of cross-validation folds, such that nearby time points are unlikely to be included in both training and testing sets. This is an attempt to reduce the influence of temporal autocorrelation. Thus, a very large number of folds may reduce generalization accuracy (due to the data being split into smaller splits in the time series). Ideally for fMRI data each split would be about 100 seconds or longer (given known autocorrelation as long as 0.01 Hz).
     
     Output: connectivity_mat (formatted targets X sources), n_components
     """
@@ -26,6 +27,14 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
         if nnodes<n_components or timepoints<n_components:
             print('activity_matrix shape: ',np.shape(activity_matrix))
             raise Exception('More components than nodes and/or timepoints! Use fewer components')
+    
+    if n_comp_search:
+        if n_components_max == None:
+            n_components_max = np.min([nnodes-1, timepoints-1])
+        else:
+            if nnodes<n_components_max or timepoints<n_components_max:
+                print('activity_matrix shape: ',np.shape(activity_matrix))
+                raise Exception('More components than nodes and/or timepoints! Use fewer components')
     
     #De-mean time series
     activity_matrix_mean = np.mean(activity_matrix,axis=1)
@@ -53,8 +62,17 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
                     regr = LinearRegression()
                     Xreg = Xreg_allPCs[:,:comp_num]
                     regr.fit(Xreg, y)
-                    # Cross-validation
-                    y_cv = cross_val_predict(regr, Xreg, y, cv=10)
+                    #Split into num_cvs equal groups (helping account for temporal autocorrelation)
+                    num_cvs=n_comp_search_cvs
+                    num_values_per_group=np.floor(np.shape(y)[0]/num_cvs)
+                    group_labels=np.zeros((np.shape(y)[0]))
+                    for group_num in np.arange(num_cvs):
+                        start=group_num*num_values_per_group
+                        end=(group_num+1)*num_values_per_group-1
+                        group_labels[start:end]=group_num
+                    group_kfold = GroupKFold(n_splits=num_cvs)
+                    # Cross-validation                  
+                    y_cv = cross_val_predict(regr, Xreg, y, groups=group_labels, cv=group_kfold)
                     mscv_vals[comp_count] = mean_squared_error(y, y_cv)
                     comp_count=comp_count+1
                 mse_regionbycomp[:,targetnode] = mscv_vals
@@ -91,9 +109,10 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
             mscv_vals=np.zeros(np.shape(componentnum_set)[0])
             comp_count=0
             for comp_num in componentnum_set:
-                mscv_vals[comp_count] = pcr_cvtest(X,y, pc=comp_num, cv=10)
+                mscv_vals[comp_count] = pcr_cvtest(X,y, pc=comp_num)
                 comp_count=comp_count+1
             n_components=componentnum_set[np.where(mscv_vals==np.min(mscv_vals))[0][0]]
+            print('n_components = ' + str(n_components))
         #Run PCA on source time series
         pca = PCA(n_components)
         reduced_mat = pca.fit_transform(X) # Time X Features
@@ -107,7 +126,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     return connectivity_mat
 
 
-def pcr_cvtest(X,y,pc,cv):
+def pcr_cvtest(X,y,pc,num_cvs=n_comp_search_cvs):
     ''' Principal Component Regression in Python'''
     ''' Based on code from here: https://nirpyresearch.com/principal-component-regression-python/'''
     
@@ -123,10 +142,18 @@ def pcr_cvtest(X,y,pc,cv):
     regr.fit(Xreg, y)
     # Calibration
     #y_c = regr.predict(Xreg)
+    #Split into num_cvs equal groups (helping account for temporal autocorrelation)
+    num_values_per_group=np.floor(np.shape(y)[0]/num_cvs)
+    group_labels=np.zeros((np.shape(y)[0]))
+    for group_num in np.arange(num_cvs):
+        start=int(group_num*num_values_per_group)
+        end=int((group_num+1)*num_values_per_group-1)
+        group_labels[start:end]=group_num
+    group_kfold = GroupKFold(n_splits=num_cvs)
     # Cross-validation
-    y_cv = cross_val_predict(regr, Xreg, y, cv=cv)
+    y_cv = cross_val_predict(regr, Xreg, y, groups=group_labels, cv=group_kfold)
+    #y_cv = cross_val_predict(regr, Xreg, y, cv=num_cvs)
     # Calculate mean square error for calibration and cross validation
-    #mse_c = mean_squared_error(y, y_c)
     mse_cv = mean_squared_error(y, y_cv)
     
     #return(y_cv, mse_c, mse_cv)
