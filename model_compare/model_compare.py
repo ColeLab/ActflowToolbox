@@ -138,7 +138,50 @@ def model_compare(target_actvect, model1_actvect, model2_actvect=None, full_repo
                 else:
                     print_comparison_results(fullcomp_compthenavg_output, fullcomp_compthenavg_output_model2, tval_ActflowPredAcc_corr_fullcomp_modelcomp, pval_ActflowPredAcc_corr_fullcomp_modelcomp, scaling_note=scaling_note)
 
-                    
+
+    ## fullcompare_avgthencomp - Average-then-compare across all conditions and all nodes between predicted and actual activations
+    if avgthencomp_fixedeffects or comparison_type=='fullcompare_compthenavg':
+        
+        #Test for accuracy of actflow prediction ("average-then-compare")
+        fullcomp_avgthencomp_output = model_compare_predicted_to_actual(target_actvect, model1_actvect, comparison_type='fullcompare_avgthencomp')
+        
+        #Add to output dictionary
+        output.update({'fullcomp_avgthencomp_output':fullcomp_avgthencomp_output,
+                       'corr_fullcomp_avgthencomp':fullcomp_avgthencomp_output['corr_vals'], 
+                       'R2_fullcomp_avgthencomp':fullcomp_avgthencomp_output['R2_vals'], 
+                       'maeAcc_fullcomp_avgthencomp':fullcomp_avgthencomp_output['mae_vals']})
+        
+        if model2_actvect is None:
+            ## Test against null model
+                
+            #Grand mean (across task) t-test
+            [tval_ActflowPredAcc_avgthencomp_fullcomp,pval_ActflowPredAcc_avgthencomp_fullcomp] = scipy.stats.ttest_1samp(np.ma.arctanh(fullcomp_avgthencomp_output['corr_vals']),0.0)
+                
+            #Add to output dictionary
+            output.update({'tval_ActflowPredAcc_avgthencomp_fullcomp':tval_ActflowPredAcc_avgthencomp_fullcomp, 
+                            'pval_ActflowPredAcc_avgthencomp_fullcomp':pval_ActflowPredAcc_avgthencomp_fullcomp})
+                
+        if print_report:
+                print(" ")
+                print("==Comparisons between predicted and actual activation patterns, across all conditions and nodes:==")
+                print("--Average-then-compare (calculating prediction accuracies after cross-subject averaging):")
+                print("Each correlation based on N conditions: " + str(nConds))
+                
+                if model2_actvect is None:
+                    print("Mean Pearson r=" + str("%.2f" % np.tanh(np.nanmean(np.ma.arctanh(fullcomp_avgthencomp_output['corr_vals'])))))
+
+        if mean_absolute_error:
+            
+            #Add to output dictionary
+            output.update({'maeAcc_fullcomp_avgthencomp':fullcomp_avgthencomp_output['mae_vals']})
+
+            if print_report:
+                print(" ")
+                print("==Mean Absolute Error (MAE) between predicted and actual activation patterns:==")
+
+                print("--Average-then-compare (calculating MAE accuracies after cross-subject averaging):")
+                print("Mean MAE=" + str("%.2f" % np.nanmean(fullcomp_avgthencomp_output['mae_vals'])))
+        
     
     
     ### Condition-wise analyses (as opposed to node-wise)

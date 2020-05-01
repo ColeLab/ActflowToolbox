@@ -126,7 +126,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     return connectivity_mat
 
 
-def pcr_cvtest(X,y,pc,num_cvs=n_comp_search_cvs):
+def pcr_cvtest(X,y,pc,num_cvs=5):
     ''' Principal Component Regression in Python'''
     ''' Based on code from here: https://nirpyresearch.com/principal-component-regression-python/'''
     

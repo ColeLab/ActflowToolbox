@@ -20,7 +20,20 @@ def model_compare_predicted_to_actual(target_actvect, pred_actvect, comparison_t
         maeAcc_fullcomp_compthenavg = [np.nanmean(np.abs(np.subtract(target_actvect[:,:,subjNum].flatten(),pred_actvect[:,:,subjNum].flatten()))) for subjNum in range(nSubjs)]
 
         output = {'corr_vals':corr_fullcomp_compthenavg,'R2_vals':R2_fullcomp_compthenavg,'mae_vals':maeAcc_fullcomp_compthenavg}
+
+    ## fullcompare_avgthencomp - Average-then-compare across all conditions and all nodes between predicted and actual activations
+    if comparison_type=='fullcompare_avgthencomp':
     
+        #Test for accuracy of actflow prediction, after averaging across subjects ("average-then-compare")
+        corr_fullcomp_avgthencomp = np.corrcoef(np.mean(target_actvect,axis=2).flatten(),np.mean(pred_actvect,axis=2).flatten())
+        #R2 coefficient of determination, https://scikit-learn.org/stable/modules/model_evaluation.html#r2-score
+        R2_fullcomp_avgthencomp = sklearn.metrics.r2_score(np.mean(target_actvect,axis=2).flatten(), np.mean(pred_actvect,axis=2).flatten())
+        #mean_absolute_error: compute the absolute mean error: mean(abs(a-p)), where a are the actual activations and p the predicted activations across all the nodes.
+        maeAcc_fullcomp_avgthencomp = np.nanmean(np.abs(np.subtract(np.mean(target_actvect,axis=2).flatten(), np.mean(pred_actvect,axis=2).flatten())))
+        
+        output = {'corr_vals':corr_fullcomp_avgthencomp,'R2_vals':R2_fullcomp_avgthencomp,'mae_vals':maeAcc_fullcomp_avgthencomp}
+        
+        
     ## conditionwise_compthenavg - Compare-then-average condition-wise correlation between predicted and actual activations
     if comparison_type=='conditionwise_compthenavg':
 
