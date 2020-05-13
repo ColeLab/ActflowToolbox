@@ -30,6 +30,8 @@ def pc_multregconn_vertexwise(activity_matrix, parcel_num, dlabelfile=defaultdla
     - subcortex options & input to set the default dlabel file & directory 
     - a sister script to re-combine whole-cortex results into 1 graph (reorganized back into original vertex order, and/or into CAB-NP order)? 
     - inquire about hemi switching in 10mm dilated mask file
+    - verbose input? (for printing out step by step process)
+    - currently using 'arpack' solver; maybe make this optional? 
     """
     
     # Define key variables, paths, etc.
@@ -65,13 +67,13 @@ def pc_multregconn_vertexwise(activity_matrix, parcel_num, dlabelfile=defaultdla
     # run PCA on source data (https://nirpyresearch.com/principal-component-regression-python/)
     # xReg: PCA scores; pcComps: coefficients or loadings
     if n_components is not None: 
-        pca = PCA(n_components=n_components); 
+        pca = PCA(n_components=n_components, svd_solver='arpack'); 
         xReg = pca.fit_transform(sourceData.T); # TRs x n_components
         pcComps = pca.components_.T; # vertices x n_components 
         #varExplained = pca.explained_variance_ratio_; # will not add to 100% because it is constrained by n_components 
     else: 
         pca = PCA(); 
-        xReg = pca.fit_transform(sourceData.T); # if # features (vertices) > # observations (TRs), xReg will be square (TRs x TRs)
+        xReg = pca.fit_transform(sourceData.T, svd_solver='arpack'); # if # features (vertices) > # observations (TRs), xReg will be square (TRs x TRs)
         pcComps = pca.components_.T; # full size (and transposed to original dims), or vertices x TRs 
         #varExplained = pca.explained_variance_ratio_; # should add to 100%  
     
@@ -88,12 +90,17 @@ def pc_multregconn_vertexwise(activity_matrix, parcel_num, dlabelfile=defaultdla
     
     # output 
     connEstimates = betasPCregAll.T;
+    data_copy_for_sources = np.copy(activity_matrix); # 59142 x 4780 
+    data_copy_for_sources[targetVertices,:] = 0; # zero out target vertices 
+    data_copy_for_sources[parcelMaskVertices,:] = 0; # zero out 10 mm dilated mask from target parcel
+    sourceVertices = np.where(data_copy_for_sources[:,0]!=0)[0] # find all indices where values were not zero'd out 
+    
     connectivity_mat = np.zeros((numVertices,numVertices)); # initialize the full matrix 
 
     for rowTarget in list(range(numTargetVertices)):
         for colSource in list(range(numSourceVertices)): 
-            connEstimate = testConn[rowTarget,colSource]; 
-            targetIndex = targetVertices[rowTarget]; sourceIndex = xx[colSource]; 
+            connEstimate = connEstimates[rowTarget,colSource]; 
+            targetIndex = targetVertices[rowTarget]; sourceIndex = sourceVertices[colSource]; 
             connectivity_mat[targetIndex,sourceIndex] = connEstimate;
     
     return connectivity_mat; # TO-DO: a helper function for when this is iterated over all cortical parcels; to concatenate into 1 full graph 
