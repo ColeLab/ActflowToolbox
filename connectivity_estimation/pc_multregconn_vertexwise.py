@@ -72,8 +72,8 @@ def pc_multregconn_vertexwise(activity_matrix, parcel_num, dlabelfile=defaultdla
         pcComps = pca.components_.T; # vertices x n_components 
         #varExplained = pca.explained_variance_ratio_; # will not add to 100% because it is constrained by n_components 
     else: 
-        pca = PCA(); 
-        xReg = pca.fit_transform(sourceData.T, svd_solver='arpack'); # if # features (vertices) > # observations (TRs), xReg will be square (TRs x TRs)
+        pca = PCA(svd_solver='arpack'); 
+        xReg = pca.fit_transform(sourceData.T); # if # features (vertices) > # observations (TRs), xReg will be square (TRs x TRs)
         pcComps = pca.components_.T; # full size (and transposed to original dims), or vertices x TRs 
         #varExplained = pca.explained_variance_ratio_; # should add to 100%  
     
