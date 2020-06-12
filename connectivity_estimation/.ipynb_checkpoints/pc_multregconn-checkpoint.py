@@ -5,7 +5,7 @@ from sklearn.model_selection import cross_val_predict, GroupKFold, LeaveOneGroup
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 
-def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_search=False, n_components_min=1, n_components_max=None, n_comp_search_cvs=5):
+def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_search=False, n_components_min=1, n_components_max=None, n_comp_search_cvs=5, svd_solver='auto'):
     """
     activity_matrix:    Activity matrix should be nodes X time
     target_ts:             Optional, used when only a single target time series (returns 1 X nnodes matrix)
@@ -14,6 +14,8 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     n_components_min: Optional. The smallest number to test in the n_comp_search.
     n_components_max: Optional. The largest number to test in the n_comp_search.
     n_comp_search_cvs: Optional. The number of cross-validation folds to use for the n_comp_search. More folds will take longer, but likely improve generalization accuracy. Note that the time series are also split into the number of cross-validation folds, such that nearby time points are unlikely to be included in both training and testing sets. This is an attempt to reduce the influence of temporal autocorrelation. Thus, a very large number of folds may reduce generalization accuracy (due to the data being split into smaller splits in the time series). Ideally for fMRI data each split would be about 100 seconds or longer (given known autocorrelation as long as 0.01 Hz).
+    
+    If 0 < n_components < 1 and svd_solver == 'full', select the number of components such that the amount of variance that needs to be explained is greater than the percentage specified by n_components.
     
     Output: connectivity_mat (formatted targets X sources), n_components
     """
@@ -54,7 +56,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
                 X = activity_matrix[othernodes,:].T
                 y = activity_matrix[targetnode,:]
                 #Run PCA
-                pca = PCA()
+                pca = PCA(svd_solver=svd_solver)
                 Xreg_allPCs = pca.fit_transform(X)
                 mscv_vals=np.zeros(np.shape(componentnum_set)[0])
                 comp_count=0
@@ -87,7 +89,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
             X = activity_matrix[othernodes,:].T
             y = activity_matrix[targetnode,:]
             #Run PCA on source time series
-            pca = PCA(n_components)
+            pca = PCA(n_components, svd_solver=svd_solver)
             reduced_mat = pca.fit_transform(X) # Time X Features
             components = pca.components_
             #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
@@ -109,12 +111,12 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
             mscv_vals=np.zeros(np.shape(componentnum_set)[0])
             comp_count=0
             for comp_num in componentnum_set:
-                mscv_vals[comp_count] = pcr_cvtest(X,y, pc=comp_num)
+                mscv_vals[comp_count] = pcr_cvtest(X,y, pc=comp_num, svd_solver=svd_solver)
                 comp_count=comp_count+1
             n_components=componentnum_set[np.where(mscv_vals==np.min(mscv_vals))[0][0]]
             print('n_components = ' + str(n_components))
         #Run PCA on source time series
-        pca = PCA(n_components)
+        pca = PCA(n_components, svd_solver=svd_solver)
         reduced_mat = pca.fit_transform(X) # Time X Features
         components = pca.components_
         #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
@@ -126,13 +128,13 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     return connectivity_mat
 
 
-def pcr_cvtest(X,y,pc,num_cvs=5):
+def pcr_cvtest(X,y,pc,num_cvs=5,svd_solver='auto'):
     ''' Principal Component Regression in Python'''
     ''' Based on code from here: https://nirpyresearch.com/principal-component-regression-python/'''
     
     ''' Step 1: PCA on input data'''
     # Define the PCA object
-    pca = PCA()
+    pca = PCA(svd_solver=svd_solver)
     # Run PCA producing the reduced variable Xred and select the first pc components
     Xreg = pca.fit_transform(X)[:,:pc]
     ''' Step 2: regression on selected principal components'''
