@@ -4,11 +4,17 @@ import os
 import pkg_resources
 #import subprocess
 
-#toolsdir = pkg_resources.resource_filename('ActflowToolbox.tools', '/')
+toolsdir = pkg_resources.resource_filename('ActflowToolbox.tools', '/')
 #glasserfile2=toolsdir+'Q1-Q6_RelatedParcellation210.LR.CorticalAreas_dil_Colors.32k_fs_RL.dlabel.nii'
+<<<<<<< HEAD
+glasserfile2=toolsdir+'Q1-Q6_RelatedValidation210.CorticalAreas_dil_Final_Final_Areas_Group_Colors.32k_fs_LR.dlabel.nii'
+#dependenciesdir = pkg_resources.resource_filename('ActflowToolbox.dependencies', '/')
+#glasserfile2=dependenciesdir+'ColeAnticevicNetPartition/CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
+=======
 #glasserfile2=toolsdir+'Q1-Q6_RelatedValidation210.CorticalAreas_dil_Final_Final_Areas_Group_Colors.32k_fs_LR.dlabel.nii'
 dependenciesdir = pkg_resources.resource_filename('ActflowToolbox.dependencies', '/')
 glasserfile2=dependenciesdir+'ColeAnticevicNetPartition/CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
+>>>>>>> 8cde7cba14445645a375c4c78b0b6f3d1df4a621
 
 def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2,fliphemispheres=False):
     """
