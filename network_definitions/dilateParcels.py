@@ -3,12 +3,14 @@
 # Luke Hearne
 # Feb, 2020
 # dilateParcels.py
-# On rutgers HCP with 1 node/8 cores/32gb mem - this script takes about 14 hrs to run
+# On rutgers HCP with 1 node/8 cores/32gb mem - this script takes about 4 hrs to run
 
 import numpy as np
 import nibabel as nib
 import pkg_resources
+import multiprocessing as mp
 import os
+import time
 
 ## global variables for directories and atlas information
 
@@ -23,12 +25,16 @@ leftSurface = partitiondir +  'S1200.L.inflated_MSMAll.32k_fs_LR.surf.gii'
 rightSurface = partitiondir +  'S1200.R.inflated_MSMAll.32k_fs_LR.surf.gii'
 
 # output cortex file directory
-dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'Glasser2016/surfaceMasks/')
+dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/surfaceMasks/')
 
 # output subcortex file directory
 dilatedmaskdir_subcortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/volumeMasks/')
 
-def dilateParcels(dilateMM=10,verbose=True):
+##global settings that are used in sub functions!
+dilateMM = 10 #default is 10mm
+dlabels = np.squeeze(nib.load(defaultdlabelfile).get_data())  
+
+def dilateParcels(dilateMM=10,nproc=10,verbose=True):
 
     '''
     This script dilates individual parcels by x mm
@@ -41,12 +47,22 @@ def dilateParcels(dilateMM=10,verbose=True):
         dilateMM : dilation in mm (default=10)
         verbose  : prints current roi
     '''
-    dlabels = np.squeeze(nib.load(defaultdlabelfile).get_data())
+    #dlabels = np.squeeze(nib.load(defaultdlabelfile).get_data())
     parcel_list = np.unique(dlabels)
 
-    for parcel in parcel_list:
+    inputs = []
+    for parcel in parcel_list: inputs.append((parcel,verbose))
+    
+    pool = mp.Pool(processes=nproc)
+    pool.starmap_async(_dilateOneParcel,inputs).get()
+    pool.close()
+    pool.join()
+
+def _dilateOneParcel(parcel,verbose=False):
         if verbose:
             print('Dilating parcel', np.int(parcel))
+            
+        #dlabels = np.squeeze(nib.load(defaultdlabelfile).get_data())    
         parcel_array = np.zeros(dlabels.shape)
 
         # Find all vertices that don't correspond to this ROI`
@@ -54,8 +70,8 @@ def dilateParcels(dilateMM=10,verbose=True):
         parcel_array[roi_ind] = 1.0
 
         if parcel < 361:
-            maskfile   = dilatedmaskdir_cortex + 'GlasserParcel' + str(np.int(parcel))
-            dilatedfile= dilatedmaskdir_cortex + 'GlasserParcel' + str(np.int(parcel)) + '_dilated_' + str(dilateMM) + 'mm'
+            maskfile   = dilatedmaskdir_cortex + 'CabnpParcel' + str(np.int(parcel))
+            dilatedfile= dilatedmaskdir_cortex + 'CabnpParcel' + str(np.int(parcel)) + '_dilated_' + str(dilateMM) + 'mm'
         else:
             maskfile   = dilatedmaskdir_subcortex + 'CabnpParcel' + str(np.int(parcel))
             dilatedfile= dilatedmaskdir_subcortex + 'CabnpParcel' + str(np.int(parcel)) + '_dilated_' + str(dilateMM) + 'mm'
@@ -71,6 +87,12 @@ def dilateParcels(dilateMM=10,verbose=True):
         wb_command = 'wb_command -cifti-dilate ' + maskfile + '.dscalar.nii COLUMN ' + str(dilateMM) + ' ' + str(dilateMM) + ' ' + dilatedfile + '.dscalar.nii -left-surface ' + leftSurface + ' -right-surface ' + rightSurface
         os.system(wb_command)
         
+        # Remove the original .csv file
+        os.remove(maskfile + '.csv')
+        
 if __name__ == '__main__':
     # default settings
-    dilateParcels(dilateMM=10,verbose=True)
+    start = time.time()
+    dilateParcels(dilateMM=dilateMM,nproc=8,verbose=True)
+    finish = time.time()
+    print('Time elapsed:',finish-start)
