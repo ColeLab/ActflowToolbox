@@ -12,7 +12,7 @@ dilateMM = 10
 partitiondir = pkg_resources.resource_filename('ActflowToolbox.dependencies', 'ColeAnticevicNetPartition/')
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
 # maskdir cortex
-dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'Glasser2016/surfaceMasks/')
+dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/surfaceMasks/')
 # maskdir subcortex
 dilatedmaskdir_subcortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/volumeMasks/')
 
@@ -64,7 +64,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
         # setup cortex/subcortex definitions
         if parcelInt < 360:
             dilatedmaskdir = dilatedmaskdir_cortex
-            atlas_label = 'Glasser'
+            atlas_label = 'Cabnp'
         else:
             dilatedmaskdir = dilatedmaskdir_subcortex
             atlas_label = 'Cabnp'
