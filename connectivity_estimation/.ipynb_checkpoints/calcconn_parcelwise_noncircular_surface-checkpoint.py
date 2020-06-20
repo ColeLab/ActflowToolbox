@@ -16,7 +16,7 @@ dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_
 # maskdir subcortex
 dilatedmaskdir_subcortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/volumeMasks/')
 
-def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, precomputedRegularTS=None, subcortex=False, verbose=False):
+def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, precomputedRegularTS=None, cortex_only=True, verbose=False):
     """
     This function produces a parcel-to-parcel connectivity matrix while excluding vertices in the neighborhood of a given target parcel.
     Excludes all vertices within a 10mm (default) dilated mask of the target parcel when computing parcel-to-parcel connectivity.
@@ -29,12 +29,12 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
         dlabelfile  : parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
         precomputedRegularTS:  optional input of precomputed 'regular' mean time series with original region set. This might cut down on computation time if provided.
-        subcortex       :       If True, will include subcortical volume rois from the CAB-NP
+        cortex_only       :       If False, will include subcortical volume rois from the CAB-NP
         verbose  :    indicate if additional print commands should be used to update user on progress
     RETURNS:
         fc_matrix       :       Target X Source FC Matrix. Sources-to-target mappings are organized as rows (targets) from each column (source)
     """
-    if subcortex is False: 
+    if cortex_only: 
         nparcels = 360
     else: 
         nparcels = 718
@@ -42,6 +42,9 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
     # Load dlabel file (cifti)
     if verbose: print('Loading in CIFTI dlabel file')
     dlabels = np.squeeze(nib.load(dlabelfile).get_data())
+    if cortex_only:
+        #Restrict to cortex grayordinates
+        dlabels = dlabels[0:59412]
     # Find and sort unique parcels
     unique_parcels = np.sort(np.unique(dlabels))
     # Only include cortex (if flagged)
@@ -77,9 +80,15 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
             parcel_mask = np.squeeze(nib.load(dilatedmaskdir + atlas_label + 'Parcel' + str(int(parcel)) + '_dilated_10mm.dscalar.nii').get_data())
         else:
             parcel_mask = np.squeeze(nib.load(dilatedmaskdir + atlas_label + 'Parcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+        if cortex_only:
+            #Restrict to cortex grayordinates
+            parcel_mask = parcel_mask[0:59412]
 
         # get all target ROI indices
         target_ind = np.squeeze(nib.load(dilatedmaskdir + atlas_label + 'Parcel' + str(int(parcel)) + '.dscalar.nii').get_data())
+        if cortex_only:
+            #Restrict to cortex grayordinates
+            target_ind = target_ind[0:59412]
         target_ind = np.asarray(target_ind,dtype=bool)
         if verbose: print('\t size of target:', np.sum(target_ind))
 
