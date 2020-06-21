@@ -17,7 +17,7 @@ dilatedmaskdir_subcortex = pkg_resources.resource_filename('ActflowToolbox.netwo
 # network definitions dir
 networkdefdir = pkg_resources.resource_filename('ActflowToolbox', 'network_definitions/')
 
-def calc_removal_coords(dlabelfile=defaultdlabelfile, cortex_only=True, verbose=False):
+def calc_removal_coords(dlabelfile=defaultdlabelfile, cortex_only=True, verbose=False, parcel_level=False):
     
     #Function to calculate which vertices to remove for each target parcel for the spatially non-circular code
     #It saves to the 'network_definitions/' directory as coords_to_remove_indices_data.h5. 
@@ -41,7 +41,10 @@ def calc_removal_coords(dlabelfile=defaultdlabelfile, cortex_only=True, verbose=
     # Only include cortex (if flagged)
     unique_parcels = unique_parcels[:nparcels]
     
-    coords_to_remove_indices={}    
+    if parcel_level:
+        parcels_to_remove={}
+    else:
+        coords_to_remove_indices={}    
 
     for parcelInt,parcel in enumerate(unique_parcels):
         if verbose: print('Identifying grayordinates for target parcel',parcelInt,'-',int(parcel),'/',len(unique_parcels))
@@ -74,20 +77,44 @@ def calc_removal_coords(dlabelfile=defaultdlabelfile, cortex_only=True, verbose=
         coords_to_remove_indices_thisparcel=np.where(coords_to_remove)[0]
         
         #Record coordinates to remove for this target parcel
-        coords_to_remove_indices[parcel]=coords_to_remove_indices_thisparcel
+        if parcel_level:
+            dlabels_coordstoremove=dlabels[coords_to_remove_indices_thisparcel]
+            unique_parcelvals=np.sort(np.unique(dlabels_coordstoremove))
+            parcels_to_remove[parcel]=unique_parcelvals
+        else:
+            coords_to_remove_indices[parcel]=coords_to_remove_indices_thisparcel
 
     #Save to h5 file
-    if cortex_only:
-        outputfilename = networkdefdir + 'coords_to_remove_indices_cortexonly_data.h5'
+    if parcel_level:
+        
+        if cortex_only:
+            outputfilename = networkdefdir + 'parcels_to_remove_indices_cortexonly_data.h5'
+        else:
+            outputfilename = networkdefdir + 'parcels_to_remove_indices_cortexsubcortex_data.h5'
+        print('Saving to h5 file:',outputfilename)
+        h5f = h5py.File(outputfilename,'a')
+        for parcelInt,parcel in enumerate(unique_parcels):
+            outname1 = 'parcels_to_remove_indices'+'/'+str(parcel)
+            try:
+                h5f.create_dataset(outname1,data=parcels_to_remove[parcel])
+            except:
+                del h5f[outname1]
+                h5f.create_dataset(outname1,data=parcels_to_remove[parcel])
+        h5f.close()    
+            
     else:
-        outputfilename = networkdefdir + 'coords_to_remove_indices_cortexsubcortex_data.h5'
-    print('Saving to h5 file:',outputfilename)
-    h5f = h5py.File(outputfilename,'a')
-    for parcelInt,parcel in enumerate(unique_parcels):
-        outname1 = 'coords_to_remove_indices'+'/'+str(parcel)
-        try:
-            h5f.create_dataset(outname1,data=coords_to_remove_indices[parcel])
-        except:
-            del h5f[outname1]
-            h5f.create_dataset(outname1,data=coords_to_remove_indices[parcel])
-    h5f.close()
+        
+        if cortex_only:
+            outputfilename = networkdefdir + 'coords_to_remove_indices_cortexonly_data.h5'
+        else:
+            outputfilename = networkdefdir + 'coords_to_remove_indices_cortexsubcortex_data.h5'
+        print('Saving to h5 file:',outputfilename)
+        h5f = h5py.File(outputfilename,'a')
+        for parcelInt,parcel in enumerate(unique_parcels):
+            outname1 = 'coords_to_remove_indices'+'/'+str(parcel)
+            try:
+                h5f.create_dataset(outname1,data=coords_to_remove_indices[parcel])
+            except:
+                del h5f[outname1]
+                h5f.create_dataset(outname1,data=coords_to_remove_indices[parcel])
+        h5f.close()

@@ -6,15 +6,14 @@ import pkg_resources
 from .multregconn import *
 from .corrcoefconn import *
 from .pc_multregconn import *
+from .. import tools
 
 dilateMM = 10
 
 partitiondir = pkg_resources.resource_filename('ActflowToolbox.dependencies', 'ColeAnticevicNetPartition/')
 defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_wSubcorGSR_parcels_LR.dlabel.nii'
-# maskdir cortex
-dilatedmaskdir_cortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/surfaceMasks/')
-# maskdir subcortex
-dilatedmaskdir_subcortex = pkg_resources.resource_filename('ActflowToolbox.network_definitions', 'CAB-NP/volumeMasks/')
+# network definitions dir
+networkdefdir = pkg_resources.resource_filename('ActflowToolbox', 'network_definitions/')
 
 def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfile=defaultdlabelfile, dilated_parcels=True, precomputedRegularTS=None, cortex_only=True, verbose=False):
     """
@@ -42,9 +41,9 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
     # Load dlabel file (cifti)
     if verbose: print('Loading in CIFTI dlabel file')
     dlabels = np.squeeze(nib.load(dlabelfile).get_data())
-    if cortex_only:
+    #if cortex_only:
         #Restrict to cortex grayordinates
-        dlabels = dlabels[0:59412]
+        #dlabels = dlabels[0:59412]
     # Find and sort unique parcels
     unique_parcels = np.sort(np.unique(dlabels))
     # Only include cortex (if flagged)
@@ -60,52 +59,43 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
 
     # Instantiate empty fc matrix
     fc_matrix = np.zeros((nparcels,nparcels))
+    
+    #Load coords_to_remove_indices file
+    if cortex_only: 
+        outputfilename = networkdefdir + 'coords_to_remove_indices_cortexonly_data.h5'
+    else: 
+        outputfilename = networkdefdir + 'coords_to_remove_indices_cortexsubcortex_data.h5'
+    h5f = h5py.File(outputfilename,'r')
+    #Load in dictionary with grayordinates to remove for each target parcel
+    coords_to_remove_indices={} 
+    for parcelInt,parcel in enumerate(unique_parcels):
+        outname1 = 'coords_to_remove_indices'+'/'+str(parcel)
+        coords_to_remove_indices[parcel] = h5f[outname1][:].copy()
+    h5f.close()
 
     for parcelInt,parcel in enumerate(unique_parcels):
         if verbose: print('Computing FC for target parcel',parcelInt,'-',int(parcel),'/',len(unique_parcels))
         
-        # setup cortex/subcortex definitions
-        if parcelInt < 360:
-            dilatedmaskdir = dilatedmaskdir_cortex
-            atlas_label = 'Cabnp'
-        else:
-            dilatedmaskdir = dilatedmaskdir_subcortex
-            atlas_label = 'Cabnp'
-            
-        # Find where this parcel is in the unique parcel array
-        parcel_ind = np.where(unique_parcels==parcel)[0]
+        #Identify target parcel indices
+        target_ind = np.where(np.asarray(dlabels==parcel,dtype=bool))[0]
+        if verbose: print('\t size of target:', len(target_ind))
         
-        # Load in mask for target parcel
-        if dilated_parcels:
-            parcel_mask = np.squeeze(nib.load(dilatedmaskdir + atlas_label + 'Parcel' + str(int(parcel)) + '_dilated_10mm.dscalar.nii').get_data())
-        else:
-            parcel_mask = np.squeeze(nib.load(dilatedmaskdir + atlas_label + 'Parcel' + str(int(parcel)) + '.dscalar.nii').get_data())
-        if cortex_only:
-            #Restrict to cortex grayordinates
-            parcel_mask = parcel_mask[0:59412]
-
-        # get all target ROI indices
-        target_ind = np.squeeze(nib.load(dilatedmaskdir + atlas_label + 'Parcel' + str(int(parcel)) + '.dscalar.nii').get_data())
-        if cortex_only:
-            #Restrict to cortex grayordinates
-            target_ind = target_ind[0:59412]
-        target_ind = np.asarray(target_ind,dtype=bool)
-        if verbose: print('\t size of target:', np.sum(target_ind))
-
-        # remove target parcel's mask from set of possible source vertices
-        mask_ind = np.where(parcel_mask==1.0)[0] # find mask indices
-        source_indices = dlabels.copy() # copy the original parcellation dlabel file
-        source_indices[mask_ind] = 0 # modify original dlabel file to remove any vertices that are in the mask
+        #Identify grayordinates to remove (from source parcels) for this target parcel
+        coords_to_remove_indices_thisparcel=coords_to_remove_indices[parcel]
+        
+        #Remove dilated target parcel's grayordinates from source parcels
+        source_parcellation = dlabels.copy() # copy the original parcellation dlabel file
+        source_parcellation[coords_to_remove_indices_thisparcel] = parcel # modify original dlabel file to remove any vertices that are in the mask
 
         # Identify all 'source' parcels to include when computing FC
-        source_parcels = np.delete(unique_parcels, parcel_ind)
+        source_parcels = np.delete(unique_parcels, parcelInt)
 
-        # Now compute mean time series of each ROI using modified dlabel file after removing target parcel's mask (ie source_indices)
+        # Now compute mean time series of each ROI using modified dlabel file after removing target parcel's mask (ie source_parcellation)
         source_parcel_ts = np.zeros((len(source_parcels),data.shape[1])) # source regions X time matrix
         empty_source_row = [] # empty array to keep track of the row index of any sources that might be excluced
-        i = 0
+        i = 0            
         for source in source_parcels:
-            source_ind = np.where(source_indices==source)[0] # Find source parcel indices (from modified dlabel file)
+            source_ind = np.where(source_parcellation==source)[0] # Find source parcel indices (from modified dlabel file)
             sourceInt = np.where(unique_parcels==source)[0]
 
             #Determine if this source parcel was modified (if not, then use standard time series)
@@ -142,7 +132,7 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
         if regular_ts_computed[parcelInt]:
             target_parcel_ts = regular_ts_matrix[parcelInt,:]
         else:
-            target_parcel_ts = np.mean(np.real(data[target_ind,:]),axis=0)
+            target_parcel_ts = np.nanmean(np.real(data[target_ind,:]),axis=0)
             #Save time series for future use
             regular_ts_matrix[parcelInt,:] = target_parcel_ts.copy()
             regular_ts_computed[parcelInt] = True
@@ -158,4 +148,5 @@ def calcconn_parcelwise_noncircular_surface(data, connmethod='multreg', dlabelfi
             fc_matrix[target_row,source_cols] = corrcoefconn(source_parcel_ts,target_parcel_ts)
         elif connmethod == 'pc_multregconn':
             fc_matrix[target_row,source_cols] = pc_multregconn(source_parcel_ts,target_parcel_ts)
+
     return fc_matrix
