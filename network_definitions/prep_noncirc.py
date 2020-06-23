@@ -15,6 +15,6 @@ from calc_removal_coords import *
 #calc_removal_coords(cortex_only=False, verbose=True)
 
 #Alternate: remove all parcels with any parts within X mm of target parcel
-calc_removal_coords(cortex_only=True, verbose=True, parcel_level=True)
-
+#calc_removal_coords(cortex_only=True, verbose=True, parcel_level=True)
+calc_removal_coords(cortex_only=False, verbose=True, parcel_level=True)
 

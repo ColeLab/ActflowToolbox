@@ -11,7 +11,7 @@ defaultdlabelfile = partitiondir + 'CortexSubcortex_ColeAnticevic_NetPartition_w
 # network definitions dir
 networkdefdir = pkg_resources.resource_filename('ActflowToolbox', 'network_definitions/')
 
-def calcactivity_parcelwise_noncircular(data, dlabelfile=defaultdlabelfile, dilated_parcels=True,subcortex=False, verbose=False):
+def calcactivity_parcelwise_noncircular(data, dlabelfile=defaultdlabelfile, dilated_parcels=True,cortex_only=True, verbose=False):
     """
     This function produces a parcel-to-parcel activity (GLM beta) matrix while excluding vertices in the neighborhood of a given target parcel.
     Excludes all vertices within a 10mm (default) dilated mask of the target parcel when computing parcel-level mean activity.
@@ -22,13 +22,13 @@ def calcactivity_parcelwise_noncircular(data, dlabelfile=defaultdlabelfile, dila
         data            :       vertex-wise data... vertices x conditions; default assumes that data is 96k dense array
         dlabelfile      :       parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
-        subcortex       :       If True, will include subcortical volume rois from the CAB-NP
+        cortex_only       :       If False, will include subcortical volume rois from the CAB-NP
         verbose  :    indicate if additional print commands should be used to update user on progress
     RETURNS:
         activation_matrix       :       Target X Source activity Matrix. Sources-to-target mappings are organized as rows (targets) from each column (source)
     """
     
-    if subcortex is False: 
+    if cortex_only: 
         nparcels = 360
     else: 
         nparcels = 718
