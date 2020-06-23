@@ -1,7 +1,7 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
 
-## Version 0.2.3 (beta version)
+## Version 0.2.4 (beta version)
 
 ## Visit [https://colelab.github.io/ActflowToolbox/](https://colelab.github.io/ActflowToolbox/) for more information
 
