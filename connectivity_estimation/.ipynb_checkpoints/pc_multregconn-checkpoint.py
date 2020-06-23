@@ -5,7 +5,7 @@ from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 
-def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_search=False, n_components_min=1, n_components_max=None):
+def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_search=False, n_components_min=1, n_components_max=None, parcelstoexclude_bytarget=None):
     """
     activity_matrix:    Activity matrix should be nodes X time
     target_ts:             Optional, used when only a single target time series (returns 1 X nnodes matrix)
@@ -13,6 +13,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     n_comp_search: Optional. Boolean indicating whether to search for the best number of components based on cross-validation generalization (to reduce overfitting).
     n_components_min: Optional. The smallest number to test in the n_comp_search.
     n_components_max: Optional. The largest number to test in the n_comp_search.
+    parcelstoexclude_bytarget: Optional. A dictionary with a list of parcels to exclude for each target parcel (e.g., to reduce potential circularity by removing parcels near the target parcel). Not used if target_ts is set.
     
     Output: connectivity_mat (formatted targets X sources), n_components
     """
@@ -25,7 +26,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     else:
         if nnodes<n_components or timepoints<n_components:
             print('activity_matrix shape: ',np.shape(activity_matrix))
-            raise Exception('More components than nodes and/or timepoints! Use fewer components')
+            raise Exception('More components than nodes and/or timepoints! Use fewer components')        
     
     #De-mean time series
     activity_matrix_mean = np.mean(activity_matrix,axis=1)
@@ -65,7 +66,13 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
         connectivity_mat = np.zeros((nnodes,nnodes))
         for targetnode in range(nnodes):
             othernodes = list(range(nnodes))
-            othernodes.remove(targetnode) # Remove target node from 'other nodes'
+            #Remove parcelstoexclude_bytarget parcels (if flagged); parcelstoexclude_bytarget is by parcel number (not index)
+            if parcelstoexclude_bytarget is not None:
+                parcelstoexclude_indices=np.subtract(parcelstoexclude_bytarget[targetnode+1],1).tolist()
+                parcelstoexclude_indices.append(targetnode) # Remove target node from 'other nodes'
+                othernodes = list(set(othernodes).difference(set(parcelstoexclude_indices)))
+            else:
+                othernodes.remove(targetnode) # Remove target node from 'other nodes'
             X = activity_matrix[othernodes,:].T
             y = activity_matrix[targetnode,:]
             #Run PCA on source time series
@@ -106,6 +113,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
 
     return connectivity_mat
 
+    
 
 def pcr_cvtest(X,y,pc,cv):
     ''' Principal Component Regression in Python'''
