@@ -3,10 +3,11 @@ from sklearn.linear_model import LinearRegression
 #from ..tools import regression
 import numpy as np
 
-def multregconn(activity_matrix, target_ts=None):
+def multregconn(activity_matrix, target_ts=None, parcelstoexclude_bytarget=None):
     """
     activity_matrix:    Activity matrix should be nodes X time
     target_ts:             Optional, used when only a single target time series (returns 1 X nnodes matrix)
+    parcelstoexclude_bytarget: Optional. A dictionary of lists, each listing parcels to exclude for each target parcel (e.g., to reduce potential circularity by removing parcels near the target parcel). Note: This is not used if target_ts is set.
     Output: connectivity_mat, formatted targets X sources
     """
 
@@ -20,7 +21,13 @@ def multregconn(activity_matrix, target_ts=None):
         connectivity_mat = np.zeros((nnodes,nnodes))
         for targetnode in range(nnodes):
             othernodes = list(range(nnodes))
-            othernodes.remove(targetnode) # Remove target node from 'other nodes'
+            #Remove parcelstoexclude_bytarget parcels (if flagged); parcelstoexclude_bytarget is by parcel number (not index)
+            if parcelstoexclude_bytarget is not None:
+                parcelstoexclude_indices=np.subtract(parcelstoexclude_bytarget[targetnode+1],1).tolist()
+                parcelstoexclude_indices.append(targetnode) # Remove target node from 'other nodes'
+                othernodes = list(set(othernodes).difference(set(parcelstoexclude_indices)))
+            else:
+                othernodes.remove(targetnode) # Remove target node from 'other nodes'
             X = activity_matrix[othernodes,:].T
             y = activity_matrix[targetnode,:]
             #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)

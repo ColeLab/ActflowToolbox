@@ -13,7 +13,7 @@ def pc_multregconn(activity_matrix, target_ts=None, n_components=None, n_comp_se
     n_comp_search: Optional. Boolean indicating whether to search for the best number of components based on cross-validation generalization (to reduce overfitting).
     n_components_min: Optional. The smallest number to test in the n_comp_search.
     n_components_max: Optional. The largest number to test in the n_comp_search.
-    parcelstoexclude_bytarget: Optional. A dictionary with a list of parcels to exclude for each target parcel (e.g., to reduce potential circularity by removing parcels near the target parcel). Not used if target_ts is set.
+    parcelstoexclude_bytarget: Optional. A dictionary of lists, each listing parcels to exclude for each target parcel (e.g., to reduce potential circularity by removing parcels near the target parcel). Note: This is not used if target_ts is set.
     
     Output: connectivity_mat (formatted targets X sources), n_components
     """
