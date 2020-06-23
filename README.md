@@ -1,9 +1,12 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
 
-## Version 0.2.4 (beta version)
+## Version 0.2.4 (beta)
 
 ## Visit [https://colelab.github.io/ActflowToolbox/](https://colelab.github.io/ActflowToolbox/) for more information
+
+## Version info:
+Version 0.2.4: Updated the non-circular code to be more efficient. Also created an easier and faster version of the non-circular approach that is at the parcel level (excluding all parcels within 10mm of the target parcel).
 
 ### Cite as:
 1) Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
