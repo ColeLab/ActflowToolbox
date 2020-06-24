@@ -26,7 +26,7 @@
 
 <h1 id="the-brain-activity-flow-actflow-toolbox">The Brain Activity Flow (&quot;Actflow&quot;) Toolbox</h1>
 
-<h2 id="version-0-2-2-beta-version-">Version 0.2.3 (beta version)</h2>
+<h2 id="version-0-2-2-beta-version-">Version 0.2.5 (beta)</h2>
 
 <br>
 <p>
@@ -46,6 +46,9 @@
 
 <p class="lead">This code repository was created by the Cole Neurocognition Lab at Rutgers University: <a href="http://www.colelab.org/">http://www.colelab.org/</a>
 <br>We are happy for others to contribute to the code as well.</p>
+
+<p class="lead"><i>See the <a href="HCP_example.html">example notebook</a></i> to see the Actflow Toolbox in action<br>
+  We provide 30 subjects' data from the Human Connectome Project to use for trying out the toolbox</p>
 
 <h3 id="core-algorithm-and-principles-behind-activity-flow-mapping">Core algorithm and principles behind activity flow mapping</h3>
 <p class="lead">Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>), with multiple follow-up studies further validating the approach.</p>
@@ -167,7 +170,7 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
     <ul>
       <li><strong>Use connectivity independent of the to-be-predicted state when possible</strong>, such as resting-state functional connectivity. This implicitly tests for generalization across brain states (when predicting task activations), which is important given that connectivity is mostly invariant across states. There is substantial evidence for the dominant effect of intrinsic/state-general connectivity (see <a href="http://www.colelab.org/pubs/2014_Cole_Neuron.pdf">Cole et al. (2014)</a> and <a href="https://doi.org/10.1016/j.neuron.2018.03.035">Gratton et al. (2018)</a>). Using structural connectivity also avoids this issue, though some details (e.g., the aggregate effects of synaptic weights) are lost with most structural connectivity methods.</li>
       <li><strong>Ensure statistical independence of activation and functional connectivity estimates</strong> when the same state is used for estimating both. The recommended approach is to use finite impulse response (FIR) regression as a preprocessing step, removing the to-be-predicted mean task activations prior to estimating task-state functional connectivity. Note that this leaves most of the task-related variance in the time series, since mean task effects are only a small (but important; which is why we try to predict them via activity flow mapping) portion of the data. See <a href="http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf">Cole et al. (2019)</a> for more info.</li>
-      <li><strong>Spatial smoothness of the data can introduce circularity</strong>, since this results in the same underlying neural activity being assigned to multiple spatial locations (such as multiple voxels in fMRI). We therefore recommend excluding activity flow source data within approximately 10 mm from the to-be-predicted neural signal with fMRI data (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>). This is less of a concern with brain region level data, since it would only apply to voxels/vertices at the border of each region. We nonetheless implemented a "non-circular" version of region-level activity analysis (excluding voxels/vertices within 10 mm of the to-be-predicted region), which we will be documenting soon. The vast majority of results do not change with vs. withou the "non-circular" region-level approach. Note that standard activity flow mapping should not be used with EEG/MEG or related methods at this time, since the source spread implicit in those approaches is so substantial (even when using source localization) that it would result in substantial circularity. (We are working on an approach to get around this problem, however.)</li>
+      <li><strong>Spatial smoothness of the data can introduce circularity</strong>, since this results in the same underlying neural activity being assigned to multiple spatial locations (such as multiple voxels in fMRI). We therefore recommend excluding activity flow source data within approximately 10 mm from the to-be-predicted neural signal with fMRI data (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>). This is less of a concern with brain region level data, since it would only apply to voxels/vertices at the border of each region. We nonetheless implemented a "non-circular" version of region-level activity analysis (excluding regions within 10 mm of the to-be-predicted region), which is demonstrated in the <a href="HCP_example.html">example notebook</a>. The vast majority of results do not change with vs. withou the "non-circular" region-level approach. Note that standard activity flow mapping should not be used with EEG/MEG or related methods at this time, since the source spread implicit in those approaches is so substantial (even when using source localization) that it would result in substantial circularity. (We are working on an approach to get around this problem, however.)</li>
     </ul>
     </li>
   <li>Compare-then-average vs. average-then-compare:
