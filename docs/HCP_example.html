@@ -13445,8 +13445,8 @@ Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 and MAE are not. 
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>CPU times: user 2h 18min 40s, sys: 5min 45s, total: 2h 24min 25s
-Wall time: 7min 13s
+<pre>CPU times: user 2h 16min 21s, sys: 5min 35s, total: 2h 21min 56s
+Wall time: 7min 6s
 </pre>
 </div>
 </div>
@@ -14031,7 +14031,7 @@ Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 and MAE are not. 
 <div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
 </div><div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>It is known that fMRI has some inherent spatial smoothness that blurs data spatially due to local vasculature. This smoothness is thought to extend somewhere between 2 mm and 8 mm. In theory this could result in some circularity to the actflow predictions (e.g., the target region's activity blurs into a source region's activity). This demonstrates an approach to remove any region within 10 mm of each to-be-predicted target region. Note that there was only a small reduction in prediction accuracy (likely due to having fewer predictors), suggesting spatial smoothness results in minor (if any) prediction circularity.</p>
+<p>It is known that fMRI has some inherent spatial smoothness that blurs data spatially due to local vasculature. This smoothness is thought to extend somewhere between 2 mm and 5 mm (Malonek and Grinvald 1996; Logothetis and Wandell 2004). In theory this could result in some circularity to the actflow predictions (e.g., the target region's activity blurs into a source region's activity). The code below demonstrates an approach to remove any region within 10 mm of each to-be-predicted target region, removing any potential circularity due to vascular spatial smoothness. Note that there was only a small reduction in prediction accuracy in the results below (likely due to having fewer predictors), suggesting spatial smoothness results in minor (if any) prediction circularity.</p>
 
 </div>
 </div>
@@ -14046,9 +14046,9 @@ Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 and MAE are not. 
 <span class="n">inputfilename</span> <span class="o">=</span> <span class="n">networkdefdir</span><span class="o">+</span><span class="s1">&#39;parcels_to_remove_indices_cortexonly_data.h5&#39;</span>
 <span class="n">h5f</span> <span class="o">=</span> <span class="n">h5py</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="n">inputfilename</span><span class="p">,</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
 <span class="n">parcels_to_remove</span><span class="o">=</span><span class="p">{}</span>
-<span class="k">for</span> <span class="n">parcelInt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">360</span><span class="p">):</span>
-    <span class="n">outname1</span> <span class="o">=</span> <span class="s1">&#39;parcels_to_remove_indices&#39;</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">parcelInt</span><span class="o">+</span><span class="mf">1.0</span><span class="p">)</span>
-    <span class="n">parcels_to_remove</span><span class="p">[</span><span class="n">parcelInt</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5f</span><span class="p">[</span><span class="n">outname1</span><span class="p">][:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">parcelInt</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numnodes</span><span class="p">):</span>
+    <span class="n">outname1</span> <span class="o">=</span> <span class="s1">&#39;parcels_to_remove_indices&#39;</span><span class="o">+</span><span class="s1">&#39;/&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">parcelInt</span><span class="p">)</span>
+    <span class="n">parcels_to_remove</span><span class="p">[</span><span class="n">parcelInt</span><span class="p">]</span> <span class="o">=</span> <span class="n">h5f</span><span class="p">[</span><span class="n">outname1</span><span class="p">][:]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">h5f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 
@@ -14084,7 +14084,7 @@ Note: Pearson r and Pearson r^2 are scale-invariant, while R^2 and MAE are not. 
 
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>CPU times: user 2h 14min 46s, sys: 5min 29s, total: 2h 20min 16s
+<pre>CPU times: user 2h 15min 1s, sys: 5min 18s, total: 2h 20min 19s
 Wall time: 7min 1s
 </pre>
 </div>

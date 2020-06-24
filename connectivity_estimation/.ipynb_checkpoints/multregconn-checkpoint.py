@@ -21,11 +21,11 @@ def multregconn(activity_matrix, target_ts=None, parcelstoexclude_bytarget=None)
         connectivity_mat = np.zeros((nnodes,nnodes))
         for targetnode in range(nnodes):
             othernodes = list(range(nnodes))
-            #Remove parcelstoexclude_bytarget parcels (if flagged); parcelstoexclude_bytarget is by parcel number (not index)
+            #Remove parcelstoexclude_bytarget parcels (if flagged); parcelstoexclude_bytarget is by index (not parcel value)
             if parcelstoexclude_bytarget is not None:
-                parcelstoexclude_indices=np.subtract(parcelstoexclude_bytarget[targetnode+1],1).tolist()
-                parcelstoexclude_indices.append(targetnode) # Remove target node from 'other nodes'
-                othernodes = list(set(othernodes).difference(set(parcelstoexclude_indices)))
+                parcelstoexclude_thisnode=parcelstoexclude_bytarget[targetnode].tolist()
+                parcelstoexclude_thisnode.append(targetnode) # Remove target node from 'other nodes'
+                othernodes = list(set(othernodes).difference(set(parcelstoexclude_thisnode)))
             else:
                 othernodes.remove(targetnode) # Remove target node from 'other nodes'
             X = activity_matrix[othernodes,:].T
