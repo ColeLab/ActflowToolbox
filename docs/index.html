@@ -217,51 +217,6 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 <li><a href="https://github.com/ColeLab/ColeAnticevicNetPartition">The Cole-Anticevic Brain-wide Network Partition (CAB-NP)</a></li>
 <li><a href="http://www.colelab.org/#resources">Other tools released by the Cole Neurocognition Lab</a></li>
 </ul>
-<h2 id="contents">Contents</h2>
-<ul>
-<li><em>Directory</em>: actflowcomp - Calculating activity flow mapping<ul>
-<li>actflowcalc.py - Main function for calculating activity flow mapping predictions</li>
-<li>actflowtest.py - A convenience function for calculating activity-flow-based predictions and testing prediction accuracies (across multiple subjects)</li>
-<li>noiseceilingcalc.py - A convenience function for calculating the theoretical limit on activity-flow-based prediction accuracies (based on noise in the data being used)</li>
-</ul>
-</li>
-<li><em>Directory</em>: connectivity_estimation - Connectivity estimation methods<ul>
-<li>calcactivity_parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation), focusing on task activations. This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within X mm (10 mm by default) of each to-be-predicted parcel.</li>
-<li>calcconn_parcelwise_noncircular_surface.py: High-level function for calculating parcelwise actflow with parcels that are touching (e.g., the Glasser 2016 parcellation), focusing on connectivity estimation. This can create circularity in the actflow predictions due to spatial autocorrelation. This function excludes vertices within X mm (10 mm by default) of each to-be-predicted parcel.</li>
-<li>corrcoefconn.py: Calculation of Pearson correlation functional connectivity</li>
-<li>multregconn.py: Calculation of multiple-regression functional connectivity</li>
-<li>partial_corrconn.py: Calculation of partial-correlation functional connectivity</li>
-<li>pc_multregconn.py: Calculation of regularized multiple-regression functional connectivity using principle components regression (PCR). Useful when there are fewer time points than nodes, for instance.</li>
-</ul>
-</li>
-<li><em>Directory</em>: dependencies - Other packages Actflow Toolbox depends on</li>
-<li><em>Directory</em>: examples - Example analyses that use the Actflow Toolbox (Jupyter notebook)</li>
-<li><em>Directory</em>: matlab_code - Limited functions for activity flow mapping in MATLAB<ul>
-<li>PCmultregressionconnectivity.m - Compute multiple regression-based functional connectivity; PC allows for more regions/voxels than time points. </li>
-<li>actflowmapping.m - MATLAB version of actflowcalc.py; Main function for computing activity flow mapping predictions</li>
-<li>multregressionconnectivity.m - Compute multiple regrression-based functional connectivity</li>
-</ul>
-</li>
-<li><em>Directory</em>: model_compare - Comparing prediction accuracies across models<ul>
-<li>model_compare_predicted_to_actual.py - Calculation of predictive model performance</li>
-<li>model_compare.py - Reporting of model prediction performance, and comparison of prediction performance across models</li>
-</ul>
-</li>
-<li><em>Directory</em>: network_definitions - Data supporting parcel/region sets and network definitions<ul>
-<li>dilateParcels.py - Dilate individual parcels (cortex and subcortex) and produce masks to exclude vertices within 10 mm; requires Connectome workbench</li>
-</ul>
-</li>
-<li><em>Directory</em>: simulations - Simulations used for validating methods </li>
-<li><em>Directory</em>: tools - Miscellaneous tools<ul>
-<li>addNetColors.py - Generates a heatmap figure with The Cole-Anticevic Brain-wide Network Partition (CAB-NP) colors along axes</li>
-<li>addNetColors_Seaborn.py - Generates a Seaborn heatmap figure with The Cole-Anticevic Brain-wide Network Partition (CAB-NP) colors along axes</li>
-<li>map_to_surface.py - Maps 2D matrix data onto a dscalar surface file (64k vertices); uses Glasser et al. 2016 ROI parcellation</li>
-<li>max_r.py - Permutation testing to control for FWE (as in Nichols &amp; Holmes, 2002 max-t); individual difference correlations (r)</li>
-<li>max_t.py - Permutation testing to control for FWE (as in Nichols &amp; Holmes, 2002); t-test variants (t)</li>
-<li>regression.py - Compute multiple linear regression (with L2 regularization option)</li>
-</ul>
-</li>
-</ul>
 
 </div>
 
