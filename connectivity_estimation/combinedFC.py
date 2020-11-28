@@ -1,6 +1,6 @@
 '''
 Implements the combinedFC connectivity method published in:
-Sanchez-Romero, R., & Cole, M. W. (2019). Combining multiple functional connectivity methods to improve causal inferences. Journal of Cognitive Neuroscience, 1-15.
+Sanchez-Romero, R., & Cole, M. W. (2020). Combining multiple functional connectivity methods to improve causal inferences. Journal of Cognitive Neuroscience, 1-15.
 Toolbox to reproduce the results of the paper in https://github.com/ColeLab/CombinedFC
 '''
 
@@ -12,25 +12,25 @@ from scipy import stats, linalg
 
 #Note: All the sub-functions called by combinedFC are in this file.
 
-def combinedFC(dataset,  
+def combinedFC(dataset,
                methodCondAsso = 'partialCorrelation',
                methodParcorr='inverseCovariance',
                alphaCondAsso = 0.01,
                methodAsso = 'correlation',
                alphaAsso = 0.01,
                equivalenceTestAsso = False,
-               lower_bound = -0.1, 
+               lower_bound = -0.1,
                upper_bound = +0.1):
     '''
     INPUT:
         dataset : in dimension [nNodes x nDatapoints] actflow convention
-        methodCondAsso : a string "partialCorrelation" or "multipleRegression" for the conditional association 
+        methodCondAsso : a string "partialCorrelation" or "multipleRegression" for the conditional association
                          first step
         methodParcorr : a string if partial correlation is chosen, "inverseCovariance" or "regression"
         alphaCondAsso : alpha significance cutoff for the conditional association. Default = 0.01
         methodAsso : a string "correlation" or "simpleRegression" for the unconditional association.
-        alphaAsso : alpha significance cutoff for the unconditional association. Defaul = 0.01
-        equivalenceTestAsso : if True perform the equivalence test, otherwise perform the two-sided null 
+        alphaAsso : alpha significance cutoff for the unconditional association. Default = 0.01
+        equivalenceTestAsso : if True perform the equivalence test, otherwise perform the two-sided null
                               hypothesis test
         lower_bound : a negative bound for the minimum r of interest in the equivalence test. Default = -0.1
         upper_bound : a positive bound for the minimum r of interest in the equivalence test. Default = +0.1
@@ -38,51 +38,61 @@ def combinedFC(dataset,
     OUTPUT:
         M: a connectivity matrix with significant partial correlation coefficients after
             removing possible spurious edges from conditioning on colliders.
+
+    The recommended use of combinedFC with activity flow mapping involves first running combinedFC with partial correlation,
+     followed by running multiple regression using only signficant combinedFC connections. This allows the combinedFC partial
+     correlation matrix to be analyzed (e.g., using graph analyses), along with using the multiple regression weights to improve
+     prediction accuracies with activity flow mapping. This is also very efficient in terms of compute time, since it uses
+     inverse covariance and Pearson correlation with combinedFC (very fast) and reduces the number of predictors for the
+     multiple regression step (which speeds up the regression step).
+     Example of this use:
+    combFC_output=actflow.connectivity_estimation.combinedFC(restdata)
+    combFC_multregweights_output=actflow.connectivity_estimation.multregconn(restdata,conn_mask=(combFC_output!=0))
     '''
-    
+
     #transpose the dataset to [nDatapoints x nNodes] combinedFC convention
     dataset = np.transpose(dataset)
-    
-    
+
+
     #first step: evaluate full conditional associations
     if methodCondAsso == 'partialCorrelation':
         #partial correlation with a two-sided null hypothesis test for the Ho: parcorr = 0
         #using the method chosen by the user
         Mca = partialCorrelationSig(dataset, alpha=alphaCondAsso, method=methodParcorr)
-    
+
     if methodCondAsso == 'multipleRegression':
         #multiple regression for each node x on the rest of the nodes in the set
         #with a two-sided t-test for the Ho : beta = 0
         Mca = multipleRegressionSig(dataset, alpha=alphaCondAsso, sigTest=True)
-            
+
 
     nNodes = dataset.shape[1]
     #second step
     #start with the conditional association matrix, and then make the collider check using correlation
-    M = Mca.copy() 
+    M = Mca.copy()
 
     if methodAsso == 'correlation' and equivalenceTestAsso == True:
         #correlation with the equivalence test for r = 0
-        Mcorr = correlationSig(dataset, alpha=alphaAsso, lower_bound=lower_bound, 
+        Mcorr = correlationSig(dataset, alpha=alphaAsso, lower_bound=lower_bound,
                             upper_bound=upper_bound, equivalenceTest=True)
-        #test if two nodes have a significant partial correlation but a zero correlation 
+        #test if two nodes have a significant partial correlation but a zero correlation
         #this will be evidence of a spurious edge from conditioning on a collider
         for x in range(nNodes-1):
             for y in range(x+1,nNodes):
                  if Mca[x,y] != 0 and Mcorr[x,y] != 0:
                     M[x,y] = M[y,x] = 0 #remove the edge from the connectivity network
-    
-     
+
+
     elif methodAsso == 'correlation' and equivalenceTestAsso == False:
         #correlation with a two-sided null hypothesis test for the null hypothesis Ho: r = 0
         Mcorr = correlationSig(dataset, alpha=alphaAsso, equivalenceTest=False)
-        #test if two nodes have a significant partial correlation but a not significant correlation 
+        #test if two nodes have a significant partial correlation but a not significant correlation
         #this will be evidence of a spurious edge from conditioning on a collider
         for x in range(nNodes-1):
             for y in range(x+1,nNodes):
                 if Mca[x,y] != 0 and Mcorr[x,y] == 0:
                     M[x,y] = M[y,x] = 0 #remove the edge from the connectivity network
-                    
+
     elif methodAsso == 'simpleRegression':
         #simple regression for each pair of nodes that have a significant conditional association
         for x in range(nNodes-1):
@@ -96,9 +106,9 @@ def combinedFC(dataset,
                     b = simpleRegressionSig(dataset[:,y],dataset[:,x],alpha=alphaAsso,sigTest=True)
                     if b == 0:
                         M[y,x] = 0
-                
-    
-    
+
+
+
     return M
 
 
@@ -115,32 +125,32 @@ def partialCorrelationSig(dataset, alpha = 0.01, method = 'inverseCovariance'):
     OUTPUT:
         M : a connectivity network of significant partial correlations
     '''
-    
+
     D = dataset
     nNodes = D.shape[1] #number of variables in the dataset
     nDatapoints = D.shape[0] #number of datapoints
-        
-    if method == 'regression':   
+
+    if method == 'regression':
         #compute the partial correlation matrix using the regression approach
         Mparcorr = parCorrRegression(D)
         condSetSize = nNodes-2
-        
+
     elif method == 'inverseCovariance':
         #compute the partial correlation matrix using the inverse covariance approach
         Mparcorr = parCorrInvCov(D)
         condSetSize = nNodes-2
-            
+
     #two-sided null hypothesis test of partial correlation = 0.
     #get the Zalpha cutoff
-    Zalpha = Zcutoff(alpha = alpha, kind = 'two-sided')    
+    Zalpha = Zcutoff(alpha = alpha, kind = 'two-sided')
     #Fisher z-transformation of the partial correlation matrix for the null hypothesis Ho: parcorr = 0
     #partial correlation of 2 nodes conditions on all the rest of the nodes,
     #so the size of the conditioning set is the number of total nodes minus 2.
     Fz = fisherZTrans(Mparcorr, nDatapoints=nDatapoints, Ho=0, condSetSize=condSetSize)
     #threshold the par.corr. matrix using the significant decision abs(Fz) >= Zalpha
-    M = np.multiply(Mparcorr, abs(Fz) >= Zalpha) + 0 #+0 is to avoid -0 in the output   
-       
-    
+    M = np.multiply(Mparcorr, abs(Fz) >= Zalpha) + 0 #+0 is to avoid -0 in the output
+
+
     return M
 
 
@@ -159,35 +169,35 @@ def parCorrRegression(dataset):
     nNodes = D.shape[1]
     #allocate memory
     M = np.zeros((nNodes,nNodes))
-    #compute the partial correlation of x and each remaining variable y, conditioning on all except x and y 
+    #compute the partial correlation of x and each remaining variable y, conditioning on all except x and y
     for x in range(nNodes-1):
         for y in range(x+1, nNodes):
             #create some indices
             idx = np.ones(nNodes, dtype=np.bool)
             #to not include x and y on the regressors
-            idx[x] = False 
+            idx[x] = False
             idx[y] = False
 
             #regressed out the rest of the variables from x and from y, independently
             reg_x = LinearRegression().fit(D[:,idx], D[:,x])
             reg_y = LinearRegression().fit(D[:,idx], D[:,y])
             #compute the residuals for x and for y
-            #residual = x - Z*B_hat, 
+            #residual = x - Z*B_hat,
             #where B_hat are the estimated coefficients and Z the data for the rest of the variables
             res_x = D[:,x] - np.dot(D[:,idx],reg_x.coef_)
             res_y = D[:,y] - np.dot(D[:,idx],reg_y.coef_)
             #compute the correlation of the residuals which are equal to
             #the partial correlation of x and y conditioning on the rest of the variables
-            parcorr = np.corrcoef(res_x, res_y, rowvar=False)[0,1] 
+            parcorr = np.corrcoef(res_x, res_y, rowvar=False)[0,1]
             #partial_correlation is symmetric, meaning that:
             M[x,y] = M[y,x] = parcorr
-   
+
     return M
 
 
 #compute the partial correlation using the inverse covariance approach.
 #The partial correlation matrix is the negative of the off-diagonal elements of the inverse covariance,
-#divided by the squared root of the corresponding diagonal elements.     
+#divided by the squared root of the corresponding diagonal elements.
 #https://en.wikipedia.org/wiki/Partial_correlation#Using_matrix_inversion
 #in this approach, for two nodes X and Y, the partial correlation conditions on all the nodes except X and Y.
 
@@ -223,7 +233,7 @@ def multipleRegressionSig(dataset, alpha = 0.01, sigTest = False):
         alpha : cutoff for the significance decision. Default is 0.01
         sigTest : if True, perform the t-test of significance for the Beta coefficients
     OUTPUT:
-        M : a connectivity network of beta coefficients. If sigTest = True, only significant betas 
+        M : a connectivity network of beta coefficients. If sigTest = True, only significant betas
             Note: It is not a symmetric matrix.
     '''
 
@@ -231,16 +241,16 @@ def multipleRegressionSig(dataset, alpha = 0.01, sigTest = False):
     D = dataset
     nNodes = D.shape[1] #number of variables
     nDatapoints = D.shape[0]
-    
+
     M = np.zeros((nNodes,nNodes))
     for x in range(nNodes):
         #create some indices
         idx = np.ones(nNodes, dtype=np.bool)
         #to not include x on the set of regressors, ie. V\{x}
-        idx[x] = False 
+        idx[x] = False
         #regressed x on the rest of the variables in the set
         reg_x = LinearRegression().fit(D[:,idx], D[:,x])
-        
+
         if sigTest == True:
             #parameters estimated =  intercept and the beta coefficients
             params = np.append(reg_x.intercept_,reg_x.coef_)
@@ -263,12 +273,12 @@ def multipleRegressionSig(dataset, alpha = 0.01, sigTest = False):
             ts_params = (params - Bho)/std_params
             #p-value for a t-statistic in a two-sided one sample t-test
             p_values = 2*(1-stats.t.cdf(np.abs(ts_params),df = nDatapoints-1))
-            
+
             #remove the intercept p-value
             p_values = np.delete(p_values,0)
             #record the Betas with p-values < alpha
             M[x,idx] = np.multiply(reg_x.coef_, p_values < alpha)
-        
+
         if sigTest == False:
             #save the beta coefficients in the corresponding x row without significance test
             M[x,idx] = reg_x.coef_
@@ -281,10 +291,10 @@ def multipleRegressionSig(dataset, alpha = 0.01, sigTest = False):
 #or a null hypothesis test to determine if r is different from zero,
 #a significant r different from zero represents an edges in the connectivity network.
 
-def correlationSig(dataset, 
-                   alpha = 0.01, 
-                   lower_bound = -0.1, 
-                   upper_bound = +0.1, 
+def correlationSig(dataset,
+                   alpha = 0.01,
+                   lower_bound = -0.1,
+                   upper_bound = +0.1,
                    equivalenceTest = False):
     '''
     INPUT:
@@ -297,19 +307,19 @@ def correlationSig(dataset,
     OUTPUT:
         M : a matrix such that:
             if equivalenceTest = True, M contains r values judged to be zero, according to the equivalence test.
-            if equivalenceTest = False, M contains r values judged different from zero, as per the null hypothesis test. 
+            if equivalenceTest = False, M contains r values judged different from zero, as per the null hypothesis test.
     '''
-    
+
     D = dataset
     nNodes = D.shape[1] #number of variables
     nDatapoints = D.shape[0] #number of datapoints
-    
+
     #compute the full correlation matrix
     Mcorr = np.corrcoef(D, rowvar=False)
-        
-    if equivalenceTest == False: 
+
+    if equivalenceTest == False:
         #get the Zalpha cutoff
-        Zalpha = Zcutoff(alpha = alpha, kind = 'two-sided')    
+        Zalpha = Zcutoff(alpha = alpha, kind = 'two-sided')
         #make the correlation matrix diagonal equal to zero to avoid problems with Fisher z-transformation
         np.fill_diagonal(Mcorr,0)
         #Fisher z-transformation of the correlation matrix for the null hypothesis of Ho: r = 0
@@ -317,29 +327,29 @@ def correlationSig(dataset,
         #threshold the correlation matrix judging significance if: abs(Fz) >= +Zalpha
         #(this is equivalent to test Fz >= +Zalpha or Fz <= -Zalpha)
         M = np.multiply(Mcorr, abs(Fz) >= Zalpha)+0 #+0 is to avoid -0 in the output
-        
-    
-    elif equivalenceTest == True:    
+
+
+    elif equivalenceTest == True:
         #the equivalence test is formed by two one-sided tests
         #Zalpha cutoffs for two one-sided test at a chosen alpha
-        #upper bound 
+        #upper bound
         Zalpha_u = Zcutoff(alpha = alpha, kind = 'one-sided-left')
         #lower bound
         Zalpha_l = Zcutoff(alpha = alpha, kind = 'one-sided-right')
         #make the correlation matrix diagonal equal to zero to avoid problems with Fisher z-transformation
-        np.fill_diagonal(Mcorr,0)     
+        np.fill_diagonal(Mcorr,0)
         #Fisher z-transform using Ho: r = upper_bound, Ha: r < upper_bound
         Fz_u = fisherZTrans(Mcorr, nDatapoints = nDatapoints, Ho = upper_bound)
         #and Fisher z-transform using Ho: r = lower_bound, Ha: r > lower_bound
         Fz_l = fisherZTrans(Mcorr, nDatapoints = nDatapoints, Ho = lower_bound)
         #Fz_u = -Fz_l, expressing it as two variables is just for clarity of exposition.
-        
+
         #threshold the correlation matrix judging significantly equal to zero if:
         #Fz_u <= Zalpha_u & Fz_l >= Zalpha_l
         #if both inequalities hold then we judge Fz ~ 0, and thus r ~ 0
         #M contains the correlation values r that were judged close to zero in the equivalence test
         M = np.multiply(Mcorr, np.multiply(Fz_u <= Zalpha_u, Fz_l >= Zalpha_l))+0
-        
+
     return M
 
 
@@ -355,19 +365,19 @@ def simpleRegressionSig(y, x, alpha = 0.01, sigTest = True):
         sigTest : if True, perform the t-test of significance for the Beta coefficients
     OUTPUT:
         b : the b regression coefficient. If sigTest = True, return b if significant, return 0 for non-significant
-            
+
     '''
-    
+
     #check dimensions, if < 2, expand to get [nDatapoints x 1]
     if len(y.shape) < 2:
         y = np.expand_dims(y, axis=1)
     if len(x.shape) < 2:
         x = np.expand_dims(x, axis=1)
-    
+
     nDatapoints = y.shape[0]
 
     reg_y = LinearRegression().fit(x, y)
-        
+
     if sigTest == True:
         #parameters estimated =  intercept and the beta coefficients
         params = np.append(reg_y.intercept_,reg_y.coef_)
@@ -392,7 +402,7 @@ def simpleRegressionSig(y, x, alpha = 0.01, sigTest = True):
         p_value = np.delete(p_values,0)
         #record the Betas with p-values < alpha
         b = np.multiply(reg_y.coef_, p_value < alpha)
-        
+
         return b, p_value
 
     if sigTest == False:
@@ -416,7 +426,7 @@ def Zcutoff(alpha = 0.01, kind = 'two-sided'):
     '''
 
     if kind == 'two-sided':
-        #For null Ho: r = 0 and alternative Ha: r != 0, where r  is correlation/partial correlation coefficient. 
+        #For null Ho: r = 0 and alternative Ha: r != 0, where r  is correlation/partial correlation coefficient.
         #using cumulative distribution function (cdf) of the standard normal
         #alpha = 2*(1-cdf(Zalpha)), solve for Zalpha = inverse_of_cdf(1-alpha/2)
         #Zalpha defines the null hypothesis rejection regions such that:
@@ -424,19 +434,19 @@ def Zcutoff(alpha = 0.01, kind = 'two-sided'):
         #Fz is the Fisher z-transform of the r value observed
         #(from scipy use stats.norm.ppf to compute the inverse_of_cdf)
         Zalpha = stats.norm.ppf(1-alpha/2,loc=0,scale=1)
-    
+
     elif kind == 'one-sided-right':
-        #For null Ho: r = 0 and alternative Ha: r > 0 
+        #For null Ho: r = 0 and alternative Ha: r > 0
         #alpha = 1 - cdf(Zalpha), solve for Zalpha = inverse_of_cdf(1-alpha)
         #reject the null hypothesis if Fz >= +Zalpha
         Zalpha = stats.norm.ppf(1-alpha,loc=0,scale=1)
-        
+
     elif kind == 'one-sided-left':
         #For null Ho: r = 0 and alternative Ha: r < 0
         #alpha = cdf(Zalpha), solve for Zalpha = inverse_of_cdf(alpha)
         #reject the null hypothesis if Fz <= -Zalpha
         Zalpha = stats.norm.ppf(alpha,loc=0,scale=1)
-        
+
     return Zalpha
 
 
@@ -456,7 +466,7 @@ def fisherZTrans(r, nDatapoints, Ho=0, condSetSize=0):
     OUTPUT:
         Fz: a single Fisher z-transform value or matrix of values
     '''
-    
+
     Fz = np.multiply(np.subtract(np.arctanh(r),np.arctanh(Ho)), np.sqrt(nDatapoints-condSetSize-3))
-    
+
     return Fz

@@ -3,11 +3,12 @@ from sklearn.linear_model import LinearRegression
 #from ..tools import regression
 import numpy as np
 
-def multregconn(activity_matrix, target_ts=None, parcelstoexclude_bytarget=None):
+def multregconn(activity_matrix, target_ts=None, parcelstoexclude_bytarget=None, conn_mask=None):
     """
     activity_matrix:    Activity matrix should be nodes X time
     target_ts:             Optional, used when only a single target time series (returns 1 X nnodes matrix)
     parcelstoexclude_bytarget: Optional. A dictionary of lists, each listing parcels to exclude for each target parcel (e.g., to reduce potential circularity by removing parcels near the target parcel). Note: This is not used if target_ts is set.
+    conn_mask: Optional. Specifies a mask to exclude some connections from being fit (setting them to 0). Consists of a matrix of 1s and 0s, where 1s indicate a connection and 0s indicate no connection. If target_ts=None then it is a N X N matrix (where N=number of nodes), otherwise it is N X 1.
     Output: connectivity_mat, formatted targets X sources
     """
 
@@ -26,13 +27,16 @@ def multregconn(activity_matrix, target_ts=None, parcelstoexclude_bytarget=None)
                 parcelstoexclude_thisnode=parcelstoexclude_bytarget[targetnode].tolist()
                 parcelstoexclude_thisnode.append(targetnode) # Remove target node from 'other nodes'
                 othernodes = list(set(othernodes).difference(set(parcelstoexclude_thisnode)))
+            elif conn_mask is not None:
+                othernodes = list(set(othernodes).difference(set((conn_mask[targetnode,:]<1).nonzero()[0])))
             else:
                 othernodes.remove(targetnode) # Remove target node from 'other nodes'
             X = activity_matrix[othernodes,:].T
             y = activity_matrix[targetnode,:]
             #Note: LinearRegression fits intercept by default (intercept beta not included in coef_ output)
-            reg = LinearRegression().fit(X, y)
-            connectivity_mat[targetnode,othernodes]=reg.coef_
+            if len(othernodes)>0:
+                reg = LinearRegression().fit(X, y)
+                connectivity_mat[targetnode,othernodes]=reg.coef_
             # run multiple regression, and add constant
             #beta_fc,resids = regression.regression(y,X,alpha=0, constant=True) # increase alpha if want to apply a ridge penalty
             #connectivity_mat[targetnode,othernodes] = beta_fc[1:] # exclude 1st coef; first coef is beta_0 (or mean)
