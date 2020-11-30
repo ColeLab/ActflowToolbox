@@ -13701,7 +13701,6 @@ Wall time: 16 s
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="o">%%time</span>
 <span class="c1">#Run multiple-regression FC using only the combinedFC-validated connections</span>
-<span class="c1">#THIS IS THE CURRENT RECOMMENDED BEST PRACTICE WITH ACTIVITY FLOW MAPPING</span>
 <span class="c1">#This adjusts the weights to better optimize for prediction, rather than using abstract r-values</span>
 <span class="c1">#(see Cole, Michael W, Takuya Ito, Danielle S Bassett, and Douglas H Schultz. (2016). “Activity Flow over Resting-State Networks Shapes Cognitive Task Activations.” Nature Neuroscience 19 (12): 1718–26. doi:10.1038/nn.4406.)</span>
 <span class="n">restFC_mregCombFC</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">numnodes</span><span class="p">,</span><span class="n">numnodes</span><span class="p">,</span><span class="n">numsubjs</span><span class="p">))</span>
