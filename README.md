@@ -1,5 +1,6 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
+A toolbox to facilitate discovery of how cognition & behavior emerge from brain network interactions
 
 ## Version 0.2.6 (beta)
 
