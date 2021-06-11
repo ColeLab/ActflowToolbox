@@ -1,7 +1,9 @@
 '''
 Implements the combinedFC connectivity method published in:
 Sanchez-Romero, R., & Cole, M. W. (2020). Combining multiple functional connectivity methods to improve causal inferences. Journal of Cognitive Neuroscience, 1-15.
-Toolbox to reproduce the results of the paper in https://github.com/ColeLab/CombinedFC
+Toolbox to reproduce the results of the paper in https://github.com/ColeLab/CombinedFC.
+
+Version: adjusted to handle separate target and source timeseries, for the purpose of using resting-state data with non-circular adjustment (10 mm dilated mask). 
 '''
 
 #modules
@@ -12,18 +14,24 @@ from scipy import stats, linalg
 
 #Note: All the sub-functions called by combinedFC are in this file.
 
-def combinedFC(dataset,
-               methodCondAsso = 'partialCorrelation',
-               methodParcorr='inverseCovariance',
-               alphaCondAsso = 0.01,
-               methodAsso = 'correlation',
-               alphaAsso = 0.01,
-               equivalenceTestAsso = False,
-               lower_bound = -0.1,
-               upper_bound = +0.1):
+def combinedFC(dataset,target_ts=None,parcelInt=None,source_cols=None,methodCondAsso = 'partialCorrelation',methodParcorr='inverseCovariance',alphaCondAsso = 0.01,
+               methodAsso = 'correlation',alphaAsso = 0.01,equivalenceTestAsso = False,lower_bound = -0.1,upper_bound = +0.1):
     '''
     INPUT:
-        dataset : in dimension [nNodes x nDatapoints] actflow convention
+        dataset : in dimension [nNodes x nDatapoints] actflow convention. When calling via calcconn_parcelwise_noncircular.py, 
+                  dataset will = 'activity_matrix' (or source timeseries). 
+        target_ts : Optional, used when only a single target time series (returns 1 X nnodes matrix). 
+                    Used when calling via calcconn_parcelwise_noncircular.py as target timseries (see function for notes and details)
+                    https://github.com/ColeLab/ActflowToolbox/.
+                    NOTE: if using this, the recommended output formatting is: M[parcelInt,source_cols]
+        parcelInt : Optional, only used with target_ts set and calling via calcconn_parcelwise_noncircular.py. This input helps indexing final network.
+                    If using separate source and target timeseries and NOT calling via calcconn_parcelwise_noncircular.py, then this is the indexing value
+                    of the target node. If there's only 1 target node, it can be set to 0. 
+        source_cols : Optional, only used with target_ts set and calling via calcconn_parcelwise_noncircular.py. This input helps indexing final network. 
+                      If using separate source and target timeseries and NOT calling via calcconn_parcelwise_noncircular.py, then this is the indexing vector
+                      of the source nodes (with target held out). If there are no special corrections, this can be set like so...
+                      ex if parcelInt is 0 and there are 360 source nodes: 
+                      parcelInt=0; nSourceNodes=360; source_cols=np.arange(nSourceNodes); source_cols=np.delete(source_cols,parcelInt)
         methodCondAsso : a string "partialCorrelation" or "multipleRegression" for the conditional association
                          first step
         methodParcorr : a string if partial correlation is chosen, "inverseCovariance" or "regression"
@@ -51,25 +59,61 @@ def combinedFC(dataset,
     '''
 
     #transpose the dataset to [nDatapoints x nNodes] combinedFC convention
-    dataset = np.transpose(dataset)
+    if target_ts is None:
+        dataset = np.transpose(dataset)
+    else:
+        # Set up for computation via separate target and source timeseries. 
+        # Note: this requires more inputs than other methods (eg, multregconn) because the procedure requires more specification (specifically step 1: finding precision matrix)
+        nParcels = 360; # Glasser et al., 2016 MMP atlas for cortical regions only. ### TO-DO: maybe make this an input so subcortical can be an option? 
+        sourceDataOrig = dataset.copy().T; 
+        targetData = target_ts.copy(); 
+        targetNode = parcelInt; # Only if target_ts is set, otherwise set to None and ignored.
+        sourceColsHere = source_cols; # Only if target_ts is set, otherwise set to None and ignored.
+        
+        # Set up indexing vector for sources; for when calcconn_parcelwise_noncircular.py is used and some sources are completely masked (ie "empties");
+        # Note: this is flexible to inputing data as separate source & target timeseries, but with no "empties" (see INPUT notes at top for proper handling). 
+        tempSources = sourceDataOrig.copy(); 
+        tempTarget = targetData.copy(); 
+        tempIxVec = np.arange(tempSources.shape[1]+1); 
+        tempIxVec = np.delete(tempIxVec,targetNode); 
+        sourceData = np.zeros((tempSources.shape[0],tempSources.shape[1]+1)); 
+        sourceData[:,targetNode] = tempTarget; 
+        sourceData[:,tempIxVec] = tempSources; 
+        
+        # Helper code for number of sources etc.
+        sourceNodes = np.ones(nParcels, dtype=np.bool); excludeSources = [];
+        for sourceNum in range(nParcels):
+            if np.where(sourceColsHere==sourceNum)[0].shape[0]==0 and sourceNum!=targetNode: 
+                sourceNodes[sourceNum] = False; excludeSources.append(sourceNum); 
+        sourceIxVecHere = np.arange(nParcels); sourceIxVecHere = np.delete(sourceIxVecHere,excludeSources); nSourceNodesHere = sourceIxVecHere.shape[0];
 
+        # The data for each target node analysis will contain the non-zero source nodes and the target node 
+        # always in the proper column for easy indexing (done above)
+        dataset = sourceData.copy(); 
+        numVar = dataset.shape[1]; 
+        nDatapoints = dataset.shape[0];
 
     #first step: evaluate full conditional associations
     if methodCondAsso == 'partialCorrelation':
         #partial correlation with a two-sided null hypothesis test for the Ho: parcorr = 0
         #using the method chosen by the user
         Mca = partialCorrelationSig(dataset, alpha=alphaCondAsso, method=methodParcorr)
-
+        if target_ts is not None:
+            McaThisTarget = Mca[targetNode,:]; 
+            
     if methodCondAsso == 'multipleRegression':
         #multiple regression for each node x on the rest of the nodes in the set
         #with a two-sided t-test for the Ho : beta = 0
         Mca = multipleRegressionSig(dataset, alpha=alphaCondAsso, sigTest=True)
-
+        if target_ts is not None:
+            McaThisTarget = Mca[targetNode,:]; 
 
     nNodes = dataset.shape[1]
     #second step
     #start with the conditional association matrix, and then make the collider check using correlation
-    M = Mca.copy()
+    M = Mca.copy();
+    if target_ts is not None:
+        M_CopyThisTarget = McaThisTarget.copy();
 
     if methodAsso == 'correlation' and equivalenceTestAsso == True:
         #correlation with the equivalence test for r = 0
@@ -77,10 +121,17 @@ def combinedFC(dataset,
                             upper_bound=upper_bound, equivalenceTest=True)
         #test if two nodes have a significant partial correlation but a zero correlation
         #this will be evidence of a spurious edge from conditioning on a collider
-        for x in range(nNodes-1):
-            for y in range(x+1,nNodes):
-                 if Mca[x,y] != 0 and Mcorr[x,y] != 0:
-                    M[x,y] = M[y,x] = 0 #remove the edge from the connectivity network
+        if target_ts is not None:
+            McorrThisTarget = Mcorr[targetNode,:]; 
+            for sourceNum in range(nSourceNodesHere):
+                if McaThisTarget[sourceNum]!=0 and McorrThisTarget[sourceNum]==0:
+                    M_CopyThisTarget[sourceNum] = 0; #remove the edge [x,y] from the connectivity network based on multiple regression or partial correlation
+            M = M_CopyThisTarget.copy();
+        else: 
+            for x in range(nNodes-1):
+                for y in range(x+1,nNodes):
+                     if Mca[x,y] != 0 and Mcorr[x,y] == 0:
+                        M[x,y] = M[y,x] = 0 #remove the edge from the connectivity network
 
 
     elif methodAsso == 'correlation' and equivalenceTestAsso == False:
@@ -88,27 +139,46 @@ def combinedFC(dataset,
         Mcorr = correlationSig(dataset, alpha=alphaAsso, equivalenceTest=False)
         #test if two nodes have a significant partial correlation but a not significant correlation
         #this will be evidence of a spurious edge from conditioning on a collider
-        for x in range(nNodes-1):
-            for y in range(x+1,nNodes):
-                if Mca[x,y] != 0 and Mcorr[x,y] == 0:
-                    M[x,y] = M[y,x] = 0 #remove the edge from the connectivity network
-
+        if target_ts is not None:
+            McorrThisTarget = Mcorr[targetNode,:]; 
+            for sourceNum in range(nSourceNodesHere):
+                if McaThisTarget[sourceNum]!=0 and McorrThisTarget[sourceNum]==0:
+                    M_CopyThisTarget[sourceNum] = 0; #remove the edge [x,y] from the connectivity network based on multiple regression or partial correlation
+            M = M_CopyThisTarget.copy(); 
+        else:
+            for x in range(nNodes-1):
+                for y in range(x+1,nNodes):
+                    if Mca[x,y] != 0 and Mcorr[x,y] == 0:
+                        M[x,y] = 0 #remove the edge from the connectivity network
+                    if Mca[y,x] != 0 and Mcorr[y,x] == 0:
+                        M[y,x] = 0
+                        
     elif methodAsso == 'simpleRegression':
         #simple regression for each pair of nodes that have a significant conditional association
-        for x in range(nNodes-1):
-            for y in range(x+1,nNodes):
-                #do both sides, regression coefficients are not symmetric
-                if Mca[x,y] != 0:
-                    b = simpleRegressionSig(dataset[:,x],dataset[:,y],alpha=alphaAsso,sigTest=True)
-                    if b == 0:
-                        M[x,y] = 0 #remove the edge from the connectivity network
-                if Mca[y,x] != 0:
-                    b = simpleRegressionSig(dataset[:,y],dataset[:,x],alpha=alphaAsso,sigTest=True)
-                    if b == 0:
-                        M[y,x] = 0
-
-
-
+        if target_ts is not None:
+            for sourceNum in range(nSourceNodesHere):
+                sourceNodeHere = sourceIxVecHere[sourceNum];
+                if McaThisTarget[sourceNum]!=0:
+                    b = simpleRegressionSig(dataset[:,targetNode],dataset[:,sourceNodeHere],alpha=alphaAsso,sigTest=True);
+                    if b==0:
+                        M_CopyThisTarget[sourceNum] = 0;
+            M = M_CopyThisTarget.copy();
+        else: 
+            for x in range(nNodes-1):
+                for y in range(x+1,nNodes):
+                    #do both sides, regression coefficients are not symmetric
+                    if Mca[x,y] != 0:
+                        b = simpleRegressionSig(dataset[:,x],dataset[:,y],alpha=alphaAsso,sigTest=True)
+                        if b == 0:
+                            M[x,y] = 0 #remove the edge from the connectivity network
+                    if Mca[y,x] != 0:
+                        b = simpleRegressionSig(dataset[:,y],dataset[:,x],alpha=alphaAsso,sigTest=True)
+                        if b == 0:
+                            M[y,x] = 0
+                            
+    if target_ts is not None:
+        tempVec = M.copy(); tempVec = np.delete(tempVec,targetNode); M = tempVec.copy();
+        
     return M
 
 
