@@ -6,6 +6,8 @@ import pkg_resources
 from .multregconn import *
 from .corrcoefconn import *
 from .pc_multregconn import *
+from .combinedFC import *
+import ActflowToolbox as actflow
 from .. import tools
 
 dilateMM = 10
@@ -24,7 +26,7 @@ def calcconn_parcelwise_noncircular(data, connmethod='multreg', dlabelfile=defau
     
     PARAMETERS:
         data        : vertex-wise data... vertices x time; default assumes that data is 96k dense array
-        connmethod  : a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr', 'pc_multregconn'
+        connmethod  : a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr', 'pc_multregconn', 'combinedFC'
         dlabelfile  : parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
         precomputedRegularTS:  optional input of precomputed 'regular' mean time series with original region set. This might cut down on computation time if provided.
@@ -58,7 +60,8 @@ def calcconn_parcelwise_noncircular(data, connmethod='multreg', dlabelfile=defau
         regular_ts_computed = np.zeros((nparcels,1))
 
     # Instantiate empty fc matrix
-    fc_matrix = np.zeros((nparcels,nparcels))
+    fc_matrix = np.zeros((nparcels,nparcels)); 
+    net_mask = np.zeros((nparcels,nparcels)); # only used for combined-FC
     
     #Load coords_to_remove_indices file
     if cortex_only: 
@@ -72,7 +75,8 @@ def calcconn_parcelwise_noncircular(data, connmethod='multreg', dlabelfile=defau
         outname1 = 'coords_to_remove_indices'+'/'+str(parcel)
         coords_to_remove_indices[parcel] = h5f[outname1][:].copy()
     h5f.close()
-
+        
+    targetDataAll = np.zeros((nparcels,data.shape[1])); # only used for combined-FC 
     for parcelInt,parcel in enumerate(unique_parcels):
         if verbose: print('Computing FC for target parcel',parcelInt,'-',int(parcel),'/',len(unique_parcels))
         
@@ -146,10 +150,19 @@ def calcconn_parcelwise_noncircular(data, connmethod='multreg', dlabelfile=defau
 
         if connmethod == 'multreg':
             # run multiple regression, and add constant
-            fc_matrix[target_row,source_cols] = multregconn(source_parcel_ts,target_parcel_ts)
+            fc_matrix[target_row,source_cols] = actflow.connectivity_estimation.multregconn(source_parcel_ts,target_parcel_ts)
         elif connmethod == 'pearsoncorr':
-            fc_matrix[target_row,source_cols] = corrcoefconn(source_parcel_ts,target_parcel_ts)
+            fc_matrix[target_row,source_cols] = actflow.connectivity_estimation.corrcoefconn(source_parcel_ts,target_parcel_ts)
         elif connmethod == 'pc_multregconn':
-            fc_matrix[target_row,source_cols] = pc_multregconn(source_parcel_ts,target_parcel_ts)
-
-    return fc_matrix
+            fc_matrix[target_row,source_cols] = actflow.connectivity_estimation.pc_multregconn(source_parcel_ts,target_parcel_ts)
+        elif connmethod == 'combinedFC':             
+            # Run combined-FC with separate target_parcel_ts: this step generates the combined-FC core result (net_mask); which can be used by itself as an FC matrix.
+            # The suggested use, however, is to run an additional multiple regression step on the weights validated by combined-FC to add precision to the act-flow predictive model (see below)
+            net_mask[target_row,source_cols] = actflow.connectivity_estimation.combinedFC(source_parcel_ts,target_parcel_ts,parcelInt,source_cols)
+            targetDataAll[parcelInt,:] = target_parcel_ts.copy(); # all target data required for 2nd combined-FC step to generate final fc_matrix (see below)
+    
+    # Multiple regression step for combined-FC (note: do not need to index by target/sources here; it's done above for net_mask): 
+    if connmethod == 'combinedFC':   
+        fc_matrix = actflow.connectivity_estimation.multregconn(targetDataAll,conn_mask=(net_mask!=0))
+            
+    return fc_matrix 
