@@ -1,8 +1,8 @@
 # ActflowToolbox
 ## The Brain Activity Flow ("Actflow") Toolbox
-A toolbox to facilitate discovery of how cognition & behavior emerge from brain network interactions
+A toolbox to facilitate discovery of how cognition & behavior are generated via brain network interactions
 
-## Version 0.2.6 (beta)
+## Version 0.2.6
 
 ## Visit [https://colelab.github.io/ActflowToolbox/](https://colelab.github.io/ActflowToolbox/) for more information
 
