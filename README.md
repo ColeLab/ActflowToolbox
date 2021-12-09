@@ -7,9 +7,9 @@ A toolbox to facilitate discovery of how cognition & behavior emerge from brain 
 ## Visit [https://colelab.github.io/ActflowToolbox/](https://colelab.github.io/ActflowToolbox/) for more information
 
 ### Version info:
-Version 0.2.6: Added combinedFC to the set of connectivity methods (current recommended best practice for activity flow mapping); see updated HCP_example Jupyter notebook for a demo
-Version 0.2.5: Fixed minor bug related to applying parcel level non-circular code to subcortical data.
-Version 0.2.4: Updated the non-circular code to be more efficient. Also created an easier and faster version of the non-circular approach that is at the parcel level (excluding all parcels within 10mm of the target parcel).
+* Version 0.2.6: Added combinedFC to the set of connectivity methods (current recommended best practice for activity flow mapping); see updated HCP_example Jupyter notebook for a demo
+* Version 0.2.5: Fixed minor bug related to applying parcel level non-circular code to subcortical data.
+* Version 0.2.4: Updated the non-circular code to be more efficient. Also created an easier and faster version of the non-circular approach that is at the parcel level (excluding all parcels within 10mm of the target parcel).
 
 ### Cite as:
 1) Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
@@ -71,5 +71,4 @@ We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.g
 	* max_t.py - Permutation testing to control for FWE (as in Nichols & Holmes, 2002); t-test variants (t)
 	* regression.py - Compute multiple linear regression (with L2 regularization option)
 
-[//]: # (This is tracking code for keeping track of visits to the repo; MWC)
-[![Analytics](https://ga-beacon.appspot.com/UA-158202396-2/ga-beacon/ActflowToolbox/readme?pixel)](https://github.com/igrigorik/ga-beacon)
+
