@@ -40,6 +40,7 @@ We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.g
 	* Add detailed comments to explain what code does (especially when not obvious)
 
 ## Contents
+_Note: only a subset of files are listed and described_
 * _Directory_: actflowcomp - Calculating activity flow mapping
 	* actflowcalc.py - Main function for calculating activity flow mapping predictions
 	* actflowtest.py - A convenience function for calculating activity-flow-based predictions and testing prediction accuracies (across multiple subjects)
