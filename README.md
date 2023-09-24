@@ -2,11 +2,12 @@
 ## The Brain Activity Flow ("Actflow") Toolbox
 A toolbox to facilitate discovery of how cognition & behavior are generated via brain network interactions
 
-## Version 0.2.6
+## Version 0.3.0
 
 ## Visit [https://colelab.github.io/ActflowToolbox/](https://colelab.github.io/ActflowToolbox/) for more information
 
 ### Version info:
+* Version 0.3.0: Added Glasso FC to the set of connectivity methods (new recommended best practice for activity flow mapping); see updated HCP_example Jupyter notebook for a demo [2023-09-24]
 * Version 0.2.6: Added combinedFC to the set of connectivity methods (current recommended best practice for activity flow mapping); see updated HCP_example Jupyter notebook for a demo
 * Version 0.2.5: Fixed minor bug related to applying parcel level non-circular code to subcortical data.
 * Version 0.2.4: Updated the non-circular code to be more efficient. Also created an easier and faster version of the non-circular approach that is at the parcel level (excluding all parcels within 10mm of the target parcel).
@@ -14,12 +15,16 @@ A toolbox to facilitate discovery of how cognition & behavior are generated via 
 ### Cite as:
 1) Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
 2) https://github.com/ColeLab/ActflowToolbox/
-and
 3) The article that describes the specific toolbox functions being used in most detail
 
 ## How to install
 
 git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
+
+## How to use
+1) See this paper for an overview of how to use the Brain Activity Flow Toolbox:
+Cocuzza CV, Sanchez-Romero R, Cole MW (2022). "<a href="https://doi.org/10.1016/j.xpro.2021.101094">Protocol for activity flow mapping of neurocognitive computations using the Brain Activity Flow Toolbox</a>". STAR Protocols. 3, 1. doi:10.1016/j.xpro.2021.101094
+2) Example notebook: https://colelab.github.io/ActflowToolbox/HCP_example.html
 
 ## Email list/forum
 We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.google.com/forum/#!forum/coleneurolab_users), so you can be informed about major updates in this repository and others hosted by the Cole Neurocognition Lab.
@@ -39,6 +44,7 @@ We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.g
 	* Add detailed comments to explain what code does (especially when not obvious)
 
 ## Contents
+_Note: only a subset of files are listed and described_
 * _Directory_: actflowcomp - Calculating activity flow mapping
 	* actflowcalc.py - Main function for calculating activity flow mapping predictions
 	* actflowtest.py - A convenience function for calculating activity-flow-based predictions and testing prediction accuracies (across multiple subjects)
