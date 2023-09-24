@@ -15,12 +15,16 @@ A toolbox to facilitate discovery of how cognition & behavior are generated via 
 ### Cite as:
 1) Cole MW, Ito T, Bassett DS, Schultz DH (2016). "Activity flow over resting-state networks shapes cognitive task activations". Nature Neuroscience. 19:1718–1726.http://dx.doi.org/10.1038/nn.4406
 2) https://github.com/ColeLab/ActflowToolbox/
-and
 3) The article that describes the specific toolbox functions being used in most detail
 
 ## How to install
 
 git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
+
+## How to use
+1) See this paper for an overview of how to use the Brain Activity Flow Toolbox:
+Cocuzza CV, Sanchez-Romero R, Cole MW (2022). "<a href="https://doi.org/10.1016/j.xpro.2021.101094">Protocol for activity flow mapping of neurocognitive computations using the Brain Activity Flow Toolbox</a>". STAR Protocols. 3, 1. doi:10.1016/j.xpro.2021.101094
+2) Example notebook: https://colelab.github.io/ActflowToolbox/HCP_example.html
 
 ## Email list/forum
 We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.google.com/forum/#!forum/coleneurolab_users), so you can be informed about major updates in this repository and others hosted by the Cole Neurocognition Lab.
