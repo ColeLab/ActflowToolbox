@@ -15168,22 +15168,9 @@ ADMM terminated after 147 iterations with status: optimal.
 ADMM terminated after 149 iterations with status: optimal.
 ADMM terminated after 143 iterations with status: optimal.
 ADMM terminated after 147 iterations with status: optimal.
-ADMM terminated after 150 iterations with status: optimal.
-ADMM terminated after 143 iterations with status: optimal.
-ADMM terminated after 146 iterations with status: optimal.
-ADMM terminated after 152 iterations with status: optimal.
-ADMM terminated after 137 iterations with status: optimal.
-ADMM terminated after 137 iterations with status: optimal.
-ADMM terminated after 136 iterations with status: optimal.
-ADMM terminated after 133 iterations with status: optimal.
-ADMM terminated after 136 iterations with status: optimal.
-ADMM terminated after 140 iterations with status: optimal.
-ADMM terminated after 140 iterations with status: optimal.
-ADMM terminated after 137 iterations with status: optimal.
-ADMM terminated after 138 iterations with status: optimal.
-ADMM terminated after 137 iterations with status: optimal.
-ADMM terminated after 115 iterations with status: optimal.
 ...
+ADMM terminated after 26 iterations with status: optimal.
+ADMM terminated after 14 iterations with status: optimal.
 ADMM terminated after 104 iterations with status: optimal.
 CPU times: user 22h 10min 23s, sys: 3h 23min 35s, total: 1d 1h 33min 58s
 Wall time: 3h 46min 20s
@@ -15307,14 +15294,15 @@ Wall time: 3h 46min 20s
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[46]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[61]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Stats on FC matrices</span>
 <span class="n">FCdensities</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">numsubjs</span><span class="p">)</span>
 <span class="n">scount</span><span class="o">=</span><span class="mi">0</span>
 <span class="k">for</span> <span class="n">subj</span> <span class="ow">in</span> <span class="n">subjNums</span><span class="p">:</span>
-    <span class="n">FCdensities</span><span class="p">[</span><span class="n">scount</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">restFC_glassoFC</span><span class="p">[</span><span class="n">netorder</span><span class="p">,:,</span><span class="n">scount</span><span class="p">][:,</span><span class="n">netorder</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">))</span><span class="o">/</span><span class="p">(</span><span class="mi">360</span><span class="o">*</span><span class="mi">359</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span>
+    <span class="n">numNodes</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">restFC_glassoFC</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">FCdensities</span><span class="p">[</span><span class="n">scount</span><span class="p">]</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">restFC_glassoFC</span><span class="p">[:,:,</span><span class="n">scount</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">numNodes</span><span class="o">*</span><span class="p">(</span><span class="n">numNodes</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span>
     <span class="n">scount</span> <span class="o">+=</span> <span class="mi">1</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;FC densities (100 X total # of non-zero connections / total possible connections):&#39;</span><span class="p">)</span>
@@ -15340,8 +15328,8 @@ Wall time: 3h 46min 20s
 
 <div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
 <pre>FC densities (100 X total # of non-zero connections / total possible connections):
-Mean: 36.97802537913959 %
-Stdev: 3.4131171350032736 %
+Mean: 18.489012689569794 %
+Stdev: 1.7065585675016368 %
 </pre>
 </div>
 </div>
