@@ -48,7 +48,7 @@
 
 <h1 id="the-brain-activity-flow-actflow-toolbox">The Brain Activity Flow (&quot;Actflow&quot;) Toolbox</h1>
 
-<h2 id="version-0-2-2-beta-version-">Version 0.2.6 (beta)</h2>
+<h2 id="version-0-3-0-version-">Version 0.3.0</h2>
 
 <br>
 <p>
@@ -97,12 +97,15 @@
 </li>
 <li>Partial-correlation functional connectivity<ul>
 <li>Inverse covariance-based partial correlation</li>
-<li>Regularized partial correlation [planned]</li>
+<li>Regularized partial correlation</li>
+  <ul>
+    <li>Glasso FC (see <a href="https://doi.org/10.1101/2023.09.16.558065">Peterson KL, Sanchez-Romero R, Mill RD, Cole MW (Preprint). "Regularized partial correlation provides reliable functional connectivity estimates while correcting for widespread confounding". bioRxiv. doi:10.1101/2023.06.27.546751)</a>) </li>
+  </ul>
 </ul>
 </li>
 <li>Causal connectivity
   <ul>
-    <li>CombinedFC</li>
+    <li>CombinedFC (see <a href="https://www.colelab.org/pubs/2020_SanchezCole.pdf">Sanchez-Romero R, Cole MW (2021). "Combining multiple functional connectivity methods to improve causal inferences". Journal of Cognitive Neuroscience. 33(2):180–194. doi:10.1162/jocn_a_01580</a>)</li>
     <li>Bayes' net methods, such as fGES and PC (Peter-Clark) algorithm; <a href="https://doi.org/10.1007/s41060-016-0032-z">https://doi.org/10.1007/s41060-016-0032-z</a>) [planned]</li>
   </ul>
   </li>
@@ -232,6 +235,8 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
   <li>Mill RD, Gordon BA, Balota DA, Cole MW (In Press). "<a href="https://www.colelab.org/pubs/2020_MillGordon.pdf" target="_blank">Predicting dysfunctional age-related task activations from resting-state network alterations</a>". <em>NeuroImage</em>. <a href="https://doi.org/10.1016/j.neuroimage.2020.117167" target="_blank">doi:10.1016/j.neuroimage.2020.117167</a></li>
   <li>Ito T, Hearne LJ, Cole MW (In Press). "<a href="https://www.colelab.org/pubs/2020_ItoHearne.pdf" target="_blank">A cortical hierarchy of localized and distributed processes revealed via dissociation of task activations, connectivity changes, and intrinsic timescales</a>". <em>NeuroImage</em>. <a href="https://doi.org/10.1016/j.neuroimage.2020.117141" target="_blank">doi:10.1016/j.neuroimage.2020.117141</a></li>
   <li>Ito T, Yang GB, Laurent P, Schultz DH, Cole MW (2022). "<a href="https://doi.org/10.1038/s41467-022-28323-7">Constructing neural network models from brain data reveals representational transformation linked to adaptive behavior</a>". Nature Communications. 13, 673. doi:10.1038/s41467-022-28323-7</li>
+  <li>Sanchez-Romero R, Ito T, Mill RD, Hanson SJ, Cole MW (2023). "<a href="https://doi.org/10.1016/j.neuroimage.2023.120300">Causally informed activity flow models provide mechanistic insight into network-generated cognitive activations</a>". NeuroImage. 278:120300. doi:10.1016/j.neuroimage.2023.120300</li>
+  <li>Peterson KL, Sanchez-Romero R, Mill RD, Cole MW (Preprint). "<a href="https://doi.org/10.1101/2023.09.16.558065">Regularized partial correlation provides reliable functional connectivity estimates while correcting for widespread confounding</a>". bioRxiv. doi:10.1101/2023.06.27.546751)</li>
   </ul>
 <h3>Using task-state fMRI (often in addition to resting-state fMRI)</h3>
   <ul>
