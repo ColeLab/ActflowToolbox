@@ -19,7 +19,8 @@ A toolbox to facilitate discovery of how cognition & behavior are generated via 
 
 ## How to install
 
-git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
+1) git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
+2) We recommend using Anaconda (for Python 3), with JupyterLab (or Jupyter Notebooks). Many of the Python package dependencies for Actflow Toolbox will be included in Anaconda. You may need to add additional packages, however, such as GGlasso. For example, to add GGlasso, run this from the command line (after installing Anaconda): pip install gglasso
 
 ## How to use
 1) See this paper for an overview of how to use the Brain Activity Flow Toolbox:
