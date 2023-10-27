@@ -27,8 +27,10 @@ def graphicalLassoCV(data,L1s=None,kFolds=10,optMethod='loglikelihood',saveFiles
     if not ((optMethod == 'loglikelihood') or (optMethod == 'R2')):
         raise ValueError(f'optMethod "{optMethod}" does not match available methods. Available options are "loglikelihood" and "R2".')
 
-    if L1s == None:
-        L1s = np.around(np.hstack((np.arange(.002,.012,.002), np.arange(.02,.22,.02), np.arange(.4,1.2,.2))),6)
+    if L1s is None:
+        # Test log-scaled range of L1s (from 0.316 to 0.001)
+        L1s = np.arange(-.5,-3.1,-.1) 
+        L1s = 10**L1s
         # We recommend checking the optimal hyperparameters for a few subjects and then narrowing down the range
     else:
         L1s = np.array(L1s)
@@ -90,7 +92,7 @@ def graphicalLassoCV(data,L1s=None,kFolds=10,optMethod='loglikelihood',saveFiles
 
                 elif optMethod == 'R2':
                     # Calculate R^2
-                    scores[l,k],r = activityPrediction(data[:,kFoldsTRs[k]],parCorr)
+                    scores[l,k],r = activityPrediction(stats.zscore(data[:,kFoldsTRs[k]],axis=1),parCorr)
 
             # Save performance metrics for this L1
             np.save(outfileCVScores,scores[l,:])
@@ -111,7 +113,7 @@ def graphicalLassoCV(data,L1s=None,kFolds=10,optMethod='loglikelihood',saveFiles
 
                 elif optMethod == 'R2':
                     # Calculate R^2
-                    scores[l,k],r = activityPrediction(data[:,kFoldsTRs[k]],parCorr)
+                    scores[l,k],r = activityPrediction(stats.zscore(data[:,kFoldsTRs[k]],axis=1),parCorr)
 
     # Find the best param according to each performance metric
     meanScores = np.mean(scores,axis=1)
