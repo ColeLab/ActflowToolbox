@@ -13,27 +13,27 @@ def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2,fliphemis
     """
     Maps a region X column 2d matrix into a dscalar file with 64k vertices
     Uses the Glasser et al. 2016 ROI parcellation
-    
+
     Input Parameters:
         mat     :   region x column (features/activations, etc.) 2D MATRIX to be mapped onto the surface. MUST BE A 2D MATRIX.
                     mat can either be 360 mat or ~59k mat. If 360, will automatically map back to ~59k
 
         filename:   a string indicating the directory + filename of the output. Do not include a suffix (e.g., ".dscalar.nii" to the file. Suffixes will be added automatically.
-        
+
         fliphemispheres: If the data were originally loaded using RL (right hemisphere then left) convention the data should be
         flipped, since CAB-NP uses LR (left hemisphere then right). A setting of True will flip the hemispheres.
 
     """
-    
+
     if fliphemispheres:
         print('Flipping hemispheres')
         newmat=np.zeros(mat.shape)
         newmat[0:180]=mat[180:360]
         newmat[180:360]=mat[0:180]
-        mat=newmat.copy() 
-    
+        mat=newmat.copy()
+
     #### Load glasser atlas
-    glasser2 = nib.load(glasserfile2).get_data()
+    glasser2 = nib.load(glasserfile2).get_fdata()
     glasser2 = np.squeeze(glasser2)
     #### Map back to surface
     if mat.shape[0]==nParcels:
@@ -45,7 +45,7 @@ def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2,fliphemis
     else:
         out_mat = mat
 
-    #### 
+    ####
     # Write file to csv and run wb_command
     np.savetxt(filename + '.csv', out_mat,fmt='%s')
     wb_file = filename + '.dscalar.nii'
@@ -60,4 +60,3 @@ def map_to_surface(mat,filename,nParcels=360,glasserfile2=glasserfile2,fliphemis
         print("CIFTI dscalar is output as:" + wb_file)
     except OSError:
         print ('wb_command does not exist')
-    
