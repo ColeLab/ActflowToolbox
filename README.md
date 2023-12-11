@@ -55,7 +55,7 @@ We strongly encourage you to join the ColeNeuroLab Users Group (https://groups.g
 * How to update PIP when gitHub code gets updated? <br>
 Steps:
 	* Clone/Pull the ActflowToolbox gitHub repository which has been updated with new code.
-	* Create a setup.py file/use the one I already created and place it at the location parallel to the ActflowToolbox folder that you just cloned.
+	* Create a setup.py file/use the one already present and place it at the location parallel to the ActflowToolbox folder that was just cloned.
 	* Increment version number in setup.py with latest version.
 	* setup.py file would have dependency on setuptools.
 Run :  pip3 install setuptools.
