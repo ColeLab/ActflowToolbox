@@ -25,6 +25,26 @@ def compute_pcaFC_opt(data_input, use_PCA, opt_mode, target_regions, model_order
     sub_id = int(sub_id)
     out_dir = str(out_dir)
 
+<<<<<<< HEAD
+=======
+    print("data input : ", data_input)
+    print("use_PCA : ", use_PCA)
+    print("opt_mode : ", opt_mode)
+    print("target_regions : ", target_regions)
+    print("model_order : ", model_order)
+    print("zscore_tseries : ", zscore_tseries)
+
+    print("include_contemp : ", include_contemp)
+    print("include_autoreg : ", include_autoreg)
+    print("outfile : ", outfile)
+    print("cv_max : ", cv_max)
+    print("cv_increment : ", cv_increment)
+    print("cv_run : ", cv_run)
+    print("sub_id : ", sub_id)
+    print("out_dir : ", out_dir)
+    print("Here")
+
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
     num_trials = len(data_input)
     num_regions = data_input[0].shape[0]
     num_target_regions = len(target_regions)
@@ -81,6 +101,19 @@ def compute_pcaFC_opt(data_input, use_PCA, opt_mode, target_regions, model_order
     # Initialize optimization variables - *set maxPC first
     maxPC = min(nVars, nObs - 1) if nObs > nVars else nVars
 
+<<<<<<< HEAD
+=======
+    # # Reshape trial_data for PCA
+    # trial_data_reshaped = trial_data.reshape((num_tp, -1))
+
+    # # Perform PCA
+    # pca = PCA(n_components=maxPC)
+    # pca.fit(trial_data_reshaped)
+
+    # # Extract PCA components
+    # pca_components = pca.components_.T
+
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
     MVAR_PCopt = {}
     # set up PC range and output vars
     if use_PCA == 3:
@@ -251,7 +284,13 @@ def compute_pcaFC_opt(data_input, use_PCA, opt_mode, target_regions, model_order
             for n in range(len(PC_range)):
                 nPCs = PC_range[n]
                 nPC_out = os.path.join(out_dir, f"{sub_id}_out_nPC{nPCs}.mat")
+<<<<<<< HEAD
                 data = mat73.loadmat(nPC_out)
+=======
+                print("Here4")
+                data = mat73.loadmat(nPC_out)
+                print("Here43")
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
                 MVAR_PCopt_full[n, :, :, :] = data['MVAR_PCopt']['nPC']
             
             # reassign to MVAR_PCopt.nPC for consistency with below
@@ -273,6 +312,10 @@ def compute_pcaFC_opt(data_input, use_PCA, opt_mode, target_regions, model_order
 
         # loop through trials and target regions and compute pca regression
         for t in range(num_trials):
+<<<<<<< HEAD
+=======
+            print(f"Trial {t + 1} of {num_trials}")
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
             trial_MVAR = np.zeros((num_predictors, num_target_regions))
             trial_MVAR_viz = np.zeros((num_predictors + increments, num_target_regions))
             trial_varEx = []
@@ -313,6 +356,11 @@ def compute_pcaFC_opt(data_input, use_PCA, opt_mode, target_regions, model_order
                     X.append(tpoint_X)
 
                 # Convert lists to NumPy arrays
+<<<<<<< HEAD
+=======
+                # y = np.array(y)
+                # X = np.array(X, dtype=object)
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
                 # Demean prior to PCA
                 X = X - np.mean(X, axis=0)
                 # Run PCA

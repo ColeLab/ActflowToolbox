@@ -3,6 +3,13 @@ import dynamic_sensory_motor_egi
 from scipy.stats import zscore
 
 def dynamic_actflow(activity, restMVAR, target_inds, MVAR_increments, cond_inds, include_contemp, include_autoreg, exclude_target_net, zscore_sub, regress_targetAct, titrate_lags, pairwise_lags, actflow_source_contemp, actflow_target_autoregs):
+<<<<<<< HEAD
+=======
+    numTasks = len(np.unique(cond_inds))
+    numTrials, numRegions_all, _ = activity.shape
+    numRegions_targets = len(target_inds)
+
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
 
 
     activity = np.asarray(activity)
@@ -18,10 +25,28 @@ def dynamic_actflow(activity, restMVAR, target_inds, MVAR_increments, cond_inds,
     pairwise_lags = int(pairwise_lags)
     actflow_source_contemp = int(actflow_source_contemp)
     actflow_target_autoregs = int(actflow_target_autoregs)
+<<<<<<< HEAD
 
     numTasks = len(np.unique(cond_inds))
     numTrials, numRegions_all, _ = activity.shape
     numRegions_targets = len(target_inds)
+=======
+    print(f"restMVAR: {restMVAR}")
+    print(f"numTasks: {numTasks}")
+    print(f"activity: {activity}")
+    print(f"activity shape: {activity.shape}")
+    print(f"numTrials: {numTrials}")
+    print(f"numRegions_all: {numRegions_all}")
+    print(f"numRegions_targets: {numRegions_targets}")
+    print(f"target_inds: {target_inds}")
+    print(f"cond_inds: {cond_inds}")
+    print(f"MVAR_increments: {MVAR_increments} include_contemp {include_contemp}")
+    print(f"include_autoreg: {include_autoreg} exclude_target_net: {exclude_target_net}")
+    print(f"zscore_sub: {zscore_sub} regress_targetAct: {regress_targetAct}")
+    print(f"titrate_lags: {titrate_lags} pairwise_lags: {pairwise_lags}")
+    print(f"actflow_source_contemp: {actflow_source_contemp} actflow_target_autoregs: {actflow_target_autoregs}")
+
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
     
     if include_contemp == 1 and actflow_source_contemp == 0:
         model_order = MVAR_increments - 1
@@ -34,7 +59,11 @@ def dynamic_actflow(activity, restMVAR, target_inds, MVAR_increments, cond_inds,
     if include_contemp == 1 and actflow_source_contemp == 0:
         contemp_inds = np.arange(0, int(numRegions_all * MVAR_increments), int(MVAR_increments))
         restMVAR = np.delete(restMVAR, contemp_inds, axis=0)
+<<<<<<< HEAD
 
+=======
+    print("restMVAR : ", restMVAR)
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
     if include_autoreg == 1 and actflow_target_autoregs == 0:
         if include_contemp == 1:
             restMVAR = restMVAR[:-MVAR_increments + 1, :]
@@ -70,6 +99,10 @@ def dynamic_actflow(activity, restMVAR, target_inds, MVAR_increments, cond_inds,
                 for ss in range(source_act.shape[1]):
                     # Perform linear regression
                     # np.linalg.lstsq returns several values, where the third value is the residuals
+<<<<<<< HEAD
+=======
+                    # print(f"target_FC0: {target_FC}")
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
                     _, _, residuals, _ = np.linalg.lstsq(reg_target, source_act[ss, :], rcond=None)
                     # Replace part of source_act with residuals
                     # Note: lstsq does not return residuals in the same shape, so reshape might be needed
@@ -112,6 +145,10 @@ def dynamic_actflow(activity, restMVAR, target_inds, MVAR_increments, cond_inds,
                     m_act = target_act[t0-m-1]
                     target_lags.append(m_act)
 
+<<<<<<< HEAD
+=======
+                # target_lags = np.concatenate(target_lags).ravel()
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
                 activity_lags = np.concatenate([activity_lags, target_lags])
                             
                 
@@ -149,5 +186,12 @@ def dynamic_actflow(activity, restMVAR, target_inds, MVAR_increments, cond_inds,
             actual[trialNum, regionNum, :] = actual_region
             pred[trialNum, regionNum, :] = pred_region
         
+<<<<<<< HEAD
 
+=======
+    # print("actual ", actual)
+    # print("pred ", pred)
+    # print("actual shape ", actual.shape)
+    # print("pred shape ", pred.shape)
+>>>>>>> 794e6bc (added compute_pcaFC_opt and dynamic_actflow support)
     return [pred, actual]
