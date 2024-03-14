@@ -6,3 +6,4 @@ from .corrcoefconn import *
 from .partial_corrconn import *
 from .combinedFC import *
 from .graphicalLassoCV import *
+from .lassoCV import *
