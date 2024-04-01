@@ -27,7 +27,7 @@ A toolbox to facilitate discovery of how cognition & behavior are generated via 
     <br>pip install actflow
   </p>
   <p><i>Option 3:</i>
-    <br>git clone --recurse-submodules https://github.com/ColeLab/ActflowToolbox.git
+    <br>git clone --recurse-submodules git@github.com:ColeLab/ActflowToolbox.git
   </p>
 
 ## How to use
