@@ -58,32 +58,37 @@
 
 <h2 id="overview">Overview</h2>
 
-<p class="lead">This toolbox facilitates linking brain connectivity with task-evoked activity and associated cognitive/behavioral functions. The primary focus is on <em>activity flow mapping</em> and related methods (<a href="http://rdcu.be/kOJq">Cole et al. (2016)</a> & <a href="http://rdcu.be/wQ1M">Ito et al. (2017)</a>).</p>
+<p class="lead">This toolbox facilitates linking brain connectivity with task-evoked activity and associated cognitive/behavioral functions. The primary focus is on <em>activity flow modeling</em> and related methods (<a href="http://rdcu.be/kOJq">Cole et al. (2016)</a> & <a href="https://doi.org/10.1038/s41467-022-28323-7">Ito et al. (2022)</a>).</p>
 
-<p class="lead">Activity flow mapping is based on core principles underlying brain network simulations, applying these principles to empirical neural/neuroimaging data. The core theoretical construct is that of activity flow &mdash; the movement of activity between neurons/neural populations. Activity flow mapping is a highly flexible framework that is constantly being improved via better connectivity methods and creative uses of the approach to better understand brain function.</p>
+<p class="lead">Activity flow modeling is based on core principles underlying neural network modeling, applying these principles to empirical neural/neuroimaging data. The core theoretical construct is that of activity flow &mdash; the movement of activity between neural populations. Activity flow modeling is a highly flexible framework that is constantly being improved via better connectivity methods and creative uses of the approach to better understand brain function.</p>
 
-<p class="lead">Activity flow mapping can be used, for instance, to infer whether one or more brain connections are involved in producing a particular function. This method can also be used to relate multiple task-evoked activations to each other (e.g., predicting one neural population's activity from another's activity). More generally, activity flow mapping can be thought of as creating <em>network coding models</em> (<a href="http://www.colelab.org/pubs/2019_ItoHearne_TiCS.pdf">Ito et al. (2020)</a>), which are empirically-constrained neural network models.</p>
+<p><img width="650" src="images/ENNfigure.png"></p>
 
-<p class="lead">Other methods included in the toolbox (which can optionally be used along with activity flow mapping) are advanced versions of resting-state functional connectivity and task-state functional connectivity. The primary focus (for now) is on fMRI data, but in principle these approaches can be applied to any kind of neural data.</p>
+<p class="lead">Activity flow modeling can be used, for instance, to infer whether one or more brain connections are involved in producing a particular function. This method can also be used to relate multiple task-evoked activations to each other (e.g., predicting one neural population's activity from another's activity). More generally, activity flow modeling can be thought of as creating <em>network coding models</em> (<a href="http://www.colelab.org/pubs/2019_ItoHearne_TiCS.pdf">Ito et al. (2020)</a>), which are empirically-constrained neural network models.</p>
+
+<p class="lead">Other methods included in the toolbox (which can optionally be used along with activity flow modeling) are advanced versions of resting-state functional connectivity and task-state functional connectivity. The primary focus (for now) is on fMRI data, but in principle these approaches can be applied to any kind of neural data.</p>
 
 <p class="lead">This code repository was created by the Cole Neurocognition Lab at Rutgers University: <a href="http://www.colelab.org/">http://www.colelab.org/</a>
 <br>We are happy for others to contribute to the code as well.</p>
 
 <p class="lead">See the <strong><a href="HCP_example.html">example notebook</a></strong> to see the Actflow Toolbox in action<br>
-  We provide 30 subjects' data from the Human Connectome Project for trying out the toolbox</p>
+  We provide 30 subjects' data from the Human Connectome Project for trying out the toolbox.</p>
+  
+<p class="lead">For a more complete tutorial walkthrough of the toolbox see <a href="https://doi.org/10.1016/j.xpro.2021.101094">Cocuzza et al. (2022) <em>STAR Protocols</em></a></p>
 
-<h3 id="core-algorithm-and-principles-behind-activity-flow-mapping">Core algorithm and principles behind activity flow mapping</h3>
-<p class="lead">Activity flow mapping is a method validated and published in Nature Neuroscience in 2016 (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>), with multiple follow-up studies further validating the approach.</p>
-<h4>Activity flow mapping has two basic steps:</h4>
+<h3 id="core-algorithm-and-principles-behind-activity-flow-modeling">Core algorithm and principles behind activity flow modeling</h3>
+<p class="lead">Activity flow modeling is a method validated and published in Nature Neuroscience in 2016 (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>), with 14+ follow-up studies further validating the approach.</p>
+
+<h4>Activity flow modeling has two basic steps:</h4>
 <p>1) <em>Activity flow modeling</em>: Simulating the flow (movement) of activity between neural populations, using empirical data to estimate activity levels and routes of flow (connectivity). This is done by running the standard &quot;propagation rule&quot; and &quot;activation rule&quot; steps used in most neural network simulations (see <a href="http://www.colelab.org/pubs/2019_ItoHearne_TiCS.pdf">Ito et al. (2020)</a>). In the standard approach each neural population&#39;s activity level is predicted based on the flow from every other recorded neural population (from <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>):</p>
 <p><img width="350" src="images/actflowfigure1.png"></p>
 <p>2) <em>Testing prediction accuracy</em>: The predicted brain activity pattern is compared to the actual recorded activity, providing evidence for or against the activity flow model used to make the predictions. Predictions of multiple models can be compared to quantify model validity. Two examples of predicted-to-actual accuracy testing with fMRI data (from <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>):</p>
 <p><img width="350" src="images/actflowfigure_predictiontesting.png"></p>
-<p>In principle, any measure of neural activity and any measure of neural connectivity (e.g., structural connectivity) can be used with activity flow mapping. Some modifications are necessary for fast temporal resolution data such as EEG/MEG or multi-unit recording, but these should be available soon (we are working on it!).</p>
+<p>In principle, any measure of neural activity and any measure of neural connectivity (e.g., structural connectivity) can be used with activity flow modeling. Some modifications are necessary for fast temporal resolution data such as EEG/MEG or multi-unit recording, but these should be available soon (we are working on it!).</p>
 <p></p>
-<p>More background info on activity flow mapping can be found on an <a href="https://blog.colelab.org/2016/10/25/frequently-asked-questions-about-activity-flow-mapping-cole-et-al-2016-nature-neuroscience/">FAQ about the Cole et al. (2016) paper</a></p>
+<p>More background info on activity flow modeling can be found on an <a href="https://blog.colelab.org/2016/10/25/frequently-asked-questions-about-activity-flow-mapping-cole-et-al-2016-nature-neuroscience/">FAQ about the Cole et al. (2016) paper</a></p>
 
-<h3 id="included-connectivity-mapping-methods">Included connectivity mapping methods</h3>
+<h3 id="included-connectivity-mapping-methods">Included connectivity modeling methods</h3>
 <ul>
 <li><em>All methods can be applied to resting-state or task-state data</em></li>
 <li>Correlation-based functional connectivity</li>
@@ -167,7 +172,7 @@ restFC_mreg=np.zeros((np.shape(restdata)[<span class="hljs-number">0</span>],np.
 print(<span class="hljs-string">"==Activity flow mapping results, multiple-regression-based resting-state FC, 24 task conditions=="</span>)
 actflowOutput_restFCMReg_bycond = actflow.actflowcomp.actflowtest(activations_bycond, restFC_mreg)
 </code></pre><p>Output:</p>
-<pre><code>==Activity flow mapping results, multiple-regression-based resting-state FC, <span class="hljs-number">24</span> task conditions==
+<pre><code>==Activity flow modeling results, multiple-regression-based resting-state FC, <span class="hljs-number">24</span> task conditions==
 ===Comparing prediction accuracies between models (similarity between predicted <span class="hljs-keyword">and</span> actual brain activation patterns)===
 
 ==Comparisons between predicted <span class="hljs-keyword">and</span> actual activation patterns, across <span class="hljs-keyword">all</span> conditions <span class="hljs-keyword">and</span> nodes:==
@@ -200,13 +205,13 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 </p>
 
 
-<h2 id="guidelinesforactflow">General guidelines for activity flow mapping</h2>
+<h2 id="guidelinesforactflow">General guidelines for activity flow modeling</h2>
 <ul>
   <li>Avoid <a href="https://wiki.biac.duke.edu/lib/exe/fetch.php?media=biac:kriegeskorte_et_al_2009.pdf">circularity</a>:
     <ul>
       <li><strong>Use connectivity independent of the to-be-predicted state when possible</strong>, such as resting-state functional connectivity. This implicitly tests for generalization across brain states (when predicting task activations), which is important given that connectivity is mostly invariant across states. There is substantial evidence for the dominant effect of intrinsic/state-general connectivity (see <a href="http://www.colelab.org/pubs/2014_Cole_Neuron.pdf">Cole et al. (2014)</a> and <a href="https://doi.org/10.1016/j.neuron.2018.03.035">Gratton et al. (2018)</a>). Using structural connectivity also avoids this issue, though some details (e.g., the aggregate effects of synaptic weights) are lost with most structural connectivity methods.</li>
-      <li><strong>Ensure statistical independence of activation and functional connectivity estimates</strong> when the same state is used for estimating both. The recommended approach is to use finite impulse response (FIR) regression as a preprocessing step, removing the to-be-predicted mean task activations prior to estimating task-state functional connectivity. Note that this leaves most of the task-related variance in the time series, since mean task effects are only a small (but important; which is why we try to predict them via activity flow mapping) portion of the data. See <a href="http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf">Cole et al. (2019)</a> for more info.</li>
-      <li><strong>Spatial smoothness of the data can introduce circularity</strong>, since this results in the same underlying neural activity being assigned to multiple spatial locations (such as multiple voxels in fMRI). We therefore recommend excluding activity flow source data within approximately 10 mm from the to-be-predicted neural signal with fMRI data (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>). This is less of a concern with brain region level data, since it would only apply to voxels/vertices at the border of each region. We nonetheless implemented a "non-circular" version of region-level activity analysis (excluding regions within 10 mm of the to-be-predicted region), which is demonstrated in the <a href="HCP_example.html">example notebook</a>. The vast majority of results do not change with vs. without the "non-circular" region-level approach. Note that standard activity flow mapping should not be used with EEG/MEG or related methods at this time, since the source spread implicit in those approaches is so substantial (even when using source localization) that it would result in substantial circularity. (We are working on an approach to get around this problem, however.)</li>
+      <li><strong>Ensure statistical independence of activation and functional connectivity estimates</strong> when the same state is used for estimating both. The recommended approach is to use finite impulse response (FIR) regression as a preprocessing step, removing the to-be-predicted mean task activations prior to estimating task-state functional connectivity. Note that this leaves most of the task-related variance in the time series, since mean task effects are only a small (but important; which is why we try to predict them via activity flow modeling) portion of the data. See <a href="http://www.colelab.org/pubs/ColeEtAl2019NeuroImage.pdf">Cole et al. (2019)</a> for more info.</li>
+      <li><strong>Spatial smoothness of the data can introduce circularity</strong>, since this results in the same underlying neural activity being assigned to multiple spatial locations (such as multiple voxels in fMRI). We therefore recommend excluding activity flow source data within approximately 10 mm from the to-be-predicted neural signal with fMRI data (see <a href="http://rdcu.be/kOJq">Cole et al. (2016)</a>). This is less of a concern with brain region level data, since it would only apply to voxels/vertices at the border of each region. We nonetheless implemented a "non-circular" version of region-level activity analysis (excluding regions within 10 mm of the to-be-predicted region), which is demonstrated in the <a href="HCP_example.html">example notebook</a>. The vast majority of results do not change with vs. without the "non-circular" region-level approach. Note that standard activity flow modeling should not be used with EEG/MEG or related methods, since the source spread implicit in those approaches is so substantial (even when using source localization) that it would result in substantial circularity. However, see <a href="https://doi.org/10.1371/journal.pbio.3001686">Mill et al. (2022)</a> for a version of activity flow modeling that can be used with EEG/MEG (or other high-temporal-resolution methods).</li>
     </ul>
     </li>
   <li>Compare-then-average vs. average-then-compare:
@@ -236,7 +241,7 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
 </ul>
 </li>
 </ul>
-<h2 id="publications-that-have-used-activity-flow-mapping-and-or-this-toolbox">Publications that have used activity flow mapping and/or this toolbox</h2>
+<h2 id="publications-that-have-used-activity-flow-mapping-and-or-this-toolbox">Publications that have used activity flow modeling and/or this toolbox</h2>
 <h3>Using resting-state fMRI</h3>
   <ul>
   <li>Cole MW, Ito T, Bassett DS, Schultz DH (2016). &quot;Activity flow over resting-state networks shapes cognitive task activations&quot;. Nature Neuroscience. 19:1718–1726. <a href="http://dx.doi.org/10.1038/nn.4406">http://dx.doi.org/10.1038/nn.4406</a></li>
@@ -245,6 +250,7 @@ ax.set(ylabel=<span class="hljs-string">'Regions'</span>)
   <li>Ito T, Hearne LJ, Cole MW (In Press). "<a href="https://www.colelab.org/pubs/2020_ItoHearne.pdf" target="_blank">A cortical hierarchy of localized and distributed processes revealed via dissociation of task activations, connectivity changes, and intrinsic timescales</a>". <em>NeuroImage</em>. <a href="https://doi.org/10.1016/j.neuroimage.2020.117141" target="_blank">doi:10.1016/j.neuroimage.2020.117141</a></li>
   <li>Ito T, Yang GB, Laurent P, Schultz DH, Cole MW (2022). "<a href="https://doi.org/10.1038/s41467-022-28323-7">Constructing neural network models from brain data reveals representational transformation linked to adaptive behavior</a>". Nature Communications. 13, 673. doi:10.1038/s41467-022-28323-7</li>
   <li>Sanchez-Romero R, Ito T, Mill RD, Hanson SJ, Cole MW (2023). "<a href="https://doi.org/10.1016/j.neuroimage.2023.120300">Causally informed activity flow models provide mechanistic insight into network-generated cognitive activations</a>". NeuroImage. 278:120300. doi:10.1016/j.neuroimage.2023.120300</li>
+  <li>Cocuzza CV, Sanchez-Romero R, Ito T, Mill RD, Keane BP, Cole MW (Preprint). "<a href="https://doi.org/10.1101/2022.02.19.481103" target="_blank">Distributed network flows generate localized category selectivity in human visual cortex</a>". <em>bioRxiv</em>. <a href="https://doi.org/10.1101/2022.02.19.481103" target="_blank">doi:10.1101/2022.02.19.481103</a></li>
   <li>Peterson KL, Sanchez-Romero R, Mill RD, Cole MW (Preprint). "<a href="https://doi.org/10.1101/2023.09.16.558065">Regularized partial correlation provides reliable functional connectivity estimates while correcting for widespread confounding</a>". bioRxiv. doi:10.1101/2023.06.27.546751)</li>
   </ul>
 <h3>Using task-state fMRI (often in addition to resting-state fMRI)</h3>
