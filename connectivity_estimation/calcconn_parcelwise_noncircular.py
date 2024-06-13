@@ -7,6 +7,7 @@ from .multregconn import *
 from .corrcoefconn import *
 from .pc_multregconn import *
 from .combinedFC import *
+from .lassoCV import *
 import ActflowToolbox as actflow
 from .. import tools
 
@@ -26,7 +27,7 @@ def calcconn_parcelwise_noncircular(data, connmethod='multreg', dlabelfile=defau
     
     PARAMETERS:
         data        : vertex-wise data... vertices x time; default assumes that data is 96k dense array
-        connmethod  : a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr', 'pc_multregconn', 'combinedFC'
+        connmethod  : a string indicating what connectivity method to use. Options: 'multreg' (default), 'pearsoncorr', 'pc_multregconn', 'combinedFC', 'lasso'
         dlabelfile  : parcellation file; each vertex indicates the number corresponding to each parcel. dlabelfile needs to match same vertex dimensions of data
         dilated_parcels :       If True, will exclude vertices within 10mm of a target parcel's borders when computing mult regression fc (reducing spatial autocorrelation inflation)
         precomputedRegularTS:  optional input of precomputed 'regular' mean time series with original region set. This might cut down on computation time if provided.
@@ -160,7 +161,13 @@ def calcconn_parcelwise_noncircular(data, connmethod='multreg', dlabelfile=defau
             # The suggested use, however, is to run an additional multiple regression step on the weights validated by combined-FC to add precision to the act-flow predictive model (see below)
             net_mask[target_row,source_cols] = actflow.connectivity_estimation.combinedFC(source_parcel_ts,target_parcel_ts,parcelInt,source_cols)
             targetDataAll[parcelInt,:] = target_parcel_ts.copy(); # all target data required for 2nd combined-FC step to generate final fc_matrix (see below)
-    
+        elif connmethod == 'lasso':
+            # Modify source_parcel_ts to include target_parcel_ts as a first row. i.e merge target with source
+            # Provide modified source_parcel_ts as a data parameter with the index of target row (i.e. 0) as targetNodesToRun to lassoCV
+            modified_source_parcel_ts = np.vstack((target_parcel_ts, source_parcel_ts))
+            lasso, cvResults = lassoCV.lassoCV(modified_source_parcel_ts, targetNodesToRun=[0])
+            fc_matrix[target_row,source_cols] = lasso[0,1:] # Only take first row of lasso output (i.e. target row) and exclude (0,0) as it is target * target value from the result.
+            
     # Multiple regression step for combined-FC (note: do not need to index by target/sources here; it's done above for net_mask): 
     if connmethod == 'combinedFC':   
         fc_matrix = actflow.connectivity_estimation.multregconn(targetDataAll,conn_mask=(net_mask!=0))
