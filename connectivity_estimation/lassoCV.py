@@ -122,7 +122,7 @@ def lassoCV(data, L1s=None, kFolds=10, optMethod='R2', saveFiles=0, outDir='', f
     # If not saving intermediate files
     else:
         # Loop through folds
-        for k in range(kFolds):
+        for k in foldsToRun:
             # Estimate the lasso FC matrices
             lassoCV = lasso(data[:,~kFoldsTRs[k]],L1s,targetNodesToRun=targetNodesToRun)
                 
