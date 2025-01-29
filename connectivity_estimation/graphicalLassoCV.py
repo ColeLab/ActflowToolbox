@@ -9,7 +9,7 @@ from sklearn.covariance import log_likelihood,empirical_covariance
 
 # Peterson, K. L., Sanchez-Romero, R., Mill, R. D., & Cole, M. W. (2023). Regularized partial correlation provides reliable functional connectivity estimates while correcting for widespread confounding. In bioRxiv (p. 2023.09.16.558065). https://doi.org/10.1101/2023.09.16.558065
 
-def graphicalLassoCV(data,L1s=None,kFolds=10,optMethod='loglikelihood',saveFiles=0,outDir=''):
+def graphicalLassoCV(data,L1s=None,kFolds=10,optMethod='loglikelihood',saveFiles=0,outDir='',foldsScheme='blocked'):
     '''
     Runs graphical lasso to compute the L1-regularized partial correlation matrix of a dataset, using cross-validation to select the optimal L1 hyperparameter. Currently, model performance for each hyperparameter value is scored as: the loglikelihood between the training data precision (regularized inverse covariance) matrix and held-out data empirical (unregularized) covariance matrix; or the R^2 between held-out activity (time series) predicted for each node using the training data connectivity matrix and the actual held-out activity (time series).
     INPUT:
@@ -19,6 +19,7 @@ def graphicalLassoCV(data,L1s=None,kFolds=10,optMethod='loglikelihood',saveFiles
         optMethod : method for choosing the optimal hyperparameter ('loglikelihood' or 'R2')
         saveFiles : whether to save intermediate and output variables to .npy files (0 = no, 1 = save R^2 and negative loglikelihood results, 2 = save connectivity and precision matrices too
         outDir : if saveFiles>=1, the directory in which to save the files
+        foldsScheme : how to assign datapoints to CV folds ('blocked' (default) or 'interleaving' (used in previous version); 'blocked' method was preferable in simulations with autocorrelated timeseries, but made little difference for empirical data)
     OUTPUT:
         parCorr : graphical lasso (L1-regularized partial correlation) connectivity matrix, using optimal L1 value from list of L1s
         cvResults : dictionary with 'bestParam' for the optimal L1 value from input list of L1s ('L1s') and 'loglikelihood' or 'R2' containing scores for every cross validation fold and L1 value
@@ -38,12 +39,20 @@ def graphicalLassoCV(data,L1s=None,kFolds=10,optMethod='loglikelihood',saveFiles
     # Divide timepoints into folds
     nTRs = data.shape[1]
     kFoldsTRs = np.full((kFolds,nTRs),False)
-    k = 0
-    for t in range(nTRs):
-        kFoldsTRs[k,t] = True
-        k += 1
-        if k >= kFolds:
-            k = 0
+    if foldsScheme=='blocked':
+        TRsPerFold = nTRs/kFolds
+        t1 = 0
+        for k in range(kFolds):
+            t2 = int(np.round((k+1)*TRsPerFold))
+            kFoldsTRs[k,t1:t2] = True
+            t1 = t2
+    elif foldsScheme=='interleaving':
+        k = 0
+        for t in range(nTRs):
+            kFoldsTRs[k,t] = True
+            k += 1
+            if k >= kFolds:
+                k = 0
 
     # Define arrays to hold performance metrics
     scores = np.zeros((len(L1s),kFolds))
