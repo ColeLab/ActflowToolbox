@@ -7,7 +7,7 @@ from sklearn.linear_model import Lasso,lasso_path
 
 # Peterson, K. L., Sanchez-Romero, R., Mill, R. D., & Cole, M. W. (2023). Regularized partial correlation provides reliable functional connectivity estimates while correcting for widespread confounding. In bioRxiv (p. 2023.09.16.558065). https://doi.org/10.1101/2023.09.16.558065
 
-def lassoCV(data, L1s=None, kFolds=10, optMethod='R2', saveFiles=0, outDir='', foldsToRun='all', targetNodesToRun='all',  nodewiseHyperparams=True): 
+def lassoCV(data, L1s=None, kFolds=10, optMethod='R2', saveFiles=0, outDir='', foldsToRun='all', targetNodesToRun='all',  nodewiseHyperparams=True, foldsScheme='blocked'): 
     '''
     Runs node-wise lasso regression to compute the L1-regularized multiple regression FC matrix of a dataset, using cross validation to select the optimal L1 hyperparameters. Currectly, model performance for each hyperparameter value is scored as the R^2 between held-out activity predicted for each node using the training data connectivity matrix and the actual held-out activity. 
     INPUT:
@@ -20,7 +20,7 @@ def lassoCV(data, L1s=None, kFolds=10, optMethod='R2', saveFiles=0, outDir='', f
         foldsToRun : list of CV folds (0 to kFolds-1) for which to compute model coefficients during hyperparameter selection; default ('all') is to run for all kFolds folds, but running only a subset of folds can reduce computation
         targetNodesToRun : list of target nodes (0 to nNodes-1) for which to fit an FC model (i.e., rows in the FC matrix), with all variables in the provided dataset used as source nodes (i.e., columns in the FC matrix); default ('all') is to use all nodes in the dataset as both targets and sources, to construct an [nNodes x nNodes] FC matrix
         nodewiseHyperparams : whether to select a different optimal hyperparameter for each target node's regression model
-        
+        foldsScheme : how to assign datapoints to CV folds ('blocked' (default) or 'interleaving' (used in previous version); 'blocked' method was preferable in simulations with autocorrelated timeseries, but made little difference for empirical data)
     OUTPUT:
         FC : lasso connectivity matrix, using optimal L1 value from list of L1s
         cvResults : dictionary with 'bestParam' for the optimal L1 value, 'L1s' for the list of tested L1 values, and 'R2' containing scores for every L1 value and cross-validation fold
@@ -44,13 +44,21 @@ def lassoCV(data, L1s=None, kFolds=10, optMethod='R2', saveFiles=0, outDir='', f
         
     # Divide timepoints into folds
     nTRs = data.shape[1]
-    kFoldsTRs = np.full((kFolds,nTRs),False)     
-    k = 0
-    for t in range(nTRs): # (interleaving folds)
-        kFoldsTRs[k,t] = True
-        k += 1
-        if k >= kFolds:
-            k = 0
+    kFoldsTRs = np.full((kFolds,nTRs),False)
+    if foldsScheme=='blocked':
+        TRsPerFold = nTRs/kFolds
+        t1 = 0
+        for k in range(kFolds):
+            t2 = int(np.round((k+1)*TRsPerFold))
+            kFoldsTRs[k,t1:t2] = True
+            t1 = t2
+    elif foldsScheme=='interleaving':
+        k = 0
+        for t in range(nTRs):
+            kFoldsTRs[k,t] = True
+            k += 1
+            if k >= kFolds:
+                k = 0
     
     # Define arrays to hold performance metrics
     nNodes = data.shape[0]
