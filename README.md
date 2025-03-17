@@ -2,11 +2,12 @@
 ## The Brain Activity Flow ("Actflow") Toolbox
 A toolbox to facilitate discovery of how cognition & behavior are generated via brain network interactions
 
-## Version 0.3.1
+## Version 0.3.2
 
 ## Visit [https://colelab.github.io/ActflowToolbox/](https://colelab.github.io/ActflowToolbox/) for more information
 
 ### Version info:
+* Version 0.3.2: Minor update, fixing overly verbose output for gglasso [2025-03-17]
 * Version 0.3.1: Minor update, fixing a bug in the map_to_surface.py function [2023-12-06]
 * Version 0.3.0: Added Glasso FC to the set of connectivity methods (new recommended best practice for activity flow mapping); see updated HCP_example Jupyter notebook for a demo [2023-09-24]
 * Version 0.2.6: Added combinedFC to the set of connectivity methods (current recommended best practice for activity flow mapping); see updated HCP_example Jupyter notebook for a demo
