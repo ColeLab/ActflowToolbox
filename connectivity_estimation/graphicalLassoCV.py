@@ -1,4 +1,5 @@
 import os
+import contextlib
 import numpy as np
 from scipy import stats
 from scipy import linalg
@@ -168,7 +169,9 @@ def graphicalLasso(data,L1):
 
     # Run glasso
     glasso = glasso_problem(empCov,nTRs,reg_params={'lambda1':L1},latent=False,do_scaling=False)
-    glasso.solve(verbose=False)
+    #Output to null device to suppress verbose output
+    with open(os.devnull, "w") as f, contextlib.redirect_stdout(f):
+        result = glasso.solve(verbose=False)
     prec = np.squeeze(glasso.solution.precision_)
 
     # Transform precision matrix into regularized partial correlation matrix
