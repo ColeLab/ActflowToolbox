@@ -9,6 +9,7 @@ from . import dependencies
 #from . import preprocessing
 from . import simulations
 from . import tools
+from . import dynamic_actflow
 #from . import latent_connectivity
 
 __all__ = []
